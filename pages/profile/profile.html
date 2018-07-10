@@ -1,0 +1,48 @@
+<!--
+  Generated template for the ProfilePage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar color="rit">
+    <ion-title>Profile</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+
+  <ion-list no-lines>
+    <ion-item>
+      <div class="imgwrap">
+        <img src="assets/imgs/avatar-finn.png">
+        <h2>{{userName}}</h2>
+        <p>My grades have been really wonderful...</p>
+      </div>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+
+    <ion-item>
+      <ion-icon name="leaf" item-start></ion-icon>
+        My Feeds
+    </ion-item>
+    <ion-item>
+      <ion-icon name="book" item-start></ion-icon>
+        My Books
+    </ion-item>
+    <ion-item>
+      <ion-icon name="rose" item-start></ion-icon>
+      My Events
+    </ion-item>
+    <ion-item (click)="signOut()">
+      <ion-icon name="rose" item-start></ion-icon>
+      Logout
+    </ion-item>
+      
+  </ion-list>
+</ion-content>
