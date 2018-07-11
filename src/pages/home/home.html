@@ -1,0 +1,141 @@
+<ion-header>
+  <ion-toolbar color="rit">
+    <ion-title>RIT Dubai</ion-title>
+  </ion-toolbar>
+  
+</ion-header>
+
+
+<ion-content class="card-background-page">
+  <ion-grid>
+    <!--Row 2 of card buttons-->
+    <ion-row>
+      <ion-col>
+        <ion-card (click)="toEvents()" color="danger" class="myHeight">
+          <ion-icon name="calendar"></ion-icon>
+          <p>Events</p> 
+        </ion-card>
+      </ion-col>
+      <ion-col>
+        <ion-card color="primary" class="myHeight">
+          <ion-icon name="restaurant"></ion-icon>
+          <p>RIT Deals</p>  
+        </ion-card>
+      </ion-col>
+      <ion-col>
+          <ion-card color="secondary" class="myHeight">
+            <ion-icon name="people"></ion-icon>
+            <p>RIT Clubs</p> 
+          </ion-card>
+      </ion-col>
+    </ion-row>
+    <!--Row 2 of card buttons-->
+    <ion-row>
+      <ion-col>
+          <ion-card padding-right padding-left  color="rit" class="myHeight">
+            <ion-icon name="football"></ion-icon>
+            <p>RIT Athletics</p> 
+          </ion-card>
+      </ion-col>
+      <ion-col>
+          <ion-card  color="purple" class="myHeight">
+            <ion-icon name="bus"></ion-icon>
+            <p>Bus Schedules</p>  
+          </ion-card>
+      </ion-col>
+      <ion-col>
+          <ion-card  color="dark" class="myHeight">
+            <ion-icon name="school"></ion-icon>
+            <p>Faculty</p> 
+          </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <!--Card images for quick links-->
+  <ion-item-group>
+    <!--Student Life-->
+    <ion-item-divider color="light">Student Life</ion-item-divider>
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <ion-card>
+            <img src="assets/imgs/card-saopaolo.png"/>
+            <div (click)="openBrowser('https://mycourses.rit.edu')" class="card-title">My courses</div>
+          </ion-card>
+        </ion-col> 
+        <ion-col>
+            <ion-card>
+              <img src="assets/imgs/card-amsterdam.png"/>
+              <div (click)="openBrowser('https://sis.rit.edu')" class="card-title">SIS</div>
+            </ion-card>
+        </ion-col>  
+      </ion-row>
+      <ion-row>
+          <ion-col>
+            <ion-card>
+              <img src="assets/imgs/card-sf.png"/>
+              <div (click)="openBrowser('https://library.rit.edu')" class="card-title">Library</div>
+            </ion-card>
+          </ion-col> 
+            <ion-col>
+              <ion-card>
+                <img src="assets/imgs/card-madison.png"/>
+                <div class="card-title">Jobs</div>
+              </ion-card>
+            </ion-col>  
+      </ion-row>
+    </ion-grid>
+
+      <!--Campus Services-->
+      <ion-item-divider color="light">Campus Services</ion-item-divider>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <ion-card>
+              <img src="assets/imgs/card-saopaolo.png"/>
+              <div class="card-title">Admissions</div>
+            </ion-card>
+          </ion-col> 
+          <ion-col>
+              <ion-card>
+                <img src="assets/imgs/card-amsterdam.png"/>
+                <div class="card-title">IT</div>
+              </ion-card>
+          </ion-col>  
+        </ion-row>
+        <ion-row>
+            <ion-col>
+              <ion-card>
+                <img src="assets/imgs/card-sf.png"/>
+                <div class="card-title">Finance</div>
+              </ion-card>
+            </ion-col> 
+              <ion-col>
+                <ion-card>
+                  <img src="assets/imgs/card-madison.png"/>
+                  <div class="card-title">Academic Advising</div>
+                </ion-card>
+              </ion-col>  
+        </ion-row>
+      </ion-grid>
+    <!--Personal-->
+    <ion-item-divider color="light">Personal</ion-item-divider>
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <ion-card>
+            <img src="assets/imgs/card-saopaolo.png"/>
+            <div class="card-title">Groups</div>
+          </ion-card>
+        </ion-col> 
+        <ion-col>
+            <ion-card>
+              <img src="assets/imgs/card-amsterdam.png"/>
+              <div class="card-title">My Library</div>
+            </ion-card>
+        </ion-col>  
+      </ion-row>
+    </ion-grid>
+  </ion-item-group>
+  
+</ion-content>
