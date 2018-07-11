@@ -24,6 +24,7 @@ export class RegisterPage {
   public email: string;
   public password: string;
   public name:string;
+  public type:any;
 
 
   constructor(public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 

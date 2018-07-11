@@ -1,4 +1,4 @@
-import { NgModule, ErrorHandler } from '@angular/core';
+import { NgModule, ErrorHandler, Injectable, Injector } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { HttpClientModule } from '@angular/common/http';
@@ -24,6 +24,11 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { NgCalendarModule  } from 'ionic2-calendar';
 import { AngularFireModule } from 'angularfire2';
 import { UserserviceProvider } from '../providers/userservice/userservice';
+import { Pro } from '@ionic/pro';
+
+Pro.init('119FE586', {
+  appVersion: '0.0.1'
+})
 
 
 const firebase = {
@@ -81,4 +86,25 @@ const firebase = {
     UserserviceProvider
   ]
 })
-export class AppModule {}
+
+
+@Injectable()
+export class AppModule implements ErrorHandler {
+  ionicErrorHandler: IonicErrorHandler;
+
+  constructor(injector: Injector) {
+    try {
+      this.ionicErrorHandler = injector.get(IonicErrorHandler);
+    } catch(e) {
+      // Unable to get the IonicErrorHandler provider, ensure
+      // IonicErrorHandler has been added to the providers list below
+    }
+  }
+
+  handleError(err: any): void {
+    Pro.monitoring.handleNewError(err);
+    // Remove this if you want to disable Ionic's auto exception handling
+    // in development mode.
+    this.ionicErrorHandler && this.ionicErrorHandler.handleError(err);
+  }
+}

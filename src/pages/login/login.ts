@@ -23,7 +23,6 @@ export class LoginPage implements OnInit {
 
   constructor(public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
     public alertCtrl: AlertController,  public navCtrl: NavController, public navParams: NavParams) {
-      this.tabBarElement = document.querySelector('.tabbar.show-tabbar');
       var that =this
     
     this.usersService.fireAuth.authState.subscribe(user => {
@@ -79,6 +78,6 @@ export class LoginPage implements OnInit {
     }
   }
   forgotPassword(){
-    
+
   }
 }
