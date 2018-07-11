@@ -2,6 +2,7 @@ import { Component, OnInit} from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { TabsPage } from '../tabs/tabs';
+import { FormsModule }   from '@angular/forms';
 
 /**
  * Generated class for the LoginPage page.
@@ -20,9 +21,11 @@ export class LoginPage implements OnInit {
   public email: string;
   public password: string;
   public checkUser: void;
+  public hide:boolean;
 
   constructor(public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
     public alertCtrl: AlertController,  public navCtrl: NavController, public navParams: NavParams) {
+      this.hide=false;
       var that =this
     
     this.usersService.fireAuth.authState.subscribe(user => {
@@ -39,10 +42,13 @@ export class LoginPage implements OnInit {
 
   }
   
+  hideImg(){
+    this.hide =true;
+  }
   
 
   submitLogin(){
-    let ritemailend = this.email.slice(-8);//get the last 8 char of email
+    let ritemailend = this.email.trim().replace(/\s+/g, " ").slice(-8);//get the last 8 char of email
 
     //check if its an rit email ending with @rit.edu
     if(ritemailend!="@rit.edu"){
@@ -60,7 +66,7 @@ export class LoginPage implements OnInit {
         content: "Please wait..."
       });
       loader.present();
-      this.usersService.loginUserService(this.email, this.password).then(authData => {
+      this.usersService.loginUserService(this.email.trim().replace(/\s+/g, " "), this.password).then(authData => {
         //successful
         loader.dismiss();
         that.navCtrl.setRoot(TabsPage);

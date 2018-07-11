@@ -39,11 +39,11 @@ export class RegisterPage {
   submitLogin(){
     var   account = {
       fullName: this.name,
-      email: this.email,
+      email: this.email.trim().replace(/\s+/g, " "),
       profilePic: null
     };
     
-    let ritemailend = this.email.slice(-8);//get the last 8 char of email
+    let ritemailend = this.email.trim().replace(/\s+/g, " ").slice(-8);//get the last 8 char of email
 
     //check if its an rit email ending with @rit.edu
     if(ritemailend!="@rit.edu"){
