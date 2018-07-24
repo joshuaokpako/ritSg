@@ -1,0 +1,31 @@
+<!--
+  Generated template for the RitAthleticsPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar color="rit">
+    <ion-title>RIT Athletics</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+  <ion-list>
+    <div *ngFor="let athletic of athletics | async">
+      <ion-item (click)="toDetails(athletic.name, athletic.photo, athletic.about,'RIT Athletics' )" >
+          <ion-avatar item-start>
+              <img src="{{athletic.photo}}">
+          </ion-avatar>
+          <h2>{{athletic.name}}</h2>
+          <p>Hayao Miyazaki • 1988</p>
+          <p>{{athletic.about}}</p>
+          <button ion-button clear item-end>View</button>
+      </ion-item>
+    </div>
+  </ion-list>
+
+</ion-content>

@@ -1,3 +1,45 @@
 page-events {
+  .noEvents{
+    text-align: center;
+    padding:10px;
+  }
+    .myHeight{
+        height: 30px;
+        border-radius: 100%;
+        width: 30px;
+        margin:auto;
+    
+        
+      }
+      .myHeight p{
+        color: white;
+        text-align: center;
+        padding-top:7px;
+        font-size: 0.8em
+      }
 
+      .newNotification {
+        border-radius: 100%;
+        margin-left:auto;
+        margin-right: auto;
+        margin-bottom: 2px;
+        width:3px;
+        height: 3px;
+        border: 3px solid color($colors,primary);
+        
+      }
+
+      .myborder{
+        position: relative;
+        top: 7px;
+        background:color($colors,rit);
+        height: 3px;
+        width:100%;
+      }
+      ion-col{
+          width:100%;
+      }
+      ion-fab{
+        margin-bottom:93px;
+      }
 }

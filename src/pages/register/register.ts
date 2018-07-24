@@ -40,7 +40,7 @@ export class RegisterPage {
     var   account = {
       fullName: this.name,
       email: this.email.trim().replace(/\s+/g, " "),
-      profilePic: null
+      admin: "none"
     };
     
     let ritemailend = this.email.trim().replace(/\s+/g, " ").slice(-8);//get the last 8 char of email

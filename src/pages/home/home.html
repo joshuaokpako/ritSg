@@ -17,13 +17,13 @@
         </ion-card>
       </ion-col>
       <ion-col>
-        <ion-card color="primary" class="myHeight">
+        <ion-card (click)="toDeals()" color="primary" class="myHeight">
           <ion-icon name="restaurant"></ion-icon>
           <p>RIT Deals</p>  
         </ion-card>
       </ion-col>
       <ion-col>
-          <ion-card color="secondary" class="myHeight">
+          <ion-card (click)="toClubs()" color="secondary" class="myHeight">
             <ion-icon name="people"></ion-icon>
             <p>RIT Clubs</p> 
           </ion-card>
@@ -32,7 +32,7 @@
     <!--Row 2 of card buttons-->
     <ion-row>
       <ion-col>
-          <ion-card padding-right padding-left  color="rit" class="myHeight">
+          <ion-card (click)="toAthletics()" padding-right padding-left  color="rit" class="myHeight">
             <ion-icon name="football"></ion-icon>
             <p>RIT Athletics</p> 
           </ion-card>

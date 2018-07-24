@@ -19,6 +19,11 @@ import { CoverPage } from '../pages/cover/cover';
 import { RegisterPage } from '../pages/register/register';
 import { TabsPage } from '../pages/tabs/tabs';
 import { EventsPage } from '../pages/events/events';
+import { RitClubsPage } from '../pages/rit-clubs/rit-clubs';
+import { RitDealsPage } from '../pages/rit-deals/rit-deals';
+import { RitAthleticsPage } from '../pages/rit-athletics/rit-athletics';
+import { DetailsPage } from '../pages/details/details';
+import { AddEventPage } from '../pages/add-event/add-event';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -53,7 +58,12 @@ const firebase = {
     RegisterPage,
     TabsPage,
     ProfilePage,
-    EventsPage
+    EventsPage,
+    RitClubsPage,
+    RitDealsPage,
+    RitAthleticsPage,
+    DetailsPage,
+    AddEventPage
   ],
   imports: [
     NgCalendarModule,
@@ -78,7 +88,12 @@ const firebase = {
     RegisterPage,
     TabsPage,
     ProfilePage,
-    EventsPage
+    EventsPage,
+    RitClubsPage,
+    RitDealsPage,
+    RitAthleticsPage,
+    DetailsPage,
+    AddEventPage
   ],
   providers: [
     StatusBar,

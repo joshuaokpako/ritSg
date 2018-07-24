@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 export interface User{
   fullName:string;
   email:string;
-  profilePic:string;
+  admin:string;
 }
 
 var MyUserState:any = function (theuser) {
@@ -38,55 +38,65 @@ export class UserserviceProvider {
   public userEmail:any;
   public userPhotoUrl:any;
   public db:any;
+  public sgEvents;
+  public ritEvents;
  
-  usersCollection: AngularFirestoreCollection<User>;
-  item: Observable<User[]>;
+  private usersCollection: AngularFirestoreCollection<User>;
+  private eventsCollection: AngularFirestoreCollection<any>;
+  private clubsCollection: AngularFirestoreCollection<any>;
+  private dealsCollection: AngularFirestoreCollection<any>;
+  private athleticsCollection: AngularFirestoreCollection<any>;
+  events: Observable<any>;
+  clubs: Observable<any>;
+  deals: Observable<any>;
+  athletics: Observable<any>;
 
   constructor(public http: HttpClient,private firebaseauth:AngularFireAuth,private afs: AngularFirestore) {
-  this.fireAuth = this.firebaseauth;
-  this.fireAuth.authState.subscribe(user => {
-    if (user) {
-      this.userName = user.displayName;
-      this.userEmail = user.email;
-      this.userPhotoUrl = user.photoURL;
-
-      
-    } 
-    else {
-      
-    }
-  
-  })
-  
-  this.usersCollection = this.afs.collection<User>("users");
-
- 
-  
-  }
-
+    this.fireAuth = this.firebaseauth;
+    //get user data
+    this.usersCollection = this.afs.collection<User>("users");
+    // get clubs data
+    this.clubsCollection = this.afs.collection<any>("clubs");
+    this.clubs = this.clubsCollection.valueChanges();
+    // get deals data
+    this.dealsCollection = this.afs.collection<any>("RIT Deals");
+    this.deals = this.dealsCollection.valueChanges();
+    //get athletics data
+    this.athleticsCollection = this.afs.collection<any>("RIT Athletics");
+    this.athletics = this.athleticsCollection.valueChanges();
+    //get events data
+    this.eventsCollection = this.afs.collection<any>("events");
+    this.events = this.eventsCollection.valueChanges();
+    this.sgEvents= this.afs.collection<any>("events", ref => ref.where('type', '==', 'sg')).valueChanges();
+    
+    this.fireAuth.authState.subscribe(user => {
+      if (user) {
+        this.userName = user.displayName;
+        this.userEmail = user.email;
+        this.userPhotoUrl = user.photoURL;
+      } 
+    })
+}
 
   loginUserService(email: string, password: string): any {
     return this.fireAuth.auth.signInWithEmailAndPassword(email, password);
   }
 
 
-  signUpUserService(account: User, password){
-
+  signUpUserService(account:User, password){
     
         return this.fireAuth.auth.createUserWithEmailAndPassword(account['email'], password).then((newUser) => {
           //sign in the user
           this.fireAuth.auth.signInWithEmailAndPassword(account['email'], password).then((updateProfile) =>{
-          var cUser = this.fireAuth.auth.currentUser;
+            var cUser = this.fireAuth.auth.currentUser;
             cUser.updateProfile({
               displayName: account['fullName']
-            }).then(function() {
-              this.userName = account['fullName'];
-              // Update successful.
-            }).catch(function(error) {
-              // An error happened.
-            });
-          }
-          )
+              }).then((adduser) => {
+                this.usersCollection.add(account);
+              }).catch(function(error) {
+                console.log(error)
+              });
+          })
         });
 
   }

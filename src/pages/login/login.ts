@@ -21,11 +21,10 @@ export class LoginPage implements OnInit {
   public email: string;
   public password: string;
   public checkUser: void;
-  public hide:boolean;
+
 
   constructor(public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
     public alertCtrl: AlertController,  public navCtrl: NavController, public navParams: NavParams) {
-      this.hide=false;
       var that =this
     
     this.usersService.fireAuth.authState.subscribe(user => {
@@ -41,10 +40,7 @@ export class LoginPage implements OnInit {
   ngOnInit(){
 
   }
-  
-  hideImg(){
-    this.hide =true;
-  }
+
   
 
   submitLogin(){

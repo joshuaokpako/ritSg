@@ -5,38 +5,16 @@ page-login {
         width: 100%;
         background: linear-gradient(10deg,#f28a21 10%,#fff 90%);
     }
-    .head {
-        position: absolute;
-        display: block;
-        color: #f28a21;
-        top: 20%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 100%;
-    }
-    .bottom {
-        position: absolute;
-        display: block;
-        color: #f28a21;
-        top: 80%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 100%;
+  
+    .head{
+        margin-top: 40px;
+        margin-bottom: 20px;
     }
     .head h1 {
-        font-size: 7vh!important;
+        color: #f28a21;
+        font-size: 7vh !important;
         font-weight: lighter!important;
-        font-family: 'Pacifico', cursive;
-    }
-    .inputs {
-        position: absolute;
-        display: block;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 80%;
-        
-        
+        font-family: 'Pacifico', 'cursive';
     }
     ion-item {
        

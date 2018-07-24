@@ -19,26 +19,26 @@
 
 <ion-content padding text-center >
   
-  <div [hidden]="hide" class="head">
-      <h1>RITSg</h1>
+  <div class="head">
+      <h1>RIT Sg</h1>
   </div>
   <form #loginForm="ngForm">
-  <ion-list class="inputs">
+  <ion-list>
     <ion-item>
       <ion-label floating>Email</ion-label>
-      <ion-input (ionFocus)="hideImg()"  [(ngModel)]="email" name="email" class="form-control" type="text" #useremail="ngModel"></ion-input>
+      <ion-input [(ngModel)]="email" name="email" class="form-control" type="text" #useremail="ngModel"></ion-input>
     </ion-item>
     
     <ion-item>
       <ion-label floating>Password</ion-label>
-      <ion-input (ionFocus)="hideImg()" [(ngModel)]="password" name="password" type="password" #userpassword></ion-input>
+      <ion-input [(ngModel)]="password" name="password" type="password" #userpassword></ion-input>
       
     </ion-item>
        <!-- Show dead button if form is not filled -->
        <!--<button *ngIf= ion-button color="danger" clear round>Login Now</button>-->
     
   </ion-list>
-  <div class="bottom">
+  <div>
     <div text-center padding>
       <button [disabled]="!email || !password" ion-button color="rit"  block (click)="submitLogin()">Login</button>
       <button ion-button color="primary" block clear (click)="forgotPassword()">Forgot Password</button>
