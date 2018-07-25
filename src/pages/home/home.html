@@ -58,23 +58,23 @@
     <ion-grid>
       <ion-row>
         <ion-col>
-          <ion-card>
+          <ion-card (click)="openBrowser('https://mycourses.rit.edu')">
             <img src="assets/imgs/card-saopaolo.png"/>
-            <div (click)="openBrowser('https://mycourses.rit.edu')" class="card-title">My courses</div>
+            <div  class="card-title">My courses</div>
           </ion-card>
         </ion-col> 
         <ion-col>
-            <ion-card>
+            <ion-card (click)="openBrowser('https://sis.rit.edu')">
               <img src="assets/imgs/card-amsterdam.png"/>
-              <div (click)="openBrowser('https://sis.rit.edu')" class="card-title">SIS</div>
+              <div class="card-title">SIS</div>
             </ion-card>
         </ion-col>  
       </ion-row>
       <ion-row>
           <ion-col>
-            <ion-card>
+            <ion-card (click)="openBrowser('https://library.rit.edu')">
               <img src="assets/imgs/card-sf.png"/>
-              <div (click)="openBrowser('https://library.rit.edu')" class="card-title">Library</div>
+              <div class="card-title">Library</div>
             </ion-card>
           </ion-col> 
             <ion-col>

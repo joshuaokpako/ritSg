@@ -2,7 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable} from '@angular/core';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection} from 'angularfire2/firestore';
+import { AngularFireStorage} from 'angularfire2/storage'
 import { Observable } from 'rxjs';
+import * as moment from 'moment';
+import * as momentTz from 'moment-timezone'
 
 export interface User{
   fullName:string;
@@ -40,7 +43,8 @@ export class UserserviceProvider {
   public db:any;
   public sgEvents;
   public ritEvents;
- 
+  public uid:string;
+
   private usersCollection: AngularFirestoreCollection<User>;
   private eventsCollection: AngularFirestoreCollection<any>;
   private clubsCollection: AngularFirestoreCollection<any>;
@@ -50,8 +54,9 @@ export class UserserviceProvider {
   clubs: Observable<any>;
   deals: Observable<any>;
   athletics: Observable<any>;
+  
 
-  constructor(public http: HttpClient,private firebaseauth:AngularFireAuth,private afs: AngularFirestore) {
+  constructor(private storage: AngularFireStorage,public http: HttpClient,private firebaseauth:AngularFireAuth,private afs: AngularFirestore) {
     this.fireAuth = this.firebaseauth;
     //get user data
     this.usersCollection = this.afs.collection<User>("users");
@@ -74,6 +79,7 @@ export class UserserviceProvider {
         this.userName = user.displayName;
         this.userEmail = user.email;
         this.userPhotoUrl = user.photoURL;
+        this.uid =user.uid;
       } 
     })
 }
@@ -105,7 +111,27 @@ export class UserserviceProvider {
     return this.fireAuth.auth.signOut();
   }
  
+  uploadImages(filePath){
+    return this.storage.ref(filePath)
+  }
 
-
-
+  addEvent(eventType,title,description,img,eventDate){
+    let now =momentTz(moment(),'Asia/Dubai').format('MMMM Do YYYY, h:mm:ss a');
+    console.log(now)
+    let event={
+      description: description,
+      eventDate: eventDate,
+      likes:"",
+      postDetails:{
+        postTime: now,
+        postedById:this.uid,
+        postedByName:this.userName ,
+        postedByPhotoUrl:this.userPhotoUrl
+      },
+      postImg:img,
+      title:title,
+      type:eventType
+    }
+   return this.eventsCollection.add(event)
+  }
 }

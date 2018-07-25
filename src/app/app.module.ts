@@ -2,7 +2,10 @@ import { NgModule, ErrorHandler, Injectable, Injector } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { HttpClientModule } from '@angular/common/http';
+
 import { InAppBrowser } from '@ionic-native/in-app-browser';
+import { ImagePicker } from '@ionic-native/image-picker';
+
 import { MyApp } from './app.component';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AngularFireStorageModule } from 'angularfire2/storage';
@@ -99,6 +102,7 @@ const firebase = {
     StatusBar,
     SplashScreen,
     InAppBrowser,
+    ImagePicker,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     UserserviceProvider
   ]

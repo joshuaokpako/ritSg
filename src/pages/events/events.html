@@ -14,15 +14,17 @@
 
 
 <ion-content>
-  <ion-fab bottom right edge>
-    <button color="danger" ion-fab mini (click)="addEventModal(eventHeaderName)"><ion-icon name="add"></ion-icon></button>
-  </ion-fab>
-  <!--Show when there are no events-->
+<!--Show fab when there are SG events-->
+    <ion-fab bottom right edge *ngIf="eventHeaderName =='SG Events'">
+      <button color="danger" ion-fab mini (click)="addEventModal(eventHeaderName)"><ion-icon name="add"></ion-icon></button>
+    </ion-fab>
+<!--SG events-->
   <div *ngIf="eventHeaderName =='SG Events'">
+    <!--Show when there are no events-->
     <p class="noEvents" [hidden]="sgEvents">
       Sorry there are no events right now 
     </p>
-    <!--SG events-->
+    <!--Show when there are SG events-->
     <ion-card *ngFor="let sgEv of sgEvents | async">
         <ion-item>
           <ion-avatar item-start>
@@ -100,8 +102,10 @@
             
             </ion-card>
           </div>
-  
-    <ion-footer>
+
+</ion-content>
+
+<ion-footer>
         <ion-toolbar>
           <ion-grid>
             <ion-row>
@@ -160,5 +164,3 @@
           </ion-grid>
         </ion-toolbar>
       </ion-footer>
-
-</ion-content>

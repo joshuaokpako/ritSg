@@ -20,5 +20,42 @@
 
 
 <ion-content padding>
-
+  <ion-list>
+    <ion-item>
+    <ion-label stacked>Enter title</ion-label>
+      <ion-input [(ngModel)]="title" name="title" class="form-control" type="text"></ion-input>
+    </ion-item>
+    <ion-item>
+    <ion-label stacked>Event Date</ion-label>
+    <ion-datetime displayFormat="MM/DD/YYYY" [(ngModel)]="myDate"></ion-datetime>
+    </ion-item>
+    <ion-item>
+    <ion-label stacked>Event Time</ion-label>
+    <ion-datetime displayFormat="hh:mm A" [(ngModel)]="myTime"></ion-datetime>
+    </ion-item>
+    <ion-item>
+    <ion-label stacked>Enter a description</ion-label>
+      <ion-textarea [(ngModel)]="description"></ion-textarea>
+    </ion-item>
+    
+  </ion-list>
+  <p text-center>
+    <button color="secondary" round ion-button>
+    <ion-icon name="camera"></ion-icon>
+    </button>
+  </p>
+  <p text-center>
+    OR
+  </p>
+<button block color="dark" outline ion-button (click)="pickImage()">
+  Add Image from Gallery
+</button>
+<ion-card *ngIf="previewImg">
+<img src="{{previewImg}}">
+</ion-card>
+<p text-center>
+<button round [disabled]="title ==''|| description =='' || previewImg=='' || myDate==''|| myTime =='' " color="secondary" ion-button (click)="addEvent(header)">
+  Add Event
+</button>
+</p>
 </ion-content>

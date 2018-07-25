@@ -16,8 +16,7 @@ export class HomePage {
 
   }
   openBrowser(link){
-    console.log("working")
-    const browser = this.iab.create(link);
+    const browser = this.iab.create(link,'_blank', 'location=yes,hideurlbar=yes,toolbarcolor=#F36E21');
     browser.show()
   }
   
