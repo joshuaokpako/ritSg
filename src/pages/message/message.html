@@ -1,0 +1,56 @@
+<!--
+  Generated template for the MessagePage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar color="rit">
+      <img class="roundImg" src="{{data.photoUrl}}" width="40px" style="display:inline-block" height="40px"/>
+      <ion-title class="titleicon" style="display:inline-block" >{{data.name}}</ion-title>
+  </ion-navbar>
+  
+ 
+</ion-header>
+
+
+<ion-content>
+  <div class="body">
+      <div *ngIf="(chats |async) != '' && user != '';">
+          <ion-list>
+            <ion-item no-lines  *ngFor="let chat of chats | async">
+              <div class="chat-message" text-right *ngIf="chat.uid == user.uid">
+                <div class="right-bubble">
+                  <span class="msg-name">Me</span>
+                  <span class="msg-date"> {{chat.postTime.seconds * 1000 | date:'shortTime'}}</span>
+                  <p text-wrap>{{chat.message}}</p>
+                </div>
+              </div>
+              <div class="chat-message" text-left *ngIf="chat.uid != user.uid">
+                <div class="left-bubble">
+                  <span class="msg-name">{{chat.sentBy}}</span>
+                  <span class="msg-date"> {{chat.postTime.seconds * 1000 | date:'shortTime'}}</span>
+                  <p text-wrap>{{chat.message}}</p>
+                </div>
+              </div> 
+            </ion-item>
+          </ion-list>
+         
+        </div>
+  </div>
+  
+</ion-content>
+
+<ion-footer>
+    <ion-grid>
+      <ion-row>
+        <ion-col col-10>
+          <ion-input type="text" [(ngModel)]=data.message placeholder="Type a message"  name="message"></ion-input>
+        </ion-col>
+        <ion-col col-2 (click)="sendMessage()">
+          <ion-icon item-end color="secondary" name="paper-plane"></ion-icon>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-footer>

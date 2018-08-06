@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
-import {IonicPage, NavController, NavParams } from 'ionic-angular';
+import { Component, OnInit } from '@angular/core';
+import {IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
 import { DetailsPage } from '../details/details';
+import { map, flatMap, filter } from 'rxjs/operators';
+import { AddpagePage } from '../addpage/addpage';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 
 /**
@@ -15,34 +17,48 @@ import { UserserviceProvider } from '../../providers/userservice/userservice';
   templateUrl: 'rit-deals.html',
   providers: [UserserviceProvider]
 })
-export class RitDealsPage {
-  tabBarElement:any;
+export class RitDealsPage implements OnInit {
   public deals:any;
+  subscription:any;
+  public user;
 
-  constructor(public uS:UserserviceProvider, public navCtrl: NavController, public navParams: NavParams) {
-    this.tabBarElement = document.querySelector('.tabbar.show-tabbar');
+  constructor(public uS:UserserviceProvider, public navCtrl: NavController, public navParams: NavParams,public modalCtrl: ModalController) {
+    this.user="";
     this.deals = this.uS.deals;
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad RitDealsPage');
   }
-  
-  ionViewWillEnter() {
-    this.tabBarElement.style.display = 'none';
+  ngOnInit(){
+    this.subscription = this.uS.user.pipe(map((user:any)=>{
+        return user     
+    })).subscribe(x=>this.user=x )
+
   }
- 
-  ionViewWillLeave() {
-    this.tabBarElement.style.display = 'flex';
+
+  ngOnDestroy() { 
+   if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
-  toDetails(headerName,photo,about, deal, headerType){
+  toDetails(headerName,photo,about, deal , location, headerType){
+    console.log(location)
     let dealsObj = {
       header: headerName, 
       pic:photo,
       about: about,
       deal : deal,
-      type: headerType
+      type: headerType,
+      location: location
     }
     this.navCtrl.push(DetailsPage,dealsObj)
+  }
+  addGroupModal(header){
+    let addObj ={
+      header:  header
+    }
+    let modal = this.modalCtrl.create(AddpagePage,addObj)
+    modal.present()
   }
 }

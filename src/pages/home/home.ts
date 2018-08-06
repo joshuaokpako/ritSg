@@ -5,6 +5,8 @@ import { EventsPage } from '../events/events';
 import { RitClubsPage } from '../rit-clubs/rit-clubs';
 import { RitDealsPage } from '../rit-deals/rit-deals';
 import { RitAthleticsPage } from '../rit-athletics/rit-athletics';
+import { TransportationPage } from '../transportation/transportation';
+import { FacultyPage } from '../faculty/faculty';
 
 @Component({
   selector: 'page-home',
@@ -34,5 +36,11 @@ export class HomePage {
 
   toAthletics(){
     this.navCtrl.push(RitAthleticsPage)
+  }
+  toFaculty(){
+    this.navCtrl.push(FacultyPage)
+  }
+  toTransportation(){
+    this.navCtrl.push(TransportationPage)
   }
 }

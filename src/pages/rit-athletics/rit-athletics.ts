@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { Component, OnInit } from '@angular/core';
+import { IonicPage, NavController, NavParams,ModalController } from 'ionic-angular';
 import { DetailsPage } from '../details/details';
+import { map, flatMap, filter } from 'rxjs/operators';
+import { AddpagePage } from '../addpage/addpage';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 
 /**
@@ -16,26 +18,36 @@ import { UserserviceProvider } from '../../providers/userservice/userservice';
   templateUrl: 'rit-athletics.html',
   providers: [UserserviceProvider]
 })
-export class RitAthleticsPage {
+export class RitAthleticsPage implements OnInit {
   public athletics:any;
-  public tabBarElement:any;
+  public user;
+  subscription;
 
-  constructor(public uS:UserserviceProvider,public navCtrl: NavController, public navParams: NavParams) {
-    this.tabBarElement = document.querySelector('.tabbar.show-tabbar');
+  constructor(public uS:UserserviceProvider,public navCtrl: NavController, public navParams: NavParams,public modalCtrl: ModalController) {
+    this.user= "";
     this.athletics = this.uS.athletics
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad RitAthleticsPage');
+  
+  ngOnInit(){
+    this.subscription = this.uS.user.pipe(map((user:any)=>{
+      return user     
+    })).subscribe(x=>this.user=x )
+
+
   }
 
-  ionViewWillEnter() {
-    this.tabBarElement.style.display = 'none';
+  ngOnDestroy() { 
+   if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
- 
-  ionViewWillLeave() {
-    this.tabBarElement.style.display = 'flex';
+
+  ionViewDidLoad() {
+   
   }
+
+  
 
   toDetails(headerName,photo,about,pageType){
     let clubsObj = {
@@ -45,5 +57,12 @@ export class RitAthleticsPage {
       type: pageType
     }
     this.navCtrl.push(DetailsPage,clubsObj)
+  }
+  addEventModal(header){
+    let addObj ={
+      header:  header
+    }
+    let modal = this.modalCtrl.create(AddpagePage,addObj)
+    modal.present()
   }
 }

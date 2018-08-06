@@ -27,7 +27,7 @@
     </ion-item>
     <ion-item>
     <ion-label stacked>Event Date</ion-label>
-    <ion-datetime displayFormat="MM/DD/YYYY" [(ngModel)]="myDate"></ion-datetime>
+    <ion-datetime displayFormat=" DD MMMM YYYY" [(ngModel)]="myDate"></ion-datetime>
     </ion-item>
     <ion-item>
     <ion-label stacked>Event Time</ion-label>
@@ -52,6 +52,7 @@
 </button>
 <ion-card *ngIf="previewImg">
 <img src="{{previewImg}}">
+<p>{{previewImg | json}}</p>
 </ion-card>
 <p text-center>
 <button round [disabled]="title ==''|| description =='' || previewImg=='' || myDate==''|| myTime =='' " color="secondary" ion-button (click)="addEvent(header)">

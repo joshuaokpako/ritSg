@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, ModalController, AlertController } from 'ionic-angular';
+import { PlannerModalPage } from '../planner-modal/planner-modal';
 import * as moment from 'moment';
 
 @Component({
@@ -19,7 +20,7 @@ export class PlannerPage {
   constructor(public navCtrl: NavController, private modalCtrl: ModalController, private alertCtrl: AlertController) { }
  
   addEvent() {
-    let modal = this.modalCtrl.create('EventModalPage', {selectedDay: this.selectedDay});
+    let modal = this.modalCtrl.create(PlannerModalPage, {selectedDay: this.selectedDay});
     modal.present();
     modal.onDidDismiss(data => {
       if (data) {

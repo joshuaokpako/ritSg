@@ -14,9 +14,12 @@
   
 
 <ion-content>
+    <ion-fab bottom right edge>
+        <button [hidden]="user.admin!='main'&& user.admin!='RIT'" color="danger" ion-fab mini (click)="addGroupModal('RIT Deals')"><ion-icon name="add"></ion-icon></button>
+    </ion-fab>
     <ion-list>
       <div *ngFor="let deal of deals | async">
-        <ion-item (click)="toDetails(deal.name, deal.img, deal.about, deal.deal,'RIT Deals')" >
+        <ion-item (click)="toDetails(deal.name, deal.img, deal.about, deal.deal, deal.location,'RIT Deals')" >
           <ion-thumbnail item-start>
             <img src="{{deal.img}}">
           </ion-thumbnail>

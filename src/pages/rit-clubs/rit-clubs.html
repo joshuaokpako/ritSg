@@ -14,6 +14,9 @@
 
 
 <ion-content>
+    <ion-fab bottom right edge>
+        <button [hidden]="user.admin!='main'&& user.SG!=true" color="danger" ion-fab mini (click)="addGroupModal('RIT Clubs')"><ion-icon name="add"></ion-icon></button>
+      </ion-fab>
     <ion-list>
       <div *ngFor="let club of clubs | async">
         <ion-item (click)="toDetails(club.name, club.clubPhoto, club.about,'RIT Clubs' )" >

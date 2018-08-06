@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { IonicPage, NavController, NavParams,LoadingController,ModalController } from 'ionic-angular';
 import { AddEventPage } from '../add-event/add-event';
+import { map, flatMap, filter } from 'rxjs/operators';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 
 /**
@@ -16,25 +17,68 @@ import { UserserviceProvider } from '../../providers/userservice/userservice';
   templateUrl: 'events.html',
   providers: [UserserviceProvider]
 })
-export class EventsPage {
+export class EventsPage implements OnInit {
   public eventHeaderName:string;
   tabBarElement:any;
   public sgEvents:any;
+  public ritEvents;
+  public comHEvents;
+  public otherEvents;
+  public sugEvents;
   public loading:any;
+  public user;
+  subscription;
 
   constructor(public modalCtrl: ModalController,public loadingCtrl: LoadingController,public navCtrl: NavController, 
     public navParams: NavParams,public uS: UserserviceProvider) {
     this.tabBarElement = document.querySelector('.tabbar.show-tabbar');
     this.eventHeaderName = "SG Events";
-    this.loading = this.loadingCtrl.create({
-      content: 'Loading...',
-      showBackdrop: false
-    });
-    this.loading.present()
-    this.showEvents("SG Events");
-    
+    this.user= "";
+      
   }
   
+  ngOnInit(){
+    this.subscription = this.uS.user.pipe(map((user:any)=>{
+     if (user.groupAdmin){
+        user.groupAdmin.forEach(element => {
+          switch (element) {
+            case "SG":
+              user.SG=true
+              break;
+            default:
+              console.log("didn't work")
+              break;
+            }
+        });
+        
+      }
+      return user    
+    })).subscribe(x=>this.user=x )
+
+    this.showEvents("SG Events");
+  }
+
+  ngOnDestroy() { 
+   if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  
+  }
+
+  presentLoader(toggle){
+    
+    if (toggle ==true){
+      this.loading = this.loadingCtrl.create({
+        content: 'Loading...',
+        showBackdrop: false
+      });
+      this.loading.present()
+    }
+    else{
+      this.loading.dismiss();
+    }
+
+  }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad EventsPage');
@@ -51,18 +95,37 @@ export class EventsPage {
   showEvents(name){
     switch (name) {
       case "SG Events":
-        this.sgEvents = this.uS.sgEvents;
-        this.loading.dismiss()
+        this.sgEvents = this.uS.sgEvents.pipe(map((event:any)=>{
+          return event.sort(function(a, b){return b.postTime.seconds - a.postTime.seconds})
+        }))
+        break;
+      case "RIT Events":
+        this.ritEvents = this.uS.ritEvents.pipe(map((event:any)=>{
+          return event.sort(function(a, b){return b.postTime.seconds - a.postTime.seconds})
+        }))
+        break;
+      case "Common Hour Events":
+        this.comHEvents = this.uS.comHEvents.pipe(map((event:any)=>{
+          return event.sort(function(a, b){return b.postTime.seconds - a.postTime.seconds})
+        }))
+        break;
+      case "Other Events":
+        this.otherEvents = this.uS.otherEvents.pipe(map((event:any)=>{
+          return event.sort(function(a, b){return b.postTime.seconds - a.postTime.seconds})
+        }))
+        break;
+      case "Suggested Events":
+        this.sugEvents = this.uS.sugEvents.pipe(map((event:any)=>{
+          return event.sort(function(a, b){return b.postTime.seconds - a.postTime.seconds})
+        }))
         break;
     
       default:
-        this.loading.dismiss()
         break;
     }
     this.eventHeaderName = name;
   }
   addEventModal(header){
-    console.log(header)
     let addObj ={
       header:  header
     }

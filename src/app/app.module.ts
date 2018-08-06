@@ -5,6 +5,12 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { InAppBrowser } from '@ionic-native/in-app-browser';
 import { ImagePicker } from '@ionic-native/image-picker';
+import { StatusBar } from '@ionic-native/status-bar';
+import { SplashScreen } from '@ionic-native/splash-screen';
+import { GoogleMaps } from "@ionic-native/google-maps";
+import { Geolocation } from '@ionic-native/geolocation';
+import { Camera } from '@ionic-native/camera';
+import { Base64 } from '@ionic-native/base64';
 
 import { MyApp } from './app.component';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
@@ -27,13 +33,19 @@ import { RitDealsPage } from '../pages/rit-deals/rit-deals';
 import { RitAthleticsPage } from '../pages/rit-athletics/rit-athletics';
 import { DetailsPage } from '../pages/details/details';
 import { AddEventPage } from '../pages/add-event/add-event';
+import { FacultyPage } from '../pages/faculty/faculty';
+import { TransportationPage } from '../pages/transportation/transportation';
+import { AddpagePage } from '../pages/addpage/addpage';
+import { PlannerModalPage } from '../pages/planner-modal/planner-modal';
+import { AddChatPage } from '../pages/add-chat/add-chat';
+import { MessagePage } from '../pages/message/message';
 
-import { StatusBar } from '@ionic-native/status-bar';
-import { SplashScreen } from '@ionic-native/splash-screen';
 import { NgCalendarModule  } from 'ionic2-calendar';
 import { AngularFireModule } from 'angularfire2';
 import { UserserviceProvider } from '../providers/userservice/userservice';
 import { Pro } from '@ionic/pro';
+import { ChatServiceProvider } from '../providers/chat-service/chat-service';
+import {FilterPipe} from '../pipes/filter/filter'
 
 Pro.init('119FE586', {
   appVersion: '0.0.1'
@@ -66,7 +78,14 @@ const firebase = {
     RitDealsPage,
     RitAthleticsPage,
     DetailsPage,
-    AddEventPage
+    AddEventPage,
+    AddpagePage,
+    FacultyPage,
+    TransportationPage,
+    PlannerModalPage,
+    AddChatPage,
+    FilterPipe,
+    MessagePage
   ],
   imports: [
     NgCalendarModule,
@@ -96,15 +115,26 @@ const firebase = {
     RitDealsPage,
     RitAthleticsPage,
     DetailsPage,
-    AddEventPage
+    AddEventPage,
+    AddpagePage,
+    FacultyPage,
+    TransportationPage,
+    PlannerModalPage,
+    AddChatPage,
+    MessagePage
   ],
   providers: [
     StatusBar,
     SplashScreen,
     InAppBrowser,
     ImagePicker,
+    Geolocation,
+    GoogleMaps,
+    Camera,
+    Base64,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    UserserviceProvider
+    UserserviceProvider,
+    ChatServiceProvider
   ]
 })
 
