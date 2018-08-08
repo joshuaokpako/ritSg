@@ -1,13 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NavController, ModalController, AlertController } from 'ionic-angular';
 import { PlannerModalPage } from '../planner-modal/planner-modal';
+import { UserserviceProvider } from '../../providers/userservice/userservice';
 import * as moment from 'moment';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'page-planner',
   templateUrl: 'planner.html'
 })
-export class PlannerPage {
+export class PlannerPage implements OnInit{
   eventSource = [];
   viewTitle: string;
   selectedDay = new Date();
@@ -17,26 +19,33 @@ export class PlannerPage {
     currentDate: new Date()
   };
   
-  constructor(public navCtrl: NavController, private modalCtrl: ModalController, private alertCtrl: AlertController) { }
+  constructor(public uS:UserserviceProvider, public navCtrl: NavController, private modalCtrl: ModalController, private alertCtrl: AlertController) { 
+    
+    
+  }
  
+  ngOnInit(){
+    this.uS.getMyEvents()
+    .pipe(
+      map((ev:any)=>{
+        ev.forEach(e => {
+          console.log(e.startTime)
+          e.startTime =  new Date(e.startTime);
+          e.endTime = new Date(e.endTime);
+        }); 
+       
+        return ev
+      })
+    ).subscribe((ev:any)=>{
+     
+      this.eventSource = ev;
+    })
+  }
+
   addEvent() {
     let modal = this.modalCtrl.create(PlannerModalPage, {selectedDay: this.selectedDay});
     modal.present();
-    modal.onDidDismiss(data => {
-      if (data) {
-        let eventData = data;
- 
-        eventData.startTime = new Date(data.startTime);
-        eventData.endTime = new Date(data.endTime);
- 
-        let events = this.eventSource;
-        events.push(eventData);
-        this.eventSource = [];
-        setTimeout(() => {
-          this.eventSource = events;
-        });
-      }
-    });
+   
   }
  
   onViewTitleChanged(title) {

@@ -31,7 +31,7 @@
       </ion-item>
     </ion-list>
    
-    <button ion-button full icon-left (click)="save()">
+    <button [disabled]="event.title ==''" ion-button full icon-left (click)="save()">
       <ion-icon name="checkmark"></ion-icon> Add Event
     </button>
   </ion-content>

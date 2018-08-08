@@ -23,11 +23,12 @@
         <ion-spinner color="rit" name="crescent"></ion-spinner>
       </p>
     <div *ngIf="(chats |async) != ''; else noChats" >
+     
       <ion-item *ngFor="let chat of chats | async" (click)="goToMessage(chat.name,chat.photoUrl,chat.uid)">
         <ion-avatar item-start>
-          <img src="{{chat.photoUrl}}">
+          <img *ngIf="(chat.userRef | doc | async)?.photoUrl" src="{{(chat.userRef | doc | async)?.photoUrl}}">
         </ion-avatar>
-        <h2>{{chat.name}}</h2>
+        <h2>{{(chat.userRef | doc | async)?.fullName}}</h2>
         <p>{{chat.lastMessage}}</p>
       </ion-item>
     </div>

@@ -7,33 +7,34 @@
 <ion-header>
 
   <ion-navbar color="rit">
-      <img class="roundImg" src="{{data.photoUrl}}" width="40px" style="display:inline-block" height="40px"/>
-      <ion-title class="titleicon" style="display:inline-block" >{{data.name}}</ion-title>
+      <img class="roundImg" *ngIf="receiver | async as rec" src="{{rec.photoUrl}}" width="40px" style="display:inline-block" height="40px"/>
+      <ion-title class="titleicon" *ngIf="receiver | async as rec" style="display:inline-block" >{{rec.fullName}}</ion-title>
   </ion-navbar>
   
  
 </ion-header>
 
 
-<ion-content>
-  <div class="body">
+<ion-content class="body">
+  <div >
       <div *ngIf="(chats |async) != '' && user != '';">
           <ion-list>
-            <ion-item no-lines  *ngFor="let chat of chats | async">
+            <ion-item no-lines  *ngFor="let chat of chats | async; let last = last">
               <div class="chat-message" text-right *ngIf="chat.uid == user.uid">
                 <div class="right-bubble">
                   <span class="msg-name">Me</span>
-                  <span class="msg-date"> {{chat.postTime.seconds * 1000 | date:'shortTime'}}</span>
+                  <span class="msg-date"> {{(chat.postTime)?.seconds * 1000 | date:'shortTime'}}</span>
                   <p text-wrap>{{chat.message}}</p>
                 </div>
               </div>
               <div class="chat-message" text-left *ngIf="chat.uid != user.uid">
                 <div class="left-bubble">
-                  <span class="msg-name">{{chat.sentBy}}</span>
-                  <span class="msg-date"> {{chat.postTime.seconds * 1000 | date:'shortTime'}}</span>
+                  <span class ="msg-name" *ngIf="receiver | async as rec">{{rec.fullName}}</span>
+                  <span class="msg-date"> {{(chat.postTime)?.seconds * 1000 | date:'shortTime'}}</span>
                   <p text-wrap>{{chat.message}}</p>
                 </div>
-              </div> 
+              </div>
+              {{last ? toBottom() : ''}} 
             </ion-item>
           </ion-list>
          
@@ -46,7 +47,7 @@
     <ion-grid>
       <ion-row>
         <ion-col col-10>
-          <ion-input type="text" [(ngModel)]=data.message placeholder="Type a message"  name="message"></ion-input>
+          <ion-input type="text" [(ngModel)]=message placeholder="Type a message"  name="message"></ion-input>
         </ion-col>
         <ion-col col-2 (click)="sendMessage()">
           <ion-icon item-end color="secondary" name="paper-plane"></ion-icon>

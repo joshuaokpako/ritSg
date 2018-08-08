@@ -45,7 +45,9 @@ import { AngularFireModule } from 'angularfire2';
 import { UserserviceProvider } from '../providers/userservice/userservice';
 import { Pro } from '@ionic/pro';
 import { ChatServiceProvider } from '../providers/chat-service/chat-service';
-import {FilterPipe} from '../pipes/filter/filter'
+import {FilterPipe} from '../pipes/filter/filter';
+import {DocPipe} from '../pipes/doc/doc'
+import { FirestoreProvider } from '../providers/firestore/firestore';
 
 Pro.init('119FE586', {
   appVersion: '0.0.1'
@@ -85,6 +87,7 @@ const firebase = {
     PlannerModalPage,
     AddChatPage,
     FilterPipe,
+    DocPipe,
     MessagePage
   ],
   imports: [
@@ -134,7 +137,8 @@ const firebase = {
     Base64,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     UserserviceProvider,
-    ChatServiceProvider
+    ChatServiceProvider,
+    FirestoreProvider
   ]
 })
 

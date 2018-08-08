@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, ViewController } from 'ionic-angular';
+import { NavController, NavParams, ViewController, AlertController } from 'ionic-angular';
+import { UserserviceProvider } from '../../providers/userservice/userservice';
 import * as moment from 'moment';
  
 @Component({
@@ -9,13 +10,14 @@ import * as moment from 'moment';
 export class PlannerModalPage {
 
  
-  event = { startTime: new Date().toISOString(), endTime: new Date().toISOString(), allDay: false };
+  event = { startTime: new Date().toISOString(), endTime: new Date().toISOString(), allDay: false, title:"" };
   minDate = new Date().toISOString();
  
-  constructor(public navCtrl: NavController, private navParams: NavParams, public viewCtrl: ViewController) {
-    let preselectedDate = moment(this.navParams.get('selectedDay')).format();
-    this.event.startTime = preselectedDate;
-    this.event.endTime = preselectedDate;
+  constructor(public uS:UserserviceProvider, public navCtrl: NavController, private navParams: NavParams, public viewCtrl: ViewController,private alertCtrl: AlertController) {
+    let preselectedDate = moment(this.navParams.get('selectedDay'))
+    this.event.startTime = preselectedDate.format();
+    this.event.endTime = preselectedDate.add(1, 'hours').format();
+     
   }
  
   cancel() {
@@ -23,7 +25,19 @@ export class PlannerModalPage {
   }
  
   save() {
-    this.viewCtrl.dismiss(this.event);
+    if(moment(this.event.endTime).isSameOrBefore(this.event.startTime)){
+      let alert = this.alertCtrl.create({
+        title: 'Change End Date',
+        subTitle:'Start time is greater than or same as end time',
+        buttons: ['OK']
+      })
+      alert.present();
+
+    }
+    else{
+      this.uS.saveMyEvents(this.event).then(()=>this.viewCtrl.dismiss())
+    }
+    
   }
  
 }
