@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicPage, NavController, NavParams,LoadingController,ModalController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams,LoadingController,ModalController, AlertController } from 'ionic-angular';
 import { AddEventPage } from '../add-event/add-event';
-import { map, flatMap, filter } from 'rxjs/operators';
+import { map} from 'rxjs/operators';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
+import { Observable } from 'rxjs';
+import { FeedbackPage } from '../feedback/feedback';
 
 /**
  * Generated class for the EventsPage page.
@@ -20,20 +22,22 @@ import { UserserviceProvider } from '../../providers/userservice/userservice';
 export class EventsPage implements OnInit {
   public eventHeaderName:string;
   tabBarElement:any;
-  public sgEvents:any;
+  public sgEvents:Observable<any>;
   public ritEvents;
   public comHEvents;
   public otherEvents;
   public sugEvents;
   public loading:any;
   public user;
+  public youGoing;
   subscription;
 
   constructor(public modalCtrl: ModalController,public loadingCtrl: LoadingController,public navCtrl: NavController, 
-    public navParams: NavParams,public uS: UserserviceProvider) {
+    public navParams: NavParams,public uS: UserserviceProvider,private alertCtrl: AlertController) {
     this.tabBarElement = document.querySelector('.tabbar.show-tabbar');
     this.eventHeaderName = "SG Events";
-    this.user= "";
+    this.user= ""
+    this.youGoing =false;
       
   }
   
@@ -64,7 +68,26 @@ export class EventsPage implements OnInit {
     }
   
   }
-
+  going(event){
+    if(event.price==''){
+      if(event.youGoing==true){
+        event.going = event.going.filter((going)=> {return going.path!=this.uS.userRef.path})
+      this.uS.updateEventGoing(event)
+      }
+      else{
+        event.going.push(this.uS.userRef)
+        this.uS.updateEventGoing(event)
+      }
+    }
+    else{
+      let alert = this.alertCtrl.create({
+        title: 'Pay At Desk',
+        subTitle: 'This is a paid event and you would need to pay a fee of '+event.price + ' AED at the SG desk on first floor',
+        buttons: ['OK']
+      })
+      alert.present();
+    }
+  }
   presentLoader(toggle){
     
     if (toggle ==true){
@@ -78,6 +101,13 @@ export class EventsPage implements OnInit {
       this.loading.dismiss();
     }
 
+  }
+  toFeedback(header,id){
+    let obj ={
+      header:header,
+      eventId: id
+    }
+    this.navCtrl.push(FeedbackPage,obj)
   }
 
   ionViewDidLoad() {
@@ -96,8 +126,21 @@ export class EventsPage implements OnInit {
     switch (name) {
       case "SG Events":
         this.sgEvents = this.uS.sgEvents.pipe(map((event:any)=>{
+          event.forEach(myelement => {
+          if(myelement.going){
+            myelement.going.forEach(element => { 
+            if(element.path==this.uS.userRef.path){
+              myelement.youGoing = true;
+            }
+              
+            });
+          
+          }
+        });
+          
           return event.sort(function(a, b){return b.postTime.seconds - a.postTime.seconds})
         }))
+        this.sgEvents.subscribe()
         break;
       case "RIT Events":
         this.ritEvents = this.uS.ritEvents.pipe(map((event:any)=>{

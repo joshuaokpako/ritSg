@@ -25,25 +25,47 @@ export class RegisterPage {
   public password: string;
   public name:string;
   public type:any;
+  public staff:string;
+  public departments:any;
+  public faculty:any = "";
+  public position:any = "";
 
 
   constructor(public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
     public alertCtrl: AlertController,  public navCtrl: NavController, public navParams: NavParams) {
-      this.type ="students"
+      this.type ="student"
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad RegisterPage');
+    this.getDepartment()
+  }
+
+  getDepartment(){
+    this.departments = this.usersService.getDepartments()
+  }
+
+  compareFn(e1, e2): boolean {
+    return e1 && e2 ? e1.id === e2.id : e1 === e2;
   }
 
   submitLogin(){
     var   account = {
       fullName: this.name,
       email: this.email.trim().replace(/\s+/g, " "),
-      admin: "none"
+      admin: "none",
+      type: this.type
     };
+    if(this.type=="staff"){
+      account["staff"] = true;
+      account["faculty"] = this.faculty;
+      account["position"] = this.position;
+    }
+    else{
+      account["staff"] = false;
+    }
     
-    let ritemailend = this.email.trim().replace(/\s+/g, " ").slice(-8);//get the last 8 char of email
+    let ritemailend = this.email.trim().replace(/\s+/g, "").slice(-8);//get the last 8 char of email
 
     //check if its an rit email ending with @rit.edu
     if(ritemailend!="@rit.edu"){

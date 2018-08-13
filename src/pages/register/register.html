@@ -12,10 +12,10 @@
 <ion-content padding text-center >
 <ion-list>
     <ion-segment color="rit" [(ngModel)]="type">
-        <ion-segment-button value="students">
+        <ion-segment-button value="student">
           Students
         </ion-segment-button>
-        <ion-segment-button value="staffs">
+        <ion-segment-button value="staff">
           Staffs
         </ion-segment-button>
     </ion-segment>
@@ -24,6 +24,18 @@
       <ion-input type="text" [(ngModel)]="name" name="name"></ion-input>
     </ion-item>
   <br>
+  <div [hidden]="type == 'student'"> 
+      <ion-item>
+        <ion-label>Department</ion-label>
+        <ion-select [(ngModel)]="faculty" [compareWith]="compareFn">
+            <ion-option *ngFor="let dep of departments | async" [value]="dep">{{dep.department}}</ion-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label floating>Position (optional) e.g Lab Assitant</ion-label>
+        <ion-input [(ngModel)]="position" name="email" type="text"></ion-input>
+      </ion-item>
+  </div>
   <ion-item>
     <ion-label floating>Email</ion-label>
     <ion-input [(ngModel)]="email" name="email" type="text"></ion-input>
@@ -41,9 +53,11 @@
      <!--<button *ngIf="!email && !password" ion-button color="danger" clear round>Login Now</button>-->
      
      
-   </div>
-   <button  ion-button [disabled]="!email || !password || !name" color="rit" block (click)="submitLogin()">
+  </div>
+  <button  ion-button [hidden]="type == 'staff'" [disabled]="!email || !password || !name" color="rit" block (click)="submitLogin()">
     Sign up</button>
+  <button  ion-button [hidden]="type == 'student'" [disabled]="!email || !password || !name || !faculty" color="rit" block (click)="submitLogin()">
+      Sign up</button>
 </ion-list>
 
 </ion-content>

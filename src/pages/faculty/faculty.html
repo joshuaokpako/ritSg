@@ -9,48 +9,38 @@
   <ion-navbar color="rit">
     <ion-title>Faculty</ion-title>
   </ion-navbar>
+  <ion-toolbar color="rit">
+    <ion-searchbar [(ngModel)]="searchText"></ion-searchbar>
+  </ion-toolbar>
 
 </ion-header>
 
 
 <ion-content>
-  <!--
-  <ion-fab bottom right edge>
-      <button [hidden]="user.admin!='main'&& user.SG!=true" color="danger" ion-fab mini (click)="addEventModal('RIT Clubs')"><ion-icon name="add"></ion-icon></button>
-    </ion-fab>
-  
-    <div *ngFor="let club of clubs | async">
-      <ion-item (click)="toDetails(club.name, club.clubPhoto, club.about,'RIT Clubs' )" >
-          <ion-avatar item-start>
-              <img src="{{club.clubPhoto}}">
-          </ion-avatar>
-          <h2>{{club.name}}</h2>
-          <p>Hayao Miyazaki • 1988</p>
-          <p>{{club.about}}</p>
-          <button ion-button clear item-end>View</button>
-      </ion-item>
-    </div>
-  -->
-<ion-list>
-<ion-item>
-  <ion-avatar item-start>
-    <img src="assets/imgs/thumbnail-totoro.png">
-  </ion-avatar>
-  <h2>ASME</h2>
-  <p>Hayao Miyazaki • 1988</p>
-  <p>We are all about this and that</p>
-  <button ion-button clear item-end>View</button>
-</ion-item>
+<ion-list>  
+  <p text-center *ngIf="!(staff | async)">
+    <ion-spinner color="rit" name="crescent"></ion-spinner>
+  </p>
+  <div *ngIf="(staff |async) != ''">
 
-<ion-item>
-    <ion-avatar item-start>
-      <img src="assets/imgs/thumbnail-totoro.png">
-    </ion-avatar>
-    <h2>Music Club</h2>
-    <p>Hayao Miyazaki • 1988</p>
-    <p>We are all about this and that</p>
-    <button ion-button clear item-end>View</button>
-  </ion-item>
+      <div *ngFor="let st of staff  | async | filter : searchText">
+   
+      <ion-item *ngIf="st.faculty.department =='Business and Management' || 
+      st.faculty.department =='Electrical Eng & Computing Sciences' || 
+      st.faculty.department =='Graduate Programs and Research' ||
+      st.faculty.department =='Mechanical & Industrial Engineering' ||
+      st.faculty.department =='Science and Liberal Arts'">
+          <ion-avatar item-start>
+            <img src="{{st.photoUrl}}">
+          </ion-avatar>
+          <h2>{{st.fullName | titlecase}}</h2>
+          <p>{{st.faculty.department}}</p>
+          <p>{{st.position}}</p>
+          <button ion-button clear item-end>View</button>
+        </ion-item>
+      </div>
+  </div>
+  
 </ion-list>
 
 </ion-content>

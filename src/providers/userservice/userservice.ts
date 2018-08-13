@@ -63,7 +63,7 @@ export class UserserviceProvider {
     //get events data
     
     this.events = this.db.col$("events");
-    this.sgEvents= this.db.col$("events", ref => ref.where('type', '==', 'SG Events'))
+    this.sgEvents= this.db.colWithIds$("events", ref => ref.where('type', '==', 'SG Events'))
     this.ritEvents= this.db.col$("events", ref => ref.where('type', '==', 'RIT Events'))
     this.comHEvents= this.db.col$("events", ref => ref.where('type', '==', 'Common Hour Events'))
     this.otherEvents= this.db.col$("events", ref => ref.where('type', '==', 'Other Events'))
@@ -73,7 +73,8 @@ export class UserserviceProvider {
         this.userName = user.displayName;
         this.userEmail = user.email;
         this.userPhotoUrl = user.photoURL;
-        this.uid =user.uid;
+        this.uid = user.uid;
+        this.userRef = this.db.doc('users/'+this.uid).ref
         this.user = this.getUserProfile(this.uid)
     
       } 
@@ -100,12 +101,20 @@ export class UserserviceProvider {
         account['uid'] = cUser.uid
         account['groupAdmin'] = []
         //account['profilePicRef']= 'profilePics/'+account['fullName']+'/'+cUser.uid
+
+        this.userName = cUser.displayName;
+        this.userEmail = cUser.email;
+        this.uid = cUser.uid;
+        this.userRef = this.db.doc('users/'+this.uid).ref
+        this.user = this.getUserProfile(this.uid)
+        
         cUser.updateProfile({
           displayName: account['fullName'],
-          photoUrl: url
+          photoURL: url
         })
         .then((adduser) => {
           this.db.set('users/'+cUser.uid, account)
+          this.userPhotoUrl = cUser.photoURL;
         })
       })
     })
@@ -119,26 +128,88 @@ export class UserserviceProvider {
     return this.storage.ref(filePath)
   }
 
-  addEvent(eventType,title,description,img,eventDate){
-    let event={
-      description: description,
-      eventDate: moment(eventDate).format('MMMM DD YYYY, h:mm a'),
-      likes:"",
-      postTime: this.db.timestamp,
-      postDetails:{
-        postedById:this.uid,
-        postedByName:this.userName ,
-        postedByPhotoUrl:this.userPhotoUrl
-      },
-      postImg:img,
-      title:title,
-      type:eventType
+  getJob(){
+    return this.db.col$('jobs', ref => ref.orderBy('createdAt','desc'))
+  }
+
+  getFeed(){
+    return this.db.col$('feeds', ref => ref.orderBy('createdAt','desc'))
+  }
+
+  getFaculty(){
+    return this.db.col$('users', ref => ref.where('staff', '==', true))
+  }
+
+  getDepartments(){
+    return this.db.col$('RIT Departments', ref => ref.orderBy('department','asc'))
+  }
+
+  getEventFeedback(evId) {
+    return this.db.col$("events/"+evId +"/feedbacks", ref => ref.orderBy('createdAt','asc'))
+  }
+
+  updateEventGoing(ev){
+    let plannerEvent = { 
+      startTime: ev.plannerStartTime, 
+      endTime: ev.plannerEndTime, 
+      allDay: false, 
+      title:ev.title, 
+      eventType:'public', 
+      eventRef:this.db.doc("users/"+this.uid+"/event/"+ev.id).ref,
+      rating:0
     }
-   return  this.db.add("events",event)
+    let event ={
+      going:ev.going
+    }
+    return  this.db.update("events/"+ev.id,event).then(()=>{
+      if(ev.youGoing ==false){
+        this.db.set("users/"+this.uid+"/event/"+ev.id,plannerEvent)
+      }
+      else{
+        this.db.delete("users/"+this.uid+"/event/"+ev.id)
+      }
+    })
+  }
+
+  addJob(job){
+    return  this.db.add("jobs",job)
+  }
+
+  addFeed(feed){
+    return  this.db.add("feeds",feed)
+  }
+
+  addComment(comment, evId){
+    let feedback ={
+      comment: comment,
+      userRef: this.userRef
+    }
+    return this.db.add("events/"+evId +"/feedbacks",feedback).then(()=>{
+      let sub = this.db.col$("events/"+evId +"/feedbacks").subscribe((x)=>{
+        console.log(x.length)
+        let event ={
+          feedback: x.length
+        }
+        this.db.update("events/"+evId,event)
+      })
+    
+    })
+  }
+
+  addEvent(event,date,start,end){
+    let eventDate=  moment(date).format('MMMM DD YYYY');
+    event['postedBy'] = this.db.doc('users/'+this.uid).ref;
+    event['eventDate'] = eventDate
+    event['startTime'] = moment(start).format('hh mm A')
+    event['plannerStartTime'] = eventDate + ' ' + start
+    event['plannerEndTime'] = eventDate + ' ' + end
+    event['endTime'] = moment(end).format('hh mm A')
+  
+    return  this.db.add("events",event)
   }
 
   saveMyEvents(event){
-    return  this.db.add("users/"+this.uid+"/event",event)
+    return  this.db.set("users/"+this.uid+"/event",event)
 
   }
 
@@ -153,7 +224,6 @@ export class UserserviceProvider {
         about: description,
         photo: profilePic,
         name: groupName,
-        timePosted: this.db.timestamp,
       }
       return this.db.add("RIT Athletics",athletics);
       case "RIT Clubs":
@@ -161,7 +231,6 @@ export class UserserviceProvider {
         about: description,
         clubPhoto: profilePic,
         name:groupName,
-        timePosted:this.db.timestamp,
         type:type
       }
       return this.db.add("RIT Clubs",club);
@@ -170,7 +239,6 @@ export class UserserviceProvider {
           about: description,
           image: profilePic,
           name: groupName,
-          timePosted: this.db.timestamp,
           location: location,
           deal: deal
         }

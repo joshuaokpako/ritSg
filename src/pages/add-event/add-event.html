@@ -22,16 +22,24 @@
 <ion-content padding>
   <ion-list>
     <ion-item>
-    <ion-label stacked>Enter title</ion-label>
+      <ion-label stacked>Enter title</ion-label>
       <ion-input [(ngModel)]="title" name="title" class="form-control" type="text"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label stacked>Enter entry fee *optional (All prices are in AED)</ion-label>
+      <ion-input [(ngModel)]="price" name="price" class="form-control" type="number"></ion-input>    
     </ion-item>
     <ion-item>
     <ion-label stacked>Event Date</ion-label>
     <ion-datetime displayFormat=" DD MMMM YYYY" [(ngModel)]="myDate"></ion-datetime>
     </ion-item>
     <ion-item>
-    <ion-label stacked>Event Time</ion-label>
-    <ion-datetime displayFormat="hh:mm A" [(ngModel)]="myTime"></ion-datetime>
+    <ion-label stacked>Event Start Time</ion-label>
+    <ion-datetime displayFormat="hh:mm A" [(ngModel)]="startTime"></ion-datetime>
+    </ion-item>
+    <ion-item>
+      <ion-label stacked>Event End Time</ion-label>
+      <ion-datetime displayFormat="hh:mm A" [(ngModel)]="endTime"></ion-datetime>
     </ion-item>
     <ion-item>
     <ion-label stacked>Enter a description</ion-label>
@@ -39,23 +47,16 @@
     </ion-item>
     
   </ion-list>
-  <p text-center>
-    <button color="secondary" round ion-button>
+  <p text-center (click)="presentConfirm()">
+    <button color="rit" round ion-button>
     <ion-icon name="camera"></ion-icon>
     </button>
   </p>
-  <p text-center>
-    OR
-  </p>
-<button block color="dark" outline ion-button (click)="pickImage()">
-  Add Image from Gallery
-</button>
 <ion-card *ngIf="previewImg">
 <img src="{{previewImg}}">
-<p>{{previewImg | json}}</p>
 </ion-card>
 <p text-center>
-<button round [disabled]="title ==''|| description =='' || previewImg=='' || myDate==''|| myTime =='' " color="secondary" ion-button (click)="addEvent(header)">
+<button block outline [disabled]="title ==''|| description =='' || previewImg=='' || myDate==''|| startTime ==''|| endTime =='' " color="rit" ion-button (click)="addEvent(header)">
   Add Event
 </button>
 </p>

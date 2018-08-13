@@ -1,33 +1,37 @@
 <ion-header>
   <ion-navbar color="rit">
     <ion-title>
-      Feeds
+      {{eventHeaderName}}
     </ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content>
-  <ion-card>
+
+  <ion-fab bottom right edge>
+      <button  color="rit" ion-fab mini (click)="addFeedModal(eventHeaderName)"><ion-icon name="add"></ion-icon></button>
+    </ion-fab>
+  <ion-card *ngFor="let feed  of feeds |async">
 
     <ion-item>
       <ion-avatar item-start>
-        <img src="assets/imgs/marty-avatar.png">
+        <img src="{{(feed.postedBy|doc|async)?.photoUrl}}">
       </ion-avatar>
-      <h2>Kelly Gosa</h2>
-      <p>November 5, 2018</p>
+      <h2>{{(feed.postedBy|doc|async)?.fullName}}</h2>
+      <p>{{(feed.createdAt)?.seconds * 1000 | date :'mediumDate'}}</p>
     </ion-item>
   
-    <img class="max" src="assets/imgs/card-portland.png">
+    <img *ngIf="(feed)?.postImg" class="max" src="{{feed?.postImg}}">
   
     <ion-card-content>
-      <p>Hey everyone there is a donation to people in alaska and we would be sending students over for a visit. Email me if you are interested. </p>
+      <p>{{feed.description}}</p>
     </ion-card-content>
   
     <ion-row>
       <ion-col>
         <button ion-button icon-left color="danger" clear small>
           <ion-icon name="heart"></ion-icon>
-          <div>12 Likes</div>
+          <div>{{feed.likes.length}} Likes</div>
         </button>
       </ion-col>
       <ion-col>
@@ -44,41 +48,4 @@
     </ion-row>
   
   </ion-card>
-  <ion-card>
-
-      <ion-item>
-        <ion-avatar item-start>
-          <img src="assets/imgs/sarah-avatar.png.jpeg">
-        </ion-avatar>
-        <h2>Roselyn Pidd</h2>
-        <p>November 5, 2018</p>
-      </ion-item>
-    
-      <img class="max" src="assets/imgs/card-portland.png">
-    
-      <ion-card-content>
-        <p>Hey everyone there is a donation to people in alaska and we would be sending students over for a visit. Email me if you are interested. </p>
-      </ion-card-content>
-    
-      <ion-row>
-        <ion-col>
-          <button ion-button icon-left color="danger" clear small>
-            <ion-icon name="heart"></ion-icon>
-            <div>12 Likes</div>
-          </button>
-        </ion-col>
-        <ion-col>
-          <button ion-button icon-left clear color="danger" small>
-            <ion-icon name="text"></ion-icon>
-            <div>4 Comments</div>
-          </button>
-        </ion-col>
-        <ion-col center text-center>
-          <ion-note>
-            11h ago
-          </ion-note>
-        </ion-col>
-      </ion-row>
-    
-    </ion-card>
 </ion-content>

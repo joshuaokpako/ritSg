@@ -16,8 +16,12 @@ export class ChatsPage implements OnInit{
   constructor( public chServ:ChatServiceProvider,public navCtrl: NavController,public modalCtrl: ModalController) {
   }
 
+ionViewWillEnter(){
+  this.chats =this.chServ.getChats()
+}
+
   ngOnInit(){
-    this.chats =this.chServ.getChats()
+    
   }
 
   addMessage(){

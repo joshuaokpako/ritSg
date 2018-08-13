@@ -41,6 +41,11 @@ export class FirestoreProvider {
     })
   }
 
+  delete<T>(ref: DocPredicate<T>) {
+    const timestamp = this.timestamp
+    return this.doc(ref).delete()
+  }
+
   upsert<T>(ref: DocPredicate<T>, data: any) {
     const doc = this.doc(ref).snapshotChanges().pipe(take(1)).toPromise()
   
@@ -76,5 +81,17 @@ export class FirestoreProvider {
     return this.col(ref, queryFn).snapshotChanges().pipe(map(docs => {
         return docs.map(a => a.payload.doc.data()) as T[];
     }));
+  }
+
+  colWithIds$<T>(ref: CollectionPredicate<T>, queryFn?): Observable<any[]> {
+    return this.col(ref, queryFn).snapshotChanges().pipe(
+    map(actions => {
+      return actions.map(a => {
+        const data:any = a.payload.doc.data();
+        const id = a.payload.doc.id;
+        return { id, ...data };
+      });
+    })
+  )
   }
 }

@@ -16,7 +16,7 @@ import { CoverPage } from '../cover/cover';
   providers: [UserserviceProvider]
 })
 export class ProfilePage implements OnInit {
-  public userName:string;
+  public user:any;
 
   constructor(public usersService : UserserviceProvider, public navCtrl: NavController, public navParams: NavParams, public app:App) {
   }
@@ -26,7 +26,14 @@ export class ProfilePage implements OnInit {
   }
 
   ngOnInit(){
-    this.userName = this.usersService.userName;
+    this.usersService.fireAuth.authState.subscribe(user => {
+      if (user) {
+        this.user = user
+      }
+      else{
+        this.signOut()
+      }
+    })
    
   }
 
@@ -37,6 +44,9 @@ export class ProfilePage implements OnInit {
     }).catch((error) => {
       // An error happened.
     });
+  }
+  toEditProfile(){
+    
   }
 
 }

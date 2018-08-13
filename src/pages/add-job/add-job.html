@@ -1,0 +1,40 @@
+<ion-header>
+
+    <ion-navbar color="rit">
+      <ion-title>Add to Jobs</ion-title>
+      <ion-buttons start>
+          <button ion-button (click)="dismiss()">
+            <span ion-text color="light" showWhen="ios">Cancel</span>
+            <ion-icon name="md-close" showWhen="android, windows"></ion-icon>
+          </button>
+        </ion-buttons>
+    </ion-navbar>
+  
+  </ion-header>
+  
+  
+  <ion-content padding>
+    <ion-list>
+      <ion-item>
+        <ion-textarea [(ngModel)]="company" placeholder="Name of Company"></ion-textarea>
+      </ion-item>
+      <ion-item>
+        <ion-textarea [(ngModel)]="description" placeholder="Describe the Job"></ion-textarea>
+      </ion-item>
+      
+    </ion-list>
+    <p text-center (click)="presentConfirm()">
+        <button color="rit" round ion-button>
+        <ion-icon name="camera"></ion-icon>
+        </button>
+      </p>
+     
+    <ion-card *ngIf="previewImg">
+    <img src="{{previewImg}}">
+    </ion-card>
+    <p text-center>
+    <button block outline  [disabled]="company =='' || description=='' " color="rit" ion-button (click)="addJobs()">
+      Add to Jobs
+    </button>
+  </p>
+  </ion-content>

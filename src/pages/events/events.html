@@ -30,7 +30,7 @@
   </ion-fab>
   <!--Show fab when there are Suggested  events-->
   <ion-fab bottom right edge *ngIf="eventHeaderName =='Suggested Events'">
-    <button [hidden]="user.admin!='main'&& user.admin!='RIT'" color="secondary" ion-fab mini (click)="addEventModal(eventHeaderName)"><ion-icon name="add"></ion-icon></button>
+    <button  color="secondary" ion-fab mini (click)="addEventModal(eventHeaderName)"><ion-icon name="add"></ion-icon></button>
   </ion-fab>
 
   <!--SG events-->
@@ -47,32 +47,35 @@
       <ion-card *ngFor="let sgEv of sgEvents | async">
         <ion-item>
           <ion-avatar item-start>
-            <img src="assets/imgs/marty-avatar.png">
+            <img class="image" src="{{(sgEv.postedBy|doc|async)?.photoUrl}}">
           </ion-avatar>
-          <h2>{{sgEv.postDetails.postedByName}}</h2> 
+          <h2>{{(sgEv.postedBy|doc|async)?.fullName | titlecase}}</h2> 
         </ion-item>
         <img class="max" src="{{sgEv.postImg}}">
         <ion-card-content>
-          <h2>{{sgEv.title}} - {{sgEv.eventDate}}</h2>
+          <h2><b>{{sgEv.title |titlecase}} - {{sgEv.eventDate}}</b></h2>
+          <h3 *ngIf="sgEv.price !=''">Entry Fee: {{sgEv.price | currency:'AED' :'code'}}</h3>
+          <h3>{{sgEv.startTime}} to {{sgEv.endTime}}</h3>
           <p>{{sgEv.description}} </p>
         </ion-card-content>
         <ion-row>
           <ion-col>
-            <button ion-button icon-left color="danger" clear small>
-              <ion-icon name="heart"></ion-icon>
-              <div *ngIf="sgEv.likes.length !=1; else like">{{sgEv.likes.length}} likes</div>
-              <ng-template #like>{{sgEv.likes.length}} like</ng-template>
+            <button ion-button icon-left [color]="sgEv.youGoing==true ? 'danger': 'inactive'" (click)="going(sgEv)" clear small>
+              <ion-icon name="walk"></ion-icon>
+              <div >{{sgEv.going.length}} going</div>
+              
             </button>
           </ion-col>
           <ion-col>
-            <button ion-button icon-left clear color="danger" small>
+            <button ion-button icon-left clear color="inactive" small (click)="toFeedback('Feedbacks',sgEv.id)">
               <ion-icon name="text"></ion-icon>
-              <div>4 Comments</div>
+              <div *ngIf="sgEv.feedback;else noFeedbacks"><span *ngIf="sgEv.feedback!=1;else oneFeedback">{{sgEv.feedback}} Feedbacks</span><ng-template #oneFeedback>{{sgEv.feedbacks}} Feedback</ng-template></div>
+              <ng-template #noFeedbacks>0 Feedbacks</ng-template>
             </button>
           </ion-col>
           <ion-col center text-center>
             <ion-note>
-              11h ago
+              
             </ion-note>
           </ion-col>
         </ion-row>

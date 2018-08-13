@@ -18,9 +18,8 @@
   <ion-list no-lines>
     <ion-item>
       <div class="imgwrap">
-        <img src="assets/imgs/avatar-finn.png">
-        <h2>{{userName}}</h2>
-        <p>My grades have been really wonderful...</p>
+        <img src="{{(user)?.photoURL}}">
+        <h2><ion-icon (click)="toEditProfile" class='icon' name="create"></ion-icon>{{(user)?.displayName|titlecase}}</h2>
       </div>
     </ion-item>
   </ion-list>
@@ -28,19 +27,19 @@
   <ion-list>
 
     <ion-item>
-      <ion-icon name="leaf" item-start></ion-icon>
+      <ion-icon color="secondary" name="paper" item-start></ion-icon>
         My Feeds
     </ion-item>
     <ion-item>
-      <ion-icon name="book" item-start></ion-icon>
+      <ion-icon color="purple" name="book" item-start></ion-icon>
         My Books
     </ion-item>
     <ion-item>
-      <ion-icon name="rose" item-start></ion-icon>
+      <ion-icon color="primary" name="calendar" item-start></ion-icon>
       My Events
     </ion-item>
     <ion-item (click)="signOut()">
-      <ion-icon name="rose" item-start></ion-icon>
+      <ion-icon color="danger" name="log-out" item-start></ion-icon>
       Logout
     </ion-item>
       

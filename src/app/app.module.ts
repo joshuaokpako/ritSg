@@ -10,7 +10,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { GoogleMaps } from "@ionic-native/google-maps";
 import { Geolocation } from '@ionic-native/geolocation';
 import { Camera } from '@ionic-native/camera';
-import { Base64 } from '@ionic-native/base64';
+import { File } from '@ionic-native/file';
 
 import { MyApp } from './app.component';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
@@ -39,6 +39,10 @@ import { AddpagePage } from '../pages/addpage/addpage';
 import { PlannerModalPage } from '../pages/planner-modal/planner-modal';
 import { AddChatPage } from '../pages/add-chat/add-chat';
 import { MessagePage } from '../pages/message/message';
+import { AddFeedPage } from '../pages/add-feed/add-feed';
+import { AddJobPage } from '../pages/add-job/add-job';
+import { JobsPage } from '../pages/jobs/jobs';
+import { FeedbackPage } from '../pages/feedback/feedback';
 
 import { NgCalendarModule  } from 'ionic2-calendar';
 import { AngularFireModule } from 'angularfire2';
@@ -88,7 +92,11 @@ const firebase = {
     AddChatPage,
     FilterPipe,
     DocPipe,
-    MessagePage
+    MessagePage,
+    AddFeedPage,
+    AddJobPage,
+    JobsPage,
+    FeedbackPage
   ],
   imports: [
     NgCalendarModule,
@@ -124,7 +132,11 @@ const firebase = {
     TransportationPage,
     PlannerModalPage,
     AddChatPage,
-    MessagePage
+    MessagePage,
+    AddFeedPage,
+    AddJobPage,
+    JobsPage,
+    FeedbackPage
   ],
   providers: [
     StatusBar,
@@ -134,7 +146,7 @@ const firebase = {
     Geolocation,
     GoogleMaps,
     Camera,
-    Base64,
+    File,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     UserserviceProvider,
     ChatServiceProvider,

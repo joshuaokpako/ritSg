@@ -1,0 +1,42 @@
+<ion-header>
+
+  <ion-navbar color="rit">
+    <ion-title>{{header}}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content>
+<ion-list>  
+  <p text-center *ngIf="!(feedback | async)">
+    <ion-spinner color="rit" name="crescent"></ion-spinner>
+  </p>
+  <!--Show when there are no events-->
+  <p text-center [hidden]="(feedback | async) != ''">
+    Be the first to give a feedback 
+  </p>
+  <div *ngIf="(feedback |async) != ''">
+    <ion-item *ngFor="let fb of feedback | async">
+          <ion-avatar item-start>
+            <img src="{{(fb.userRef|doc|async)?.photoUrl}}">
+          </ion-avatar>
+          <p text-wrap><span *ngIf="(fb.userRef|doc|async)?.id!= userId; else you"><b>{{(fb.userRef|doc|async)?.fullName | titlecase}}</b></span><ng-template #you><span><b>You</b></span></ng-template> {{fb.comment}}</p>
+        </ion-item>
+  </div>
+  
+</ion-list>
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar color="light">
+      <ion-buttons end (click)="addComment()">
+          <button ion-button icon-only clear color="primary">
+            <ion-icon name="send"></ion-icon>
+          </button>
+        </ion-buttons>
+          <ion-input type="text" placeholder="Add a comment" name="comment" [(ngModel)]="comment"></ion-input>
+        
+  </ion-toolbar>
+
+</ion-footer>

@@ -7,6 +7,7 @@ import { RitDealsPage } from '../rit-deals/rit-deals';
 import { RitAthleticsPage } from '../rit-athletics/rit-athletics';
 import { TransportationPage } from '../transportation/transportation';
 import { FacultyPage } from '../faculty/faculty';
+import { JobsPage } from '../jobs/jobs';
 
 @Component({
   selector: 'page-home',
@@ -42,5 +43,8 @@ export class HomePage {
   }
   toTransportation(){
     this.navCtrl.push(TransportationPage)
+  }
+  toJobs(){
+    this.navCtrl.push(JobsPage)
   }
 }

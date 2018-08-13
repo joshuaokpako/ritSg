@@ -23,14 +23,14 @@
               <div class="chat-message" text-right *ngIf="chat.uid == user.uid">
                 <div class="right-bubble">
                   <span class="msg-name">Me</span>
-                  <span class="msg-date"> {{(chat.postTime)?.seconds * 1000 | date:'shortTime'}}</span>
+                  <span *ngIf="(chat.createdAt)?.seconds" class="msg-date"> {{(chat.createdAt)?.seconds * 1000 | date:'shortTime'}}</span>
                   <p text-wrap>{{chat.message}}</p>
                 </div>
               </div>
               <div class="chat-message" text-left *ngIf="chat.uid != user.uid">
                 <div class="left-bubble">
                   <span class ="msg-name" *ngIf="receiver | async as rec">{{rec.fullName}}</span>
-                  <span class="msg-date"> {{(chat.postTime)?.seconds * 1000 | date:'shortTime'}}</span>
+                  <span *ngIf="(chat.createdAt)?.seconds"s class="msg-date"> {{(chat.createdAt)?.seconds * 1000 | date:'shortTime'}}</span>
                   <p text-wrap>{{chat.message}}</p>
                 </div>
               </div>

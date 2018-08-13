@@ -44,7 +44,7 @@ export class ChatServiceProvider {
       map((chat:any)=>{
         if(chat){
           this.key =chat.messageKey
-          return this.db.col$('messages/'+chat.messageKey +'/chats', ref => ref.orderBy('postTime','asc'));
+          return this.db.col$('messages/'+chat.messageKey +'/chats', ref => ref.orderBy('createdAt','asc'));
         }
       })
     )
@@ -59,7 +59,6 @@ export class ChatServiceProvider {
       sentBy: this.uS.userName,
       uid: this.uS.uid,
       message: data.message,
-      postTime:  this.db.timestamp,
       readBy: []
     }
     return this.db.add('messages/'+this.key +'/chats', themessage)
@@ -74,7 +73,6 @@ export class ChatServiceProvider {
       uid: this.uS.uid,
       userRef: this.db.doc('users/'+this.uS.uid).ref,
       lastMessage:data.message,
-      postTime: this.db.timestamp,
       messageKey:messageKey
 
     }
