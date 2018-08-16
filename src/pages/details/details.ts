@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
-import { GoogleMaps, GoogleMap, GoogleMapsEvent, Marker } from '@ionic-native/google-maps';
+import { GoogleMaps, GoogleMap, GoogleMapOptions, Marker } from '@ionic-native/google-maps';
 
 
 
@@ -41,20 +41,21 @@ export class DetailsPage implements OnInit {
 
   loadMap() {
     
-    
+    let mapOptions: GoogleMapOptions = {
+      camera: {
+         target: {
+           lat: this.location.latitude,
+           lng: this.location.longitude
+         },
+         zoom: 18,
+         tilt: 30
+       }
+    };
     // Create a map after the view is ready and the native platform is ready.
-    let element: HTMLElement = document.getElementById("map_canvas");
-    console.log(element)
-    this.map = GoogleMaps.create(element);
-    this.map.one(GoogleMapsEvent.MAP_READY).then(() => {
+    this.map = GoogleMaps.create('map_canvas', mapOptions);
 
 
-      console.log('map is ready to use.');
-
-
-    });
-
-    /*let marker: Marker = this.map.addMarkerSync({
+      let marker: Marker = this.map.addMarkerSync({
       title: this.header,
       icon: 'red',
       animation: 'BOUNCE',
@@ -64,7 +65,7 @@ export class DetailsPage implements OnInit {
       }
     });
     
-    marker.showInfoWindow();*/
+    marker.showInfoWindow();
   }
 
   

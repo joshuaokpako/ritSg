@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams,AlertController, ViewController, LoadingController } from 'ionic-angular';
-import { ImagePicker } from '@ionic-native/image-picker';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { finalize } from 'rxjs/operators';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
@@ -24,7 +23,7 @@ export class AddFeedPage {
   public loading:any;
   public post:string ="";
   constructor(public uS : UserserviceProvider,public navCtrl: NavController,public loadingCtrl: LoadingController, public alertCtrl: AlertController, 
-    private imagePicker: ImagePicker, public navParams: NavParams,public viewCtrl: ViewController,public camera: Camera) {
+   public navParams: NavParams,public viewCtrl: ViewController,public camera: Camera) {
     this.header = this.navParams.get('header');
   }
 
@@ -73,18 +72,19 @@ export class AddFeedPage {
     alert.present();
   }
 
-  takePhoto() 
-    {
+  takePhoto() {
       const options : CameraOptions = 
       {
-        quality: 80,
+        quality: 95,
+        targetHeight: 400,
         destinationType: this.camera.DestinationType.DATA_URL,
         encodingType: this.camera.EncodingType.JPEG,
-        mediaType: this.camera.MediaType.PICTURE
+        mediaType: this.camera.MediaType.PICTURE,
+        correctOrientation: true
       }
-      this.camera.getPicture(options) .then((imageData) => 
+      this.camera.getPicture(options).then((imageData) => 
       {
-          this.previewImg = "data:image/jpeg;base64," + imageData;
+        this.previewImg = "data:image/jpeg;base64," + imageData;
           
       }, 
       (err) => 
@@ -94,60 +94,77 @@ export class AddFeedPage {
     }
 
   pickImage(){
-    this.imagePicker.hasReadPermission().then((result) =>{
-      if(result==true){
-        let options = {
-          maximumImagesCount: 1,
-          width: 500,
-          height: 500,
-          quality: 80,
-          outputType: 1
-        }
-          
-          this.imagePicker.getPictures(options).then((results) => {
-            this.previewImg = 'data:image/jpeg;base64,' + results[0]
-            }, (err) => {
-              console.log(err);
-            });
-            
-     
-      }
-      else{
-        this.imagePicker.requestReadPermission().then(()=>this.pickImage())
-      }
-    })
+    const options : CameraOptions = 
+    {
+      quality: 98,
+      targetHeight: 400,
+      destinationType: this.camera.DestinationType.DATA_URL,
+      sourceType: this.camera.PictureSourceType.SAVEDPHOTOALBUM,
+      encodingType: this.camera.EncodingType.JPEG,
+      mediaType: this.camera.MediaType.PICTURE,
+      correctOrientation: true
+    }
+    this.camera.getPicture(options).then((imageData) => 
+    {
+      this.previewImg = "data:image/jpeg;base64," + imageData;
+        
+    }, 
+    (err) => 
+    {
+        console.log(err);
+    }); 
   }
   
   addFeeds(){
     let randName = new Date().getTime().toString()
     this.presentLoader(true)
-    const ref = this.uS.uploadImages('FeedsImages/'+this.uS.userName+'/'+this.uS.uid+'/'+randName);
-    const task = ref.putString(this.previewImg,'data_url');
-    
-    // get notified when the download URL is available
-    task.snapshotChanges().pipe(
-      finalize(() => {
-        ref.getDownloadURL().subscribe((myUrl) =>{
-          let feed={
-            description: this.post,
-            likes:[],
-            postedBy:this.uS.userRef,
-            postImg:myUrl,
-          }
-          this.uS.addFeed(feed).then(()=>{
-            this.presentLoader(false)
-            this.viewCtrl.dismiss();
+    if (this.previewImg ==""){
+      let feed={
+        description: this.post,
+        likes:[],
+        postedBy:this.uS.userRef,
+        postedByUid : this.uS.uid
+      }
+      this.uS.addFeed(feed).then(()=>{
+        this.presentLoader(false)
+        this.viewCtrl.dismiss();
+        })
+        .catch(function(error) {
+          let alert = this.alertCtrl.create({
+          subTitle: error,
+          buttons: ['OK']
+          });
+        alert.present();
+        })
+    }
+    else{
+      const ref = this.uS.uploadImages('FeedsImages/'+this.uS.userName+'/'+this.uS.uid+'/'+randName);
+      const task = ref.putString(this.previewImg,'data_url');
+      
+      // get notified when the download URL is available
+      task.snapshotChanges().pipe(
+        finalize(() => {
+          ref.getDownloadURL().subscribe((myUrl) =>{
+            let feed={
+              description: this.post,
+              likes:[],
+              postedBy:this.uS.userRef,
+              postImg:myUrl,
+            }
+            this.uS.addFeed(feed).then(()=>{
+              this.presentLoader(false)
+              this.viewCtrl.dismiss();
+              })
+              .catch(function(error) {
+                let alert = this.alertCtrl.create({
+                subTitle: error,
+                buttons: ['OK']
+                });
+              alert.present();
             })
-            .catch(function(error) {
-              let alert = this.alertCtrl.create({
-              subTitle: error,
-              buttons: ['OK']
-              });
-            alert.present();
           })
         })
-      })
-    ).subscribe()
-  }
-         
+      ).subscribe()
+    }
+  }       
 }

@@ -7,12 +7,22 @@
 <ion-header>
 
   <ion-navbar color="rit">
-    <ion-title>transportation</ion-title>
+    <ion-title>Transportation</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
+    <ion-segment color="rit" [(ngModel)]="type">
+        <ion-segment-button value="RIT Bus">
+          RIT Bus
+        </ion-segment-button>
+        <ion-segment-button value="Parking">
+          Parking
+        </ion-segment-button>
+    </ion-segment>
+
+    <p text-center> This Feature is coming soon</p>
 
 </ion-content>

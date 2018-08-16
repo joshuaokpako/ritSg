@@ -41,6 +41,10 @@ export class FirestoreProvider {
     })
   }
 
+  geopoint(lat: number, lng: number) {
+    return new firebase.firestore.GeoPoint(lat, lng)
+  }
+
   delete<T>(ref: DocPredicate<T>) {
     const timestamp = this.timestamp
     return this.doc(ref).delete()

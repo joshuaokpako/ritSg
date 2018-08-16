@@ -54,9 +54,6 @@
   </p>
  
 <ion-card *ngIf="previewImg">
-  <div>
-    {{base64 | json}}
-  </div>
 <img src="{{previewImg}}">
 </ion-card>
 <p text-center>
@@ -66,7 +63,7 @@
 <button block outline *ngIf="header == 'RIT Clubs'" [disabled]="groupName ==''|| description =='' || previewImg=='' || type =='' " color="rit" ion-button (click)="addGroup(header)">
   Add {{groupName}}
 </button>
-<button block outline *ngIf="header =='RIT Deals'" [disabled]="groupName ==''|| description =='' || previewImg=='' || location ==null " color="rit" ion-button (click)="addGroup(header)">
+<button block outline *ngIf="header =='RIT Deals'" [disabled]="groupName ==''|| description =='' || previewImg =='' || chosenLoc || deal=='' " color="rit" ion-button (click)="addGroup(header)">
     Add {{groupName}}
   </button>
 </p>

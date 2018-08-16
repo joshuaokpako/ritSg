@@ -46,12 +46,12 @@
     <div [hidden]="(sgEvents | async) == ''">
       <ion-card *ngFor="let sgEv of sgEvents | async">
         <ion-item>
-          <ion-avatar item-start>
-            <img class="image" src="{{(sgEv.postedBy|doc|async)?.photoUrl}}">
+          <ion-avatar item-start >
+            <img *ngIf="sgEv.postedBy.photoUrl" src="{{sgEv.postedBy.photoUrl}}">
           </ion-avatar>
-          <h2>{{(sgEv.postedBy|doc|async)?.fullName | titlecase}}</h2> 
+          <h2>{{sgEv.postedBy.fullName | titlecase}}</h2> 
         </ion-item>
-        <img class="max" src="{{sgEv.postImg}}">
+        <img *ngIf="sgEv.postImg" class="max" src="{{sgEv.postImg}}">
         <ion-card-content>
           <h2><b>{{sgEv.title |titlecase}} - {{sgEv.eventDate}}</b></h2>
           <h3 *ngIf="sgEv.price !=''">Entry Fee: {{sgEv.price | currency:'AED' :'code'}}</h3>
@@ -69,7 +69,7 @@
           <ion-col>
             <button ion-button icon-left clear color="inactive" small (click)="toFeedback('Feedbacks',sgEv.id)">
               <ion-icon name="text"></ion-icon>
-              <div *ngIf="sgEv.feedback;else noFeedbacks"><span *ngIf="sgEv.feedback!=1;else oneFeedback">{{sgEv.feedback}} Feedbacks</span><ng-template #oneFeedback>{{sgEv.feedbacks}} Feedback</ng-template></div>
+              <div *ngIf="sgEv.feedback;else noFeedbacks"><span *ngIf="sgEv.feedback!=1;else oneFeedback">{{sgEv.feedback}} Feedbacks</span><ng-template #oneFeedback>{{sgEv.feedback}} Feedback</ng-template></div>
               <ng-template #noFeedbacks>0 Feedbacks</ng-template>
             </button>
           </ion-col>
@@ -91,38 +91,41 @@
       Sorry there are no events right now 
     <div [hidden]="(ritEvents | async) == ''">
       <ion-card *ngFor="let ritEv of ritEvents | async">
-        <ion-item>
-          <ion-avatar item-start>
-            <img src="assets/imgs/marty-avatar.png">
-          </ion-avatar>
-          <h2>{{ritEv.postDetails.postedByName}} {{ritEvents | async}}</h2>
-        </ion-item>
-        <img class="max" src="{{ritEv.postImg}}">
-        <ion-card-content>
-          <h2>{{ritEv.title}} - {{ritEv.eventDate}}</h2>
-          <p>{{ritEv.description}} </p>
-        </ion-card-content>
-        <ion-row>
-          <ion-col>
-            <button ion-button icon-left color="danger" clear small>
-              <ion-icon name="heart"></ion-icon>
-              <div *ngIf="ritEv.likes.length !=1; else like">{{ritEv.likes.length}} likes</div>
-              <ng-template #like>{{ritEv.likes.length}} like</ng-template>
-            </button>
-          </ion-col>
-          <ion-col>
-            <button ion-button icon-left clear color="danger" small>
-              <ion-icon name="text"></ion-icon>
-              <div>4 Comments</div>
-            </button>
-          </ion-col>
-          <ion-col center text-center>
-            <ion-note>
-              11h ago
-            </ion-note>
-          </ion-col>
-        </ion-row>
-      </ion-card>
+          <ion-item>
+            <ion-avatar item-start >
+              <img *ngIf="ritEv.postedBy.photoUrl" src="{{ritEv.postedBy.photoUrl}}">
+            </ion-avatar>
+            <h2 >{{ritEv.postedBy.fullName | titlecase}}</h2> 
+          </ion-item>
+          <img *ngIf="ritEv.postImg" class="max" src="{{ritEv.postImg}}">
+          <ion-card-content>
+            <h2><b>{{ritEv.title |titlecase}} - {{ritEv.eventDate}}</b></h2>
+            <h3 *ngIf="ritEv.price !=''">Entry Fee: {{ritEv.price | currency:'AED' :'code'}}</h3>
+            <h3>{{ritEv.startTime}} to {{ritEv.endTime}}</h3>
+            <p>{{ritEv.description}} </p>
+          </ion-card-content>
+          <ion-row>
+            <ion-col>
+              <button ion-button icon-left [color]="ritEv.youGoing==true ? 'danger': 'inactive'" (click)="going(ritEv)" clear small>
+                <ion-icon name="walk"></ion-icon>
+                <div >{{ritEv.going.length}} going</div>
+                
+              </button>
+            </ion-col>
+            <ion-col>
+              <button ion-button icon-left clear color="inactive" small (click)="toFeedback('Feedbacks',ritEv.id)">
+                <ion-icon name="text"></ion-icon>
+                <div *ngIf="ritEv.feedback;else noFeedbacks"><span *ngIf="ritEv.feedback!=1;else oneFeedback">{{ritEv.feedback}} Feedbacks</span><ng-template #oneFeedback>{{ritEv.feedback}} Feedback</ng-template></div>
+                <ng-template #noFeedbacks>0 Feedbacks</ng-template>
+              </button>
+            </ion-col>
+            <ion-col center text-center>
+              <ion-note>
+                
+              </ion-note>
+            </ion-col>
+          </ion-row>
+        </ion-card>
     </div>
   </div>
         
@@ -137,36 +140,39 @@
         <div [hidden]="(comHEvents | async) == ''">
           <ion-card *ngFor="let ch of comHEvents | async">
               <ion-item>
-                  <ion-avatar item-start>
-                    <img src="assets/imgs/marty-avatar.png">
-                  </ion-avatar>
-                  <h2>{{ch.postDetails.postedByName}}</h2>   
-                </ion-item>
-                <img class="max" src="{{ch.postImg}}">
-                <ion-card-content>
-                  <h2>{{ch.title}} - {{ch.eventDate}}</h2>
-                  <p>{{ch.description}} </p>
-                </ion-card-content>
-                <ion-row>
-                  <ion-col>
-                    <button ion-button icon-left color="danger" clear small>
-                      <ion-icon name="heart"></ion-icon>
-                      <div *ngIf="ch.likes.length !=1; else like">{{ch.likes.length}} likes</div>
-                      <ng-template #like>{{ch.likes.length}} like</ng-template>
-                    </button>
-                  </ion-col>
-                  <ion-col>
-                    <button ion-button icon-left clear color="danger" small>
-                      <ion-icon name="text"></ion-icon>
-                      <div>4 Comments</div>
-                    </button>
-                  </ion-col>
-                  <ion-col center text-center>
-                    <ion-note>
-                      11h ago
-                    </ion-note>
-                  </ion-col>
-                </ion-row>
+                <ion-avatar item-start >
+                  <img *ngIf="ch.postedBy.photoUrl" src="{{ch.postedBy.photoUrl}}">
+                </ion-avatar>
+                <h2 >{{ch.postedBy.fullName | titlecase}}</h2> 
+              </ion-item>
+              <img *ngIf="ch.postImg" class="max" src="{{ch.postImg}}">
+              <ion-card-content>
+                <h2><b>{{ch.title |titlecase}} - {{ch.eventDate}}</b></h2>
+                <h3 *ngIf="ch.price !=''">Entry Fee: {{ch.price | currency:'AED' :'code'}}</h3>
+                <h3>{{ch.startTime}} to {{ch.endTime}}</h3>
+                <p>{{ch.description}} </p>
+              </ion-card-content>
+              <ion-row>
+                <ion-col>
+                  <button ion-button icon-left [color]="ch.youGoing==true ? 'danger': 'inactive'" (click)="going(ch)" clear small>
+                    <ion-icon name="walk"></ion-icon>
+                    <div >{{ch.going.length}} going</div>
+                    
+                  </button>
+                </ion-col>
+                <ion-col>
+                  <button ion-button icon-left clear color="inactive" small (click)="toFeedback('Feedbacks',ch.id)">
+                    <ion-icon name="text"></ion-icon>
+                    <div *ngIf="ch.feedback;else noFeedbacks"><span *ngIf="ch.feedback!=1;else oneFeedback">{{ch.feedback}} Feedbacks</span><ng-template #oneFeedback>{{ch.feedback}} Feedback</ng-template></div>
+                    <ng-template #noFeedbacks>0 Feedbacks</ng-template>
+                  </button>
+                </ion-col>
+                <ion-col center text-center>
+                  <ion-note>
+                    
+                  </ion-note>
+                </ion-col>
+              </ion-row>
             </ion-card>
           </div>
         </div>
@@ -180,40 +186,41 @@
       </p>
         <div [hidden]="(otherEvents | async) == ''">
           <ion-card *ngFor="let ot of otherEvents | async">
-      
               <ion-item>
-                  <ion-avatar item-start>
-                    <img src="assets/imgs/marty-avatar.png">
+                  <ion-avatar item-start >
+                    <img *ngIf="ot.postedBy.photoUrl" src="{{ot.postedBy.photoUrl}}">
                   </ion-avatar>
-                  <h2>{{ot.postDetails.postedByName}}</h2>
-                  
+                  <h2 >{{ot.postedBy.fullName | titlecase}}</h2> 
                 </ion-item>
-                <img class="max" src="{{ot.postImg}}">
+                <img *ngIf="ot.postImg" class="max" src="{{ot.postImg}}">
                 <ion-card-content>
-                  <h2>{{ot.title}} - {{ot.eventDate}}</h2>
+                  <h2><b>{{ot.title |titlecase}} - {{ot.eventDate}}</b></h2>
+                  <h3 *ngIf="ot.price !=''">Entry Fee: {{ot.price | currency:'AED' :'code'}}</h3>
+                  <h3>{{ot.startTime}} to {{ot.endTime}}</h3>
                   <p>{{ot.description}} </p>
                 </ion-card-content>
                 <ion-row>
                   <ion-col>
-                    <button ion-button icon-left color="danger" clear small>
-                      <ion-icon name="heart"></ion-icon>
-                      <div *ngIf="ot.likes.length !=1; else like">{{ot.likes.length}} likes</div>
-                      <ng-template #like>{{ot.likes.length}} like</ng-template>
+                    <button ion-button icon-left [color]="ot.youGoing==true ? 'danger': 'inactive'" (click)="going(ot)" clear small>
+                      <ion-icon name="walk"></ion-icon>
+                      <div >{{ot.going.length}} going</div>
+                      
                     </button>
                   </ion-col>
                   <ion-col>
-                    <button ion-button icon-left clear color="danger" small>
+                    <button ion-button icon-left clear color="inactive" small (click)="toFeedback('Feedbacks',ot.id)">
                       <ion-icon name="text"></ion-icon>
-                      <div>4 Comments</div>
+                      <div *ngIf="ot.feedback;else noFeedbacks"><span *ngIf="ot.feedback!=1;else oneFeedback">{{ot.feedback}} Feedbacks</span><ng-template #oneFeedback>{{ot.feedback}} Feedback</ng-template></div>
+                      <ng-template #noFeedbacks>0 Feedbacks</ng-template>
                     </button>
                   </ion-col>
                   <ion-col center text-center>
                     <ion-note>
-                      11h ago
+                      
                     </ion-note>
                   </ion-col>
                 </ion-row>
-            </ion-card>
+              </ion-card>
           </div>
         </div>
     <!--Suggested Events-->
@@ -226,41 +233,41 @@
         </p>
         <div [hidden]="(sugEvents | async) == ''">
             <ion-card *ngFor="let sug of sugEvents | async">
-      
                 <ion-item>
-                    <ion-avatar item-start>
-                      <img src="assets/imgs/marty-avatar.png">
+                    <ion-avatar item-start >
+                      <img *ngIf="sug.postedBy.photoUrl" src="{{sug.postedBy.photoUrl}}">
                     </ion-avatar>
-                    <h2>{{sug.postDetails.postedByName}}</h2>
-                    
+                    <h2 >{{sug.postedBy.fullName | titlecase}}</h2> 
                   </ion-item>
-                  <img class="max" src="{{sug.postImg}}">
+                  <img *ngIf="sug.postImg" class="max" src="{{sug.postImg}}">
                   <ion-card-content>
-                    <h2>{{sug.title}} - {{sug.eventDate}}</h2>
+                    <h2><b>{{sug.title |titlecase}} - {{sug.eventDate}}</b></h2>
+                    <h3 *ngIf="sug.price !=''">Entry Fee: {{sug.price | currency:'AED' :'code'}}</h3>
+                    <h3>{{sug.startTime}} to {{sug.endTime}}</h3>
                     <p>{{sug.description}} </p>
                   </ion-card-content>
                   <ion-row>
                     <ion-col>
-                      <button ion-button icon-left color="danger" clear small>
-                        <ion-icon name="heart"></ion-icon>
-                        <div *ngIf="sug.likes.length !=1; else like">{{sug.likes.length}} likes</div>
-                        <ng-template #like>{{sug.likes.length}} like</ng-template>
+                      <button ion-button icon-left [color]="sug.youGoing==true ? 'danger': 'inactive'" (click)="going(sug)" clear small>
+                        <ion-icon name="walk"></ion-icon>
+                        <div >{{sug.going.length}} going</div>
+                        
                       </button>
                     </ion-col>
                     <ion-col>
-                      <button ion-button icon-left clear color="danger" small>
+                      <button ion-button icon-left clear color="inactive" small (click)="toFeedback('Feedbacks',sug.id)">
                         <ion-icon name="text"></ion-icon>
-                        <div>4 Comments</div>
+                        <div *ngIf="sug.feedback;else noFeedbacks"><span *ngIf="sug.feedback!=1;else oneFeedback">{{sug.feedback}} Feedbacks</span><ng-template #oneFeedback>{{sug.feedback}} Feedback</ng-template></div>
+                        <ng-template #noFeedbacks>0 Feedbacks</ng-template>
                       </button>
                     </ion-col>
                     <ion-col center text-center>
                       <ion-note>
-                        11h ago
+                        
                       </ion-note>
                     </ion-col>
                   </ion-row>
-                
-              </ion-card>
+                </ion-card>
         </div>
          
           </div>
@@ -271,8 +278,6 @@
           <ion-grid>
             <ion-row>
               <ion-col>
-                <div class="newNotification">
-                </div>
                 <ion-card (click)="showEvents('SG Events')" color="danger" class="myHeight">
                     <p>SG</p> 
                 </ion-card>
@@ -282,8 +287,6 @@
               </ion-col>
               
               <ion-col>
-                  <div  class="newNotification">
-                    </div>
                   <ion-card (click)="showEvents('RIT Events')" color="rit" class="myHeight">
                     <p>RIT</p> 
                   </ion-card>
@@ -292,8 +295,7 @@
               </ion-col>
       
               <ion-col>
-                  <div  class="newNotification">
-                    </div>
+                  
                   <ion-card (click)="showEvents('Common Hour Events')" color="primary" class="myHeight">
                     <p>C.H</p> 
                   </ion-card>
@@ -302,8 +304,6 @@
               </ion-col>
         
               <ion-col>
-                  <div [style.visibility]="'hidden'" class="newNotification">
-                    </div>
                   <ion-card (click)="showEvents('Other Events')" color="purple" class="myHeight">
                     <p>OT</p> 
                   </ion-card>
@@ -312,8 +312,6 @@
               </ion-col>
       
               <ion-col>
-                <div [style.visibility]="'hidden'" class="newNotification">
-                </div>
                 <ion-card (click)="showEvents('Suggested Events')" color="secondary" class="myHeight">
                   <p>SUG</p> 
                 </ion-card>

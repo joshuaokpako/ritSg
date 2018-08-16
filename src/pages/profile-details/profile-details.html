@@ -1,0 +1,100 @@
+<!--
+  Generated template for the ProfileDetailsPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar color="rit">
+    <ion-title>{{header}}</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content >
+  
+    <div *ngIf="header == 'My Feeds'">
+      <p text-center *ngIf="!(myFeeds |async)">
+        <ion-spinner color="rit" name="crescent"></ion-spinner>
+      </p>
+      <p text-center class="noEvents" [hidden]="(myFeeds |async) != ''">
+          Sorry there are no events right now 
+        </p>
+      <ion-card *ngFor="let feed  of myFeeds |async">
+
+          <ion-item>
+            <ion-avatar item-start>
+              <img *ngIf="feed.postedBy.photoUrl" src="{{feed.postedBy.photoUrl}}">
+            </ion-avatar>
+            <h2>Me</h2>
+            <p>{{(feed.createdAt)?.seconds * 1000 | date :'mediumDate'}}</p>
+          </ion-item>
+        
+          <img *ngIf="(feed)?.postImg" class="max" src="{{feed?.postImg}}">
+        
+          <ion-card-content>
+            <p>{{feed.description}}</p>
+          </ion-card-content>
+        
+          <ion-row>
+            <ion-col>
+              <button ion-button icon-left [color]="feed.youLike==true ? 'danger': 'inactive'" (click)="like(feed)" clear small>
+                <ion-icon name="heart"></ion-icon>
+                <div ><span *ngIf="feed.likes.length!=1; else oneLike">{{feed.likes.length}} likes </span> <ng-template #oneLike>{{feed.likes.length}} like<span></span></ng-template></div>
+                
+              </button>
+            </ion-col>
+            <ion-col>
+              <button ion-button icon-left clear color="inactive" small (click)="toComments('Comments',feed.id)">
+                <ion-icon name="text"></ion-icon>
+                <div *ngIf="feed.comment;else noComment"><span *ngIf="feed.comment!=1;else oneComment">{{feed.comment}} Comments</span><ng-template #oneComment>{{feed.comment}} Comment</ng-template></div>
+                <ng-template #noComment>0 Comments</ng-template>
+              </button>
+            </ion-col>
+            <ion-col center text-center>
+            </ion-col>
+          </ion-row>
+        
+        </ion-card>
+    </div>
+
+    <div *ngIf="header == 'My Events'">
+        <ion-card *ngFor="let Ev of myEvents | async">
+            <ion-item>
+              <ion-avatar item-start >
+                <img *ngIf="(Ev.eventRef.postedBy)?.photoUrl" src="{{(Ev.eventRef.postedBy)?.photoUrl}}">
+              </ion-avatar>
+              <h2>{{(Ev.eventRef.postedBy)?.fullName | titlecase}}</h2> 
+            </ion-item>
+            <img *ngIf="(Ev.eventRef)?.postImg" class="max" src="{{(Ev.eventRef)?.postImg}}">
+            <ion-card-content>
+              <h2><b>{{Ev.title |titlecase}} - {{Ev.eventRef.eventDate}}</b></h2>
+              <h3 *ngIf="Ev.eventRef.price !=''">Entry Fee: {{Ev.eventRef.price | currency:'AED' :'code'}}</h3>
+              <h3>{{Ev.eventRef.startTime}} to {{Ev.eventRef.endTime}}</h3>
+              <p>{{Ev.description}} </p>
+            </ion-card-content>
+            <ion-row>
+              <ion-col>
+                <button ion-button icon-left [color]="Ev.youGoing==true ? 'danger': 'inactive'"  clear small>
+                  <ion-icon name="walk"></ion-icon>
+                  <div >{{(Ev.eventRef.going)?.length}} going</div>
+                  
+                </button>
+              </ion-col>
+              <ion-col>
+                <button ion-button icon-left clear color="inactive" small (click)="toFeedback('Feedbacks',Ev.id)">
+                  <ion-icon name="text"></ion-icon>
+                  <div *ngIf="(Ev.eventRef)?.feedback;else noFeedbacks"><span *ngIf="(Ev.eventRef)?.feedback!=1;else oneFeedback">{{(Ev.eventRef)?.feedback}} Feedbacks</span><ng-template #oneFeedback>{{Ev.feedback}} Feedback</ng-template></div>
+                  <ng-template #noFeedbacks>0 Feedbacks</ng-template>
+                </button>
+              </ion-col>
+              <ion-col center text-center>
+
+              </ion-col>
+            </ion-row>
+          </ion-card>
+    </div>
+
+</ion-content>

@@ -21,7 +21,7 @@
     <ion-spinner color="rit" name="crescent"></ion-spinner>
   </p>
     <div *ngIf="(jobs |async) != ''">
-      <ion-item *ngFor="let job of jobs  | async">
+      <ion-item *ngFor="let job of jobs  | async" (click)="toDetails(job.name, job.photoUrl, job.description,'Jobs' )">
         <ion-avatar *ngIf="job.photoUrl != ''" item-start>
           <img src="{{job.photoUrl}}">
         </ion-avatar>

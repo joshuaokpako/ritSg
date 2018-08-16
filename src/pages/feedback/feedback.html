@@ -7,21 +7,28 @@
 
 
 <ion-content>
-<ion-list>  
+<ion-list inset>  
   <p text-center *ngIf="!(feedback | async)">
     <ion-spinner color="rit" name="crescent"></ion-spinner>
   </p>
   <!--Show when there are no events-->
-  <p text-center [hidden]="(feedback | async) != ''">
+  <p text-center *ngIf="header=='Feedbacks';else noComment" [hidden]="(feedback | async) != ''">
     Be the first to give a feedback 
   </p>
+  <ng-template #noComment>
+    <p text-center [hidden]="(feedback | async) != ''">
+      Be the first to give a comment
+    </p>
+  </ng-template>
+
   <div *ngIf="(feedback |async) != ''">
-    <ion-item *ngFor="let fb of feedback | async">
-          <ion-avatar item-start>
-            <img src="{{(fb.userRef|doc|async)?.photoUrl}}">
-          </ion-avatar>
-          <p text-wrap><span *ngIf="(fb.userRef|doc|async)?.id!= userId; else you"><b>{{(fb.userRef|doc|async)?.fullName | titlecase}}</b></span><ng-template #you><span><b>You</b></span></ng-template> {{fb.comment}}</p>
-        </ion-item>
+    <ion-item *ngFor="let fb of feedback | async; let last = last">
+      <ion-avatar item-start>
+        <img src="{{fb.userRef.photoUrl}}">
+      </ion-avatar>
+      <p text-wrap><span *ngIf="fb.userRef.uid!= userId; else you"><b>{{fb.userRef.fullName | titlecase}}</b></span><ng-template #you><span><b>You</b></span></ng-template> {{fb.comment}}</p>
+      {{last ? toBottom() : ''}}   
+    </ion-item> 
   </div>
   
 </ion-list>

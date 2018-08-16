@@ -4,6 +4,7 @@ import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { TabsPage } from '../tabs/tabs';
 import { LoginPage } from '../login/login';
 import { RegisterPage } from '../register/register';
+import { SplashScreen } from '@ionic-native/splash-screen';
 
 /**
  * Generated class for the CoverPage page.
@@ -20,7 +21,7 @@ import { RegisterPage } from '../register/register';
 })
 export class CoverPage implements OnInit {
 
-  constructor(public usersService : UserserviceProvider,public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public usersService : UserserviceProvider, private splashScreen: SplashScreen, public navCtrl: NavController, public navParams: NavParams) {
     var that =this
     this.usersService.fireAuth.authState.subscribe(user => {
       if (user) {
@@ -32,10 +33,11 @@ export class CoverPage implements OnInit {
 
       }
     })
+    
   }
   
   ngOnInit(){
-    
+    this.splashScreen.hide();
     
   }
   ionViewDidLoad() {

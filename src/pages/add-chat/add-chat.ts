@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { IonicPage, NavController, NavParams,ViewController } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
+import { ChatServiceProvider} from '../../providers/chat-service/chat-service';
 import { MessagePage } from '../message/message';
 import { map} from 'rxjs/operators';
 import { Observable } from 'rxjs';
@@ -22,8 +23,9 @@ export class AddChatPage implements OnInit{
   public users:Observable<any>;
   public user;
   subscription;
+  sub;
 
-  constructor(public uS:UserserviceProvider, public navCtrl: NavController, public navParams: NavParams,
+  constructor(public uS:UserserviceProvider,public chatServ:ChatServiceProvider, public navCtrl: NavController, public navParams: NavParams,
   public viewCtrl: ViewController) {
     this.user ="";
   }
@@ -47,11 +49,15 @@ export class AddChatPage implements OnInit{
         return user
       }     
      })).subscribe(x=>this.user=x )
-    this.users = this.uS.users.pipe(map((allUsers:any)=>{
-      return allUsers.sort()
-    }))
+    this.users = this.uS.users
     
    }
+
+   ionViewWillLeave(){
+    if(this.sub){
+      this.sub.unsubscribe()
+    }
+  }
  
    ngOnDestroy() { 
     if (this.subscription) {
@@ -62,14 +68,23 @@ export class AddChatPage implements OnInit{
     console.log('ionViewDidLoad AddChatPage');
   }
 
-  goToMessage(name,photoUrl,uid){
-    let messageObj = {
-      name: name, 
-      pic:photoUrl,
-      uid: uid
+  goToMessage(uid,name){
+    let that =this
+    let messageObj
+    this.sub = this.chatServ.getConvo(uid).subscribe(result=>{
+      if(result){
+      messageObj = {
+        name:name,
+        uid: uid,
+        key: result.messageKey,
+        receiverUnread: result.unreadMessages,
+      }
+      that.navCtrl.push(MessagePage, messageObj) 
     }
-    this.navCtrl.push(MessagePage, messageObj)
+    else{
+      this.goToMessage(uid,name)
+    }
+    })
+
   }
-
-
 }

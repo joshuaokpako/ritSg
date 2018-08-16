@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
 import { NavController } from 'ionic-angular';
 import { EventsPage } from '../events/events';
@@ -8,16 +8,22 @@ import { RitAthleticsPage } from '../rit-athletics/rit-athletics';
 import { TransportationPage } from '../transportation/transportation';
 import { FacultyPage } from '../faculty/faculty';
 import { JobsPage } from '../jobs/jobs';
+import { FcmProvider } from '../../providers/fcm/fcm';
 
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
-export class HomePage {
+export class HomePage implements OnInit {
 
-  constructor(public navCtrl: NavController,private iab: InAppBrowser) {
+  constructor(public fcm:FcmProvider, public navCtrl: NavController,private iab: InAppBrowser) {
 
   }
+
+  ngOnInit(){
+    this.fcm.getToken()
+  }
+
   openBrowser(link){
     const browser = this.iab.create(link,'_blank', 'location=yes,hideurlbar=yes,toolbarcolor=#F36E21');
     browser.show()

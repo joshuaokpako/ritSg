@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController,  AlertController, LoadingController  } from 'ionic-angular';
-import { File } from '@ionic-native/file';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -34,7 +33,7 @@ export class AddEventPage {
   public loading:any;
   public price:any;
   public uploadUrl:Observable<string | null>;
-  constructor(public uS : UserserviceProvider,private file: File,public alertCtrl: AlertController, 
+  constructor(public uS : UserserviceProvider,public alertCtrl: AlertController, 
     public navCtrl: NavController,public loadingCtrl: LoadingController, public navParams: NavParams,public viewCtrl: ViewController,public camera: Camera) {
     this.header = this.navParams.get('header');
     this.previewImg="";
@@ -93,9 +92,8 @@ export class AddEventPage {
   takePhoto() {
       const options : CameraOptions = 
       {
-        quality: 80,
-        targetHeight: 300,
-        targetWidth: 300,
+        quality: 95,
+        targetHeight: 400,
         destinationType: this.camera.DestinationType.DATA_URL,
         encodingType: this.camera.EncodingType.JPEG,
         mediaType: this.camera.MediaType.PICTURE,
@@ -115,9 +113,8 @@ export class AddEventPage {
   pickImage(){
     const options : CameraOptions = 
     {
-      quality: 80,
-      targetHeight: 300,
-      targetWidth: 300,
+      quality: 98,
+      targetHeight: 400,
       destinationType: this.camera.DestinationType.DATA_URL,
       sourceType: this.camera.PictureSourceType.SAVEDPHOTOALBUM,
       encodingType: this.camera.EncodingType.JPEG,
@@ -161,11 +158,15 @@ export class AddEventPage {
               postImg:myUrl,
               postImgRef:'Events/'+header+'/'+this.title +randName,
               title:this.title,
-              type:header
+              type:header,
+              price:this.price
             }
             this.uS.addEvent(event,this.myDate,this.startTime,this.endTime).then((success)=>{
               this.presentLoader(false)
-              this.viewCtrl.dismiss();
+              let myheader = {
+                header:this.header
+              }
+              this.viewCtrl.dismiss(myheader);
               })
               .catch(function(error) {
                 let alert = this.alertCtrl.create({

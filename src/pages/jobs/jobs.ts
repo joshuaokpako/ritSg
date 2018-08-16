@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angu
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { AddJobPage } from '../add-job/add-job';
 import { map} from 'rxjs/operators';
+import { DetailsPage } from '../details/details';
 
 /**
  * Generated class for the JobsPage page.
@@ -57,6 +58,15 @@ export class JobsPage implements OnInit {
     modal.present()
   }
 
+  toDetails(headerName,photo,about,pageType){
+    let clubsObj = {
+      header: headerName, 
+      pic:photo,
+      about: about,
+      type: pageType
+    }
+    this.navCtrl.push(DetailsPage,clubsObj)
+  }
   ionViewDidLoad() {
     console.log('ionViewDidLoad JobsPage');
   }

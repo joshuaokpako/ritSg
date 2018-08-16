@@ -1,9 +1,7 @@
 import { Component, ViewChild,ElementRef } from '@angular/core';
 import { NavController, NavParams, AlertController, ViewController, LoadingController} from 'ionic-angular';
-import { ImagePicker } from '@ionic-native/image-picker';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Camera, CameraOptions } from '@ionic-native/camera';
-import { Base64 } from '@ionic-native/base64';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
@@ -19,20 +17,22 @@ export class AddpagePage {
   public header:string;
   public previewImg:any;
   public uploadPercent:any;
-  public groupName:string;
-  public description:string;
+  public groupName:string="";
+  public description:string ="";
   public type:any;
-  public inputlocation:string;
-  public deal:any;
+  public inputlocation:string ="";
+  public deal:string ="";
   public loading:any;
   public uploadUrl:Observable<string | null>;
+  address:string;
+  chosenLoc:boolean =true;
   search: boolean = false;
   addressElement: HTMLInputElement = null;
   listSearch: string = '';
  
 
   constructor(public uS : UserserviceProvider,public navCtrl: NavController,public loadingCtrl: LoadingController, public alertCtrl: AlertController, 
-    private imagePicker: ImagePicker, public navParams: NavParams,public viewCtrl: ViewController,public camera: Camera,private base64: Base64) {
+   public navParams: NavParams,public viewCtrl: ViewController,public camera: Camera) {
   this.previewImg ='';
   this.header = this.navParams.get('header');
   }
@@ -90,6 +90,8 @@ export class AddpagePage {
     this.addressElement = <HTMLInputElement>document.getElementsByClassName("text-input")[3]
     this.createAutocomplete(this.addressElement).subscribe((location) => {
       console.log('Searchdata', location);
+      console.log(this.chosenLoc)
+      console.log(this.location)
     });
   }
 
@@ -98,14 +100,15 @@ export class AddpagePage {
       new google.maps.LatLng(23.11150760505184, 52.505126953125),
       new google.maps.LatLng(23.73723793168785, 55.38240430318797));
     
-    
     let options = {
       bounds: defaultBounds,
       types: ['establishment']
     };
     const autocomplete = new google.maps.places.Autocomplete(addressEl, options);
     return new Observable((sub: any) => {
+      this.chosenLoc= true
       google.maps.event.addListener(autocomplete, 'place_changed', () => {
+        this.chosenLoc= false
         const place = autocomplete.getPlace();
         if (!place.geometry) {
           sub.error({
@@ -113,8 +116,12 @@ export class AddpagePage {
           });
         } else {
           this.inputlocation = place.formatted_address;
+          this.address = place.formatted_address;
+          this.chosenLoc= false
           console.log('Search Lng', place.geometry.location.lng());
-          sub.next(this.location={latitude:place.geometry.location.lat(),longitude:place.geometry.location.lng()});
+          sub.next(
+            this.location={latitude:place.geometry.location.lat(),longitude:place.geometry.location.lng()},
+          );
           //sub.complete();
         }
       });
@@ -142,6 +149,7 @@ export class AddpagePage {
   }
 
   presentConfirm() {
+   
     let alert = this.alertCtrl.create({
       title: 'Choose a Picture',
       buttons: [
@@ -162,18 +170,19 @@ export class AddpagePage {
     alert.present();
   }
 
-  takePhoto() 
-    {
+  takePhoto() {
       const options : CameraOptions = 
       {
-        quality: 80,
+        quality: 95,
+        targetHeight: 400,
         destinationType: this.camera.DestinationType.DATA_URL,
         encodingType: this.camera.EncodingType.JPEG,
-        mediaType: this.camera.MediaType.PICTURE
+        mediaType: this.camera.MediaType.PICTURE,
+        correctOrientation: true
       }
-      this.camera.getPicture(options) .then((imageData) => 
+      this.camera.getPicture(options).then((imageData) => 
       {
-          this.previewImg = "data:image/jpeg;base64," + imageData;
+        this.previewImg = "data:image/jpeg;base64," + imageData;
           
       }, 
       (err) => 
@@ -183,33 +192,39 @@ export class AddpagePage {
     }
 
   pickImage(){
-    this.imagePicker.hasReadPermission().then((result) =>{
-      if(result==true){
-        let options = {
-          maximumImagesCount: 1,
-          }
-          let base64="";
-          
-          this.imagePicker.getPictures(options).then((results) => {
-            let filePath: string = results;
-            this.base64.encodeFile(filePath).then((base64File: string) => {
-              base64 = base64File;
-            }, (err) => {
-              console.log(err);
-            });
-            this.previewImg ='data:image/jpeg;base64,' +  base64
-          },
-          (err) => { });
-      }
-      else{
-        this.imagePicker.requestReadPermission();
-      }
-    })
+    const options : CameraOptions = 
+    {
+      quality: 98,
+      targetHeight: 400,
+      destinationType: this.camera.DestinationType.DATA_URL,
+      sourceType: this.camera.PictureSourceType.SAVEDPHOTOALBUM,
+      encodingType: this.camera.EncodingType.JPEG,
+      mediaType: this.camera.MediaType.PICTURE,
+      correctOrientation: true
+    }
+    this.camera.getPicture(options).then((imageData) => 
+    {
+      this.previewImg = "data:image/jpeg;base64," + imageData;
+        
+    }, 
+    (err) => 
+    {
+        console.log(err);
+    }); 
   }
   
+  
   addGroup(header){
+    if(this.address != this.inputlocation){
+      let alert = this.alertCtrl.create({
+        title: 'Choose a Picture',
+        buttons: ['OK']
+      })
+      alert.present();
+    }
+    else{
     this.presentLoader(true)
-    const ref = this.uS.uploadImages('clubImages/'+header+'/'+this.groupName);
+    const ref = this.uS.uploadImages(header+'/'+this.groupName);
     const task = ref.putString(this.previewImg,'data_url');
     // observe percentage changes
     this.uploadPercent = task.percentageChanges();
@@ -217,9 +232,8 @@ export class AddpagePage {
     task.snapshotChanges().pipe(
       finalize(() => {
         ref.getDownloadURL().subscribe((myUrl) =>{this.uploadUrl=myUrl
-          switch (header) {
-            case "RIT Athletics":
-              this.uS.addGroup(header,this.groupName,this.description,this.uploadUrl).then((success)=>{
+   
+              this.uS.addGroup(header,this.groupName,this.description,this.uploadUrl, this.type, this.location,this.deal).then((success)=>{
                 this.presentLoader(false)
                 this.viewCtrl.dismiss();
                 })
@@ -231,46 +245,12 @@ export class AddpagePage {
                   });
                 alert.present();
               })
-              break;
-            case "RIT Clubs":
-              this.uS.addGroup(header,this.groupName,this.description,this.uploadUrl,this.type).then((success)=>{
-                this.presentLoader(false)
-                this.viewCtrl.dismiss();
-                })
-                .catch(function(error) {
-                  this.presentLoader(false)
-                  let alert = this.alertCtrl.create({
-                  subTitle: error,
-                  buttons: ['OK']
-                  });
-                alert.present();
-              })
-              break;
-          
-            case "RIT Deals":
-              this.uS.addGroup(header,this.groupName,this.description,this.uploadUrl,this.location,this.deal).then((success)=>{
-                this.presentLoader(false)
-                this.viewCtrl.dismiss();
-                })
-                .catch(function(error) {
-                  this.presentLoader(false)
-                  let alert = this.alertCtrl.create({
-                  subTitle: error,
-                  buttons: ['OK']
-                  });
-                alert.present();
-              })
-              break;
-            default:
-              break;
-              
-          }
          
         })
       })
     ).subscribe()
          
-
+  }
    
   }
   

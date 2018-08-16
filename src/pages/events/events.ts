@@ -123,50 +123,146 @@ export class EventsPage implements OnInit {
   }
 
   showEvents(name){
+    this.eventHeaderName = name;
     switch (name) {
       case "SG Events":
-        this.sgEvents = this.uS.sgEvents.pipe(map((event:any)=>{
+        if(!this.sgEvents){
+          this.sgEvents = this.uS.sgEvents.pipe(map((event:any)=>{
+            event.forEach(myelement => {
+             
+                this.uS.getRef(myelement.postedBy).subscribe(x=>{
+                  myelement.postedBy =x;
+                 
+              })
+           
+            if(myelement.going){
+              myelement.going.forEach(element => { 
+              if(element.path==this.uS.userRef.path){
+                myelement.youGoing = true;
+              } 
+              });
+            }
+          }); 
+            return event.sort(function(a, b){return b.createdAt.seconds - a.createdAt.seconds})
+          }))
+        }
+        break;
+      case "RIT Events":
+      if(!this.ritEvents){
+        let test =false
+        let output:any =""
+        this.ritEvents = this.uS.ritEvents.pipe(map((event:any)=>{
           event.forEach(myelement => {
+            if (test==false) {
+                this.uS.getRef(myelement.postedBy).subscribe(x=>{
+                  myelement.postedBy =x;
+                  test =true;
+                  output =x;
+              })
+            }
+            else{
+              myelement.postedBy = output
+            }
           if(myelement.going){
             myelement.going.forEach(element => { 
             if(element.path==this.uS.userRef.path){
               myelement.youGoing = true;
-            }
-              
+            } 
             });
-          
           }
-        });
-          
-          return event.sort(function(a, b){return b.postTime.seconds - a.postTime.seconds})
+        }); 
+          return event.sort(function(a, b){return b.createdAt.seconds - a.createdAt.seconds})
         }))
-        this.sgEvents.subscribe()
-        break;
-      case "RIT Events":
-        this.ritEvents = this.uS.ritEvents.pipe(map((event:any)=>{
-          return event.sort(function(a, b){return b.postTime.seconds - a.postTime.seconds})
-        }))
+      }
         break;
       case "Common Hour Events":
+      if(!this.comHEvents){
+        let test =false
+        let output:any =""
         this.comHEvents = this.uS.comHEvents.pipe(map((event:any)=>{
-          return event.sort(function(a, b){return b.postTime.seconds - a.postTime.seconds})
+          event.forEach(myelement => {
+            if (test==false) {
+                this.uS.getRef(myelement.postedBy).subscribe(x=>{
+                  myelement.postedBy =x;
+                  test =true;
+                  output =x;
+              })
+            }
+            else{
+              myelement.postedBy = output
+            }
+          if(myelement.going){
+            myelement.going.forEach(element => { 
+            if(element.path==this.uS.userRef.path){
+              myelement.youGoing = true;
+            } 
+            });
+          }
+        }); 
+          return event.sort(function(a, b){return b.createdAt.seconds - a.createdAt.seconds})
         }))
+      }
         break;
       case "Other Events":
+      if(!this.otherEvents){
+        let test =false
+        let output:any =""
         this.otherEvents = this.uS.otherEvents.pipe(map((event:any)=>{
-          return event.sort(function(a, b){return b.postTime.seconds - a.postTime.seconds})
+          event.forEach(myelement => {
+            if (test==false) {
+                this.uS.getRef(myelement.postedBy).subscribe(x=>{
+                  myelement.postedBy =x;
+                  test =true;
+                  output =x;
+              })
+            }
+            else{
+              myelement.postedBy = output
+            }
+          if(myelement.going){
+            myelement.going.forEach(element => { 
+            if(element.path==this.uS.userRef.path){
+              myelement.youGoing = true;
+            } 
+            });
+          }
+        }); 
+          return event.sort(function(a, b){return b.createdAt.seconds - a.createdAt.seconds})
         }))
+      }
         break;
       case "Suggested Events":
+      if(!this.sugEvents){
+        let test =false
+        let output:any =""
         this.sugEvents = this.uS.sugEvents.pipe(map((event:any)=>{
-          return event.sort(function(a, b){return b.postTime.seconds - a.postTime.seconds})
+          event.forEach(myelement => {
+            if (test==false) {
+                this.uS.getRef(myelement.postedBy).subscribe(x=>{
+                  myelement.postedBy =x;
+                  test =true;
+                  output =x;
+              })
+            }
+            else{
+              myelement.postedBy = output
+            }
+          if(myelement.going){
+            myelement.going.forEach(element => { 
+            if(element.path==this.uS.userRef.path){
+              myelement.youGoing = true;
+            } 
+            });
+          }
+        }); 
+          return event.sort(function(a, b){return b.createdAt.seconds - a.createdAt.seconds})
         }))
+      }
         break;
     
       default:
         break;
     }
-    this.eventHeaderName = name;
   }
   addEventModal(header){
     let addObj ={
@@ -174,5 +270,6 @@ export class EventsPage implements OnInit {
     }
     let modal = this.modalCtrl.create(AddEventPage,addObj)
     modal.present()
+   
   }
 }

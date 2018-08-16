@@ -78,10 +78,10 @@
             </ion-card>
           </ion-col> 
             <ion-col>
-              <ion-card (click)="toJobs()">
-                <img src="assets/imgs/card-madison.png"/>
-                <div class="card-title">Jobs</div>
-              </ion-card>
+                <ion-card (click)="openBrowser('https://mymail.rit.edu/')">
+                  <img src="assets/imgs/card-madison.png"/>
+                  <div class="card-title">Webmail</div>
+                </ion-card>
             </ion-col>  
       </ion-row>
     </ion-grid>
@@ -91,34 +91,34 @@
       <ion-grid>
         <ion-row>
           <ion-col>
-            <ion-card>
+            <ion-card (click)="openBrowser('http://www.rit.edu/dubai/admission/undergraduate-programs')">
               <img src="assets/imgs/card-saopaolo.png"/>
               <div class="card-title">Admissions</div>
             </ion-card>
           </ion-col> 
           <ion-col>
-              <ion-card>
-                <img src="assets/imgs/card-amsterdam.png"/>
-                <div class="card-title">IT</div>
-              </ion-card>
+            <ion-card (click)="toJobs()">
+              <img src="assets/imgs/card-amsterdam.png"/>
+              <div class="card-title">Jobs</div>
+            </ion-card>
           </ion-col>  
         </ion-row>
         <ion-row>
             <ion-col>
-              <ion-card>
+              <ion-card (click)="openBrowser('http://www.rit.edu/dubai/tuition-and-scholarships/tuition-and-fees')">
                 <img src="assets/imgs/card-sf.png"/>
                 <div class="card-title">Finance</div>
               </ion-card>
             </ion-col> 
               <ion-col>
-                <ion-card>
+                <ion-card (click)="openBrowser('http://www.rit.edu/dubai/academic-support/academic-advising')">
                   <img src="assets/imgs/card-madison.png"/>
                   <div class="card-title">Academic Advising</div>
                 </ion-card>
               </ion-col>  
         </ion-row>
       </ion-grid>
-    <!--Personal-->
+    <!--Personal
     <ion-item-divider color="light">Personal</ion-item-divider>
     <ion-grid>
       <ion-row>
@@ -136,6 +136,7 @@
         </ion-col>  
       </ion-row>
     </ion-grid>
+    -->
   </ion-item-group>
   
 </ion-content>

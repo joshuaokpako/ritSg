@@ -14,6 +14,8 @@ export class DocPipe implements PipeTransform {
   constructor(private db: FirestoreProvider) {}
 
   transform(value: any): Observable<any> {
+  
     return this.db.doc$(value.path)
+    
   }
 }

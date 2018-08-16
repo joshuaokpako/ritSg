@@ -5,7 +5,6 @@ import { FirestoreProvider } from '../../providers/firestore/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import * as moment from 'moment';
-var now =moment().format('MMMM Do YYYY, h:mm:ss a');
 export interface message{
   message: string;
   timestamp: any;
@@ -30,7 +29,7 @@ export class ChatServiceProvider {
   }
 
   getChats(){
-    this.chat =this.db.col$('users/'+this.uS.uid +'/chats');
+    this.chat =this.db.col$('users/'+this.uS.uid +'/chats', ref => ref.orderBy('updatedAt','desc'));
     return this.chat;
   }
 
@@ -39,50 +38,75 @@ export class ChatServiceProvider {
   }
 
   getConvo(uid){
-    return  this.db.doc$('users/'+this.uS.uid+'/chats/'+uid)
+    return  this.db.doc$('users/'+uid+'/chats/'+this.uS.uid)
     .pipe(
       map((chat:any)=>{
         if(chat){
-          this.key =chat.messageKey
-          return this.db.col$('messages/'+chat.messageKey +'/chats', ref => ref.orderBy('createdAt','asc'));
+            return chat
+        }
+        else{
+          chat= {messageKey: " "}
+          return chat
         }
       })
     )
   }
 
-  saveMessage(data){
-    if (!this.key) {
-      this.key = data.chatUid + this.uS.uid
+  getMessgages(key){
+    if(key){
+      return this.db.col$('messages/'+key +'/chats', ref => ref.orderBy('createdAt','asc'));
     }
-    let themessage ={
+  }
 
+  saveMessage(data,key){
+    
+    let themessage ={
+      sentTo:data.chatUid,
       sentBy: this.uS.userName,
       uid: this.uS.uid,
       message: data.message,
       readBy: []
     }
-    return this.db.add('messages/'+this.key +'/chats', themessage)
+    return this.db.add('messages/'+key+'/chats', themessage)
      
     
   }
 
-  addChat(data,messageKey){
-    let sender ={
+  updateUnreadMessages(chatUid){
+    let receiver ={ // the recievers info to put in senders database
+      unreadMessages: []
+    }
+    this.db.update('users/'+this.uS.uid+'/chats/'+chatUid,receiver)
+  }
+
+  getReceiverUnreadMessages(chatUid){
+   return this.db.doc$('users/'+chatUid+'/chats/'+this.uS.uid)
+  }
+
+  getMyUnreadMessages(chatUid){
+    return this.db.doc$('users/'+this.uS.uid+'/chats/'+chatUid)
+  }
+
+  addChat(data,messageKey,recUnread){
+    recUnread.push(data.message)
+    console.log(recUnread)
+    let sender ={ //the senders info to put in receivers database
       name : this.uS.userName,
-      photoUrl: this.uS.userPhotoUrl,
       uid: this.uS.uid,
       userRef: this.db.doc('users/'+this.uS.uid).ref,
       lastMessage:data.message,
-      messageKey:messageKey
+      messageKey:messageKey,
+      unreadMessages:recUnread
 
     }
-    let receiver ={
+    let receiver ={ // the recievers info to put in senders database
       name : data.name,
       photoUrl: data.photoUrl,
       uid: data.chatUid,
       userRef: this.db.doc('users/'+data.chatUid).ref,
       lastMessage:data.message,
-      messageKey:messageKey
+      messageKey:messageKey,
+      unreadMessages: []
 
     }
     this.db.upsert('users/'+this.uS.uid+'/chats/'+data.chatUid,receiver).then(()=>{

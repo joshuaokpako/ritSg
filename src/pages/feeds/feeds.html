@@ -15,9 +15,9 @@
 
     <ion-item>
       <ion-avatar item-start>
-        <img src="{{(feed.postedBy|doc|async)?.photoUrl}}">
+        <img *ngIf="feed.postedBy.photoUrl" src="{{feed.postedBy.photoUrl}}">
       </ion-avatar>
-      <h2>{{(feed.postedBy|doc|async)?.fullName}}</h2>
+      <h2>{{feed.postedBy.fullName | titlecase}}</h2>
       <p>{{(feed.createdAt)?.seconds * 1000 | date :'mediumDate'}}</p>
     </ion-item>
   
@@ -29,15 +29,17 @@
   
     <ion-row>
       <ion-col>
-        <button ion-button icon-left color="danger" clear small>
+        <button ion-button icon-left [color]="feed.youLike==true ? 'danger': 'inactive'" (click)="like(feed)" clear small>
           <ion-icon name="heart"></ion-icon>
-          <div>{{feed.likes.length}} Likes</div>
+          <div ><span *ngIf="feed.likes.length!=1; else oneLike">{{feed.likes.length}} likes </span> <ng-template #oneLike>{{feed.likes.length}} like<span></span></ng-template></div>
+          
         </button>
       </ion-col>
       <ion-col>
-        <button ion-button icon-left clear color="danger" small>
+        <button ion-button icon-left clear color="inactive" small (click)="toComments('Comments',feed.id)">
           <ion-icon name="text"></ion-icon>
-          <div>4 Comments</div>
+          <div *ngIf="feed.comment;else noComment"><span *ngIf="feed.comment!=1;else oneComment">{{feed.comment}} Comments</span><ng-template #oneComment>{{feed.comment}} Comment</ng-template></div>
+          <ng-template #noComment>0 Comments</ng-template>
         </button>
       </ion-col>
       <ion-col center text-center>

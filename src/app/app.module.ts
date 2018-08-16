@@ -4,13 +4,15 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { HttpClientModule } from '@angular/common/http';
 
 import { InAppBrowser } from '@ionic-native/in-app-browser';
-import { ImagePicker } from '@ionic-native/image-picker';
+import { Geofence } from '@ionic-native/geofence';
+import { LocalNotifications } from '@ionic-native/local-notifications';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { GoogleMaps } from "@ionic-native/google-maps";
 import { Geolocation } from '@ionic-native/geolocation';
 import { Camera } from '@ionic-native/camera';
 import { File } from '@ionic-native/file';
+import { Firebase } from '@ionic-native/firebase'
 
 import { MyApp } from './app.component';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
@@ -43,6 +45,9 @@ import { AddFeedPage } from '../pages/add-feed/add-feed';
 import { AddJobPage } from '../pages/add-job/add-job';
 import { JobsPage } from '../pages/jobs/jobs';
 import { FeedbackPage } from '../pages/feedback/feedback';
+import { ProfileDetailsPage } from '../pages/profile-details/profile-details';
+import { BooksPage } from '../pages/books/books';
+import { AddBooksPage } from '../pages/add-books/add-books';
 
 import { NgCalendarModule  } from 'ionic2-calendar';
 import { AngularFireModule } from 'angularfire2';
@@ -52,6 +57,7 @@ import { ChatServiceProvider } from '../providers/chat-service/chat-service';
 import {FilterPipe} from '../pipes/filter/filter';
 import {DocPipe} from '../pipes/doc/doc'
 import { FirestoreProvider } from '../providers/firestore/firestore';
+import { FcmProvider } from '../providers/fcm/fcm';
 
 Pro.init('119FE586', {
   appVersion: '0.0.1'
@@ -96,7 +102,10 @@ const firebase = {
     AddFeedPage,
     AddJobPage,
     JobsPage,
-    FeedbackPage
+    FeedbackPage,
+    ProfileDetailsPage,
+    BooksPage,
+    AddBooksPage
   ],
   imports: [
     NgCalendarModule,
@@ -136,17 +145,23 @@ const firebase = {
     AddFeedPage,
     AddJobPage,
     JobsPage,
-    FeedbackPage
+    FeedbackPage,
+    ProfileDetailsPage,
+    BooksPage,
+    AddBooksPage
   ],
   providers: [
     StatusBar,
     SplashScreen,
     InAppBrowser,
-    ImagePicker,
+    LocalNotifications,
     Geolocation,
     GoogleMaps,
     Camera,
     File,
+    Firebase,
+    FcmProvider,
+    Geofence,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     UserserviceProvider,
     ChatServiceProvider,

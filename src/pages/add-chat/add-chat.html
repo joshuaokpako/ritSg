@@ -22,9 +22,9 @@
     </p>
     <div *ngIf="(users |async) != ''">
       <div *ngFor="let us of users  | async | filter : searchText">
-        <ion-item *ngIf="us.email!=user.email" (click)="goToMessage(us.fullName,us.photoUrl,us.uid)">
+        <ion-item *ngIf="us.email!=user.email" (click)="goToMessage(us.uid,us.name)">
           <ion-avatar item-start>
-            <img src="{{us.photoUrl}}">
+            <img *ngIf="us.photoUrl" src="{{us.photoUrl}}">
           </ion-avatar>
           <h2>{{us.fullName |titlecase}}</h2>
         </ion-item>

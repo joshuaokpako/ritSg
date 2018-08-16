@@ -23,6 +23,20 @@ page-message {
         border-radius: 100%;
     }
 
+    .chat-status {
+      min-height: 49px;
+      .chat-content-center {
+        padding: 5px 10px;
+        background-color: #e1e1f7;
+        border-radius: 6px;
+        font-size: 12px;
+        color: #555;
+        height: 34px;
+        left: 10%;
+        right:10%;
+      }
+    }
+
     .chat-message {
         width: 80%;
         min-height: 40px;
@@ -47,15 +61,15 @@ page-message {
         .right-bubble:after {
             content: '';
             position: absolute;
-            right: 0;
+            right: 13px;
             top: 0;
             width: 0;
             height: 0;
-            border: 27px solid transparent;
+            border: 15px solid transparent;
             border-left-color: #dcf8c6;
             border-right: 0;
             border-top: 0;
-            margin-top: -13.5px;
+            margin-top: 0px;
             margin-right: -27px;
         }
         .left-bubble {
@@ -79,15 +93,15 @@ page-message {
         .left-bubble:after {
             content: '';
             position: absolute;
-            left: 0;
+            left: 13px;
             top: 0;
             width: 0;
             height: 0;
-            border: 27px solid transparent;
+            border: 15px solid transparent;
             border-right-color: #ffffff;
             border-left: 0;
             border-top: 0;
-            margin-top: -13.5px;
+            margin-top: 0px;
             margin-left: -27px;
         }
       }

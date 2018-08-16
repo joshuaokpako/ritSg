@@ -7,8 +7,8 @@
 <ion-header>
 
   <ion-navbar color="rit">
-      <img class="roundImg" *ngIf="receiver | async as rec" src="{{rec.photoUrl}}" width="40px" style="display:inline-block" height="40px"/>
-      <ion-title class="titleicon" *ngIf="receiver | async as rec" style="display:inline-block" >{{rec.fullName}}</ion-title>
+      <img class="roundImg" *ngIf="receiver" src="{{receiver.photoUrl}}" width="40px" style="display:inline-block" height="40px"/>
+      <ion-title class="titleicon" *ngIf="receiver" style="display:inline-block" >{{receiver.fullName | titlecase}}</ion-title>
   </ion-navbar>
   
  
@@ -19,7 +19,21 @@
   <div >
       <div *ngIf="(chats |async) != '' && user != '';">
           <ion-list>
-            <ion-item no-lines  *ngFor="let chat of chats | async; let last = last">
+            <ion-item no-lines  *ngFor="let chat of chats | async as chatArray; let last = last; let i =index; let first = first">
+                <!-- Show the first chat date-->
+                <div class="chat-status" text-center *ngIf="first">
+                  <span class="chat-content-center" *ngIf="((chat.createdAt)?.seconds * 1000 | date:'mediumDate')!= (now | date:'mediumDate'); else today">{{(chat.createdAt)?.seconds * 1000 | date:'mediumDate'}}</span>
+                  <ng-template #today><span class="chat-content-center">Today</span></ng-template>
+                </div>
+                <!--Show subsequent start date-->
+                <div *ngIf="chatArray[i+1]" >
+                  <div class="chat-status" text-center *ngIf="((chatArray[i-1]?.createdAt)?.seconds * 1000 | date:'shortDate')!==((chatArray[i]?.createdAt)?.seconds * 1000 | date:'shortDate') && !first">
+                    <span class="chat-content-center" *ngIf="((chat.createdAt)?.seconds * 1000 | date:'mediumDate')!= (now | date:'mediumDate'); else todayOne"><span *ngIf="chatArray[i+1]">{{(chatArray[i+1].createdAt)?.seconds * 1000 | date:'mediumDate'}}</span></span>
+                    <ng-template #todayOne>
+                      <span class="chat-content-center">Today</span>
+                    </ng-template>
+                  </div>
+                </div>
               <div class="chat-message" text-right *ngIf="chat.uid == user.uid">
                 <div class="right-bubble">
                   <span class="msg-name">Me</span>
@@ -29,11 +43,12 @@
               </div>
               <div class="chat-message" text-left *ngIf="chat.uid != user.uid">
                 <div class="left-bubble">
-                  <span class ="msg-name" *ngIf="receiver | async as rec">{{rec.fullName}}</span>
-                  <span *ngIf="(chat.createdAt)?.seconds"s class="msg-date"> {{(chat.createdAt)?.seconds * 1000 | date:'shortTime'}}</span>
+                  <span class ="msg-name" *ngIf="receiver">{{receiver.fullName}}</span>
+                  <span *ngIf="(chat.createdAt)?.seconds" class="msg-date"> {{(chat.createdAt)?.seconds * 1000 | date:'shortTime'}}</span>
                   <p text-wrap>{{chat.message}}</p>
                 </div>
               </div>
+              
               {{last ? toBottom() : ''}} 
             </ion-item>
           </ion-list>

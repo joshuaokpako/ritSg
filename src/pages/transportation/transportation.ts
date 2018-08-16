@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
+import { Geofence } from '@ionic-native/geofence';
 
 /**
  * Generated class for the TransportationPage page.
@@ -13,8 +14,8 @@ import { NavController, NavParams } from 'ionic-angular';
   templateUrl: 'transportation.html',
 })
 export class TransportationPage {
-
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+ type = "RIT Bus"
+  constructor(public geofence: Geofence, public navCtrl: NavController, public navParams: NavParams) {
   }
 
   ionViewDidLoad() {

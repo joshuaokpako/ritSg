@@ -19,9 +19,9 @@
     </ion-fab>
     <ion-list>
       <div *ngFor="let deal of deals | async">
-        <ion-item (click)="toDetails(deal.name, deal.img, deal.about, deal.deal, deal.location,'RIT Deals')" >
+        <ion-item (click)="toDetails(deal.name, deal.image, deal.about, deal.deal, deal.location,'RIT Deals')" >
           <ion-thumbnail item-start>
-            <img src="{{deal.img}}">
+            <img src="{{deal.image}}">
           </ion-thumbnail>
           <h2>{{deal.name}}</h2>
           <p>{{deal.deal}}</p>

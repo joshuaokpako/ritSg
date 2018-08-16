@@ -10,7 +10,7 @@ import * as moment from 'moment';
 export class PlannerModalPage {
 
  
-  event = { startTime: new Date().toISOString(), endTime: new Date().toISOString(), allDay: false, title:"" };
+  event = { startTime: new Date().toISOString(), endTime: new Date().toISOString(), allDay: false, title:"", eventType : "private" };
   minDate = new Date().toISOString();
  
   constructor(public uS:UserserviceProvider, public navCtrl: NavController, private navParams: NavParams, public viewCtrl: ViewController,private alertCtrl: AlertController) {

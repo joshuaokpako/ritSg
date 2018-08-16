@@ -16,7 +16,7 @@
 <ion-content>
 
   <div class="backgroundImg">
-    <img src="{{img}}">
+    <img *ngIf="img" src="{{img}}">
   </div>
 
   <ion-list>
@@ -30,8 +30,9 @@
       {{about}}
     </p>
     </ion-item>
-
-    <div *ngIf="type =='RIT Clubs' || type =='RIT Athletics';else showMap">
+    
+    <div *ngIf="type =='RIT Clubs' || type =='RIT Athletics'  || type =='Jobs';else showMap">
+      <!--
       <ion-item text-center (click)="itemSelected(item)">
         View {{header}} Posts
         <ion-icon name="arrow-forward" color="primary"  item-end></ion-icon>
@@ -40,13 +41,15 @@
       <div padding>
         <button ion-button block color="secondary"> Join {{header}}</button>
       </div>
+      -->
     </div>
     
-    <div id="map_canvas">
+    
+    
+    <ng-template #showMap>
+      <div id="map_canvas">
 
       </div>
-    <ng-template #showMap>
-      
     </ng-template>
 
   </ion-list>
