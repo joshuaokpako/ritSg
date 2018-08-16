@@ -18,7 +18,7 @@
   <ion-list no-lines>
     <ion-item>
       <div class="imgwrap">
-        <img src="{{(user)?.photoURL}}" (click)="presentConfirm()">
+        <img *ngIf="(user)?.photoURL" src="{{(user)?.photoURL}}" (click)="presentConfirm()">
         <h2><ion-icon (click)="openEditAlert()" class='icon' name="create"></ion-icon>{{(user)?.displayName|titlecase}}</h2>
       </div>
     </ion-item>
