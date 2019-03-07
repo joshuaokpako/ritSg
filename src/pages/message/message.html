@@ -7,8 +7,9 @@
 <ion-header>
 
   <ion-navbar color="rit">
-      <img class="roundImg" *ngIf="receiver" src="{{receiver.photoUrl}}" width="40px" style="display:inline-block" height="40px"/>
+      <img class="roundImg resize" *ngIf="receiver" src="{{receiver.photoUrl}}" width="40px" style="display:inline-block" height="40px"/>
       <ion-title class="titleicon" *ngIf="receiver" style="display:inline-block" >{{receiver.fullName | titlecase}}</ion-title>
+
   </ion-navbar>
   
  
@@ -17,7 +18,9 @@
 
 <ion-content class="body">
   <div >
-      <div *ngIf="(chats |async) != '' && user != '';">
+        <p text-center *ngIf="!(chats |async)">
+          <ion-spinner color="rit" name="crescent"></ion-spinner>
+        </p>
           <ion-list>
             <ion-item no-lines  *ngFor="let chat of chats | async as chatArray; let last = last; let i =index; let first = first">
                 <!-- Show the first chat date-->
@@ -34,39 +37,35 @@
                     </ng-template>
                   </div>
                 </div>
-              <div class="chat-message" text-right *ngIf="chat.uid == user.uid">
-                <div class="right-bubble">
+              <div class="innermsg right" text-right *ngIf="chat.uid == user">
                   <span class="msg-name">Me</span>
                   <span *ngIf="(chat.createdAt)?.seconds" class="msg-date"> {{(chat.createdAt)?.seconds * 1000 | date:'shortTime'}}</span>
                   <p text-wrap>{{chat.message}}</p>
-                </div>
               </div>
-              <div class="chat-message" text-left *ngIf="chat.uid != user.uid">
-                <div class="left-bubble">
+              <div class="innermsg left" text-left *ngIf="chat.uid != user">
+                
                   <span class ="msg-name" *ngIf="receiver">{{receiver.fullName}}</span>
                   <span *ngIf="(chat.createdAt)?.seconds" class="msg-date"> {{(chat.createdAt)?.seconds * 1000 | date:'shortTime'}}</span>
                   <p text-wrap>{{chat.message}}</p>
-                </div>
               </div>
               
               {{last ? toBottom() : ''}} 
             </ion-item>
           </ion-list>
          
-        </div>
+
   </div>
   
 </ion-content>
 
 <ion-footer>
-    <ion-grid>
-      <ion-row>
-        <ion-col col-10>
-          <ion-input type="text" [(ngModel)]=message placeholder="Type a message"  name="message"></ion-input>
-        </ion-col>
-        <ion-col col-2 (click)="sendMessage()">
-          <ion-icon item-end color="secondary" name="paper-plane"></ion-icon>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+    <ion-toolbar color="light">
+      <ion-buttons end (click)="sendMessage()">
+          <button ion-button icon-only clear color="secondary">
+            <ion-icon name="paper-plane"></ion-icon>
+          </button>
+        </ion-buttons>
+        <ion-textarea autocomplete="on" autocorrect="on" type="text" placeholder="Add a message" name="message" [(ngModel)]="message"></ion-textarea>
+        
+  </ion-toolbar>
   </ion-footer>

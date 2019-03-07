@@ -16,10 +16,11 @@ type DocPredicate<T> = string | AngularFirestoreDocument<T>;
 
 @Injectable()
 export class FirestoreProvider {
-
+firebase = firebase;
   constructor(public http: HttpClient,private afs: AngularFirestore) {
     console.log('Hello FirestoreProvider Provider');
   }
+
 
   get timestamp() {
     return firebase.firestore.FieldValue.serverTimestamp()

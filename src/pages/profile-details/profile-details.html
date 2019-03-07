@@ -20,19 +20,20 @@
         <ion-spinner color="rit" name="crescent"></ion-spinner>
       </p>
       <p text-center class="noEvents" [hidden]="(myFeeds |async) != ''">
-          Sorry there are no events right now 
+          Sorry there are no feeds right now 
         </p>
       <ion-card *ngFor="let feed  of myFeeds |async">
 
           <ion-item>
-            <ion-avatar item-start>
-              <img *ngIf="feed.postedBy.photoUrl" src="{{feed.postedBy.photoUrl}}">
+            <ion-avatar  item-start>
+              <img class="resize" *ngIf="feed.postedBy.photoUrl" src="{{feed.postedBy.photoUrl}}">
+              <img *ngIf="!(feed.postedBy.photoUrl)" src="assets/imgs/blank-profile-picture.png">
             </ion-avatar>
             <h2>Me</h2>
             <p>{{(feed.createdAt)?.seconds * 1000 | date :'mediumDate'}}</p>
           </ion-item>
         
-          <img *ngIf="(feed)?.postImg" class="max" src="{{feed?.postImg}}">
+          <img *ngIf="(feed)?.postImg" class="max resizeImg" src="{{feed?.postImg}}">
         
           <ion-card-content>
             <p>{{feed.description}}</p>
@@ -47,7 +48,7 @@
               </button>
             </ion-col>
             <ion-col>
-              <button ion-button icon-left clear color="inactive" small (click)="toComments('Comments',feed.id)">
+              <button ion-button icon-left clear color="inactive" small (click)="toComments('Comments',feed.id,feed.likes)">
                 <ion-icon name="text"></ion-icon>
                 <div *ngIf="feed.comment;else noComment"><span *ngIf="feed.comment!=1;else oneComment">{{feed.comment}} Comments</span><ng-template #oneComment>{{feed.comment}} Comment</ng-template></div>
                 <ng-template #noComment>0 Comments</ng-template>
@@ -61,32 +62,32 @@
     </div>
 
     <div *ngIf="header == 'My Events'">
-        <ion-card *ngFor="let Ev of myEvents | async">
+        <ion-card *ngFor="let user of myEvents | async">
             <ion-item>
               <ion-avatar item-start >
-                <img *ngIf="(Ev.eventRef.postedBy)?.photoUrl" src="{{(Ev.eventRef.postedBy)?.photoUrl}}">
+                <img class="resize" *ngIf="(user.eventRef.postedBy)?.photoUrl" src="{{(user.eventRef.postedBy)?.photoUrl}}">
               </ion-avatar>
-              <h2>{{(Ev.eventRef.postedBy)?.fullName | titlecase}}</h2> 
+              <h2>{{(user.eventRef.postedBy)?.fullName | titlecase}}</h2> 
             </ion-item>
-            <img *ngIf="(Ev.eventRef)?.postImg" class="max" src="{{(Ev.eventRef)?.postImg}}">
+            <img *ngIf="(user.eventRef)?.postImg" class="max resizeImg" src="{{(user.eventRef)?.postImg}}">
             <ion-card-content>
-              <h2><b>{{Ev.title |titlecase}} - {{Ev.eventRef.eventDate}}</b></h2>
-              <h3 *ngIf="Ev.eventRef.price !=''">Entry Fee: {{Ev.eventRef.price | currency:'AED' :'code'}}</h3>
-              <h3>{{Ev.eventRef.startTime}} to {{Ev.eventRef.endTime}}</h3>
-              <p>{{Ev.description}} </p>
+              <h2><b>{{user.title |titlecase}} - {{user.eventRef.eventDate}}</b></h2>
+              <h3 *ngIf="user.eventRef.price !=''">Entry Fee: {{user.eventRef.price | currency:'AED' :'code'}}</h3>
+              <h3>{{user.eventRef.startTime}} to {{user.eventRef.endTime}}</h3>
+              <p>{{user.description}} </p>
             </ion-card-content>
             <ion-row>
               <ion-col>
-                <button ion-button icon-left [color]="Ev.youGoing==true ? 'danger': 'inactive'"  clear small>
+                <button ion-button icon-left [color]="user.youGoing==true ? 'danger': 'inactive'"  clear small>
                   <ion-icon name="walk"></ion-icon>
-                  <div >{{(Ev.eventRef.going)?.length}} going</div>
+                  <div >{{(user.eventRef.going)?.length}} going</div>
                   
                 </button>
               </ion-col>
               <ion-col>
-                <button ion-button icon-left clear color="inactive" small (click)="toFeedback('Feedbacks',Ev.id)">
+                <button ion-button icon-left clear color="inactive" small (click)="toFeedback('Feedbacks',user.id,user.eventRef.going)">
                   <ion-icon name="text"></ion-icon>
-                  <div *ngIf="(Ev.eventRef)?.feedback;else noFeedbacks"><span *ngIf="(Ev.eventRef)?.feedback!=1;else oneFeedback">{{(Ev.eventRef)?.feedback}} Feedbacks</span><ng-template #oneFeedback>{{Ev.feedback}} Feedback</ng-template></div>
+                  <div *ngIf="(user.eventRef)?.feedback;else noFeedbacks"><span *ngIf="(user.eventRef)?.feedback!=1;else oneFeedback">{{(user.eventRef)?.feedback}} Feedbacks</span><ng-template #oneFeedback>{{(user.eventRef)?.feedback}} Feedback</ng-template></div>
                   <ng-template #noFeedbacks>0 Feedbacks</ng-template>
                 </button>
               </ion-col>
@@ -96,5 +97,40 @@
             </ion-row>
           </ion-card>
     </div>
+
+
+    <div *ngIf="header == 'Spirit Points'">
+          <p text-center *ngIf="!(userSpirit |async)">
+            <ion-spinner color="rit" name="crescent"></ion-spinner>
+          </p>
+      <ion-item *ngFor="let us of userSpirit | async; let i = index">
+        <h2>{{i+1}} {{us.fullName | titlecase}}</h2> 
+        <p>{{us.email}}</p>
+        <button ion-button clear item-end >{{us.spiritPoints}}</button>
+      </ion-item>
+    </div>
+
+    <div *ngIf="header == 'Members'">
+    <p text-center *ngIf="!(members |async)">
+      <ion-spinner color="rit" name="crescent"></ion-spinner>
+    </p>
+    <p text-center class="noEvents" [hidden]="(members |async) != ''">
+      Sorry there are no members  
+    </p>
+    <ion-item *ngFor="let mem of members | async">
+      <ion-avatar item-start >
+        <img class="resize" *ngIf="(mem.member | doc |async)?.photoUrl" src="{{(mem.member| doc |async)?.photoUrl}}">
+      </ion-avatar>
+      <h2>{{(mem.member | doc | async)?.fullName | titlecase}}</h2> 
+      <p>{{(mem.member| doc | async)?.email}}</p>
+      <p>{{mem.position}}</p>
+      <button ion-button item-end clear color='danger' (click)="deleteMember(mem)">Delete</button>
+    </ion-item>
+    <p padding>
+      <button ion-button block color='secondary' (click)="showAlert()">Add Member</button>
+    </p>
+  </div>
+
+
 
 </ion-content>

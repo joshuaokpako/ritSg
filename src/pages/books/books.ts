@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { IonicPage, NavController, NavParams,ModalController } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
-import { AddBooksPage } from '../add-books/add-books';
 
 /**
  * Generated class for the BooksPage page.
@@ -31,7 +30,7 @@ books;
     let addObj ={
       header:  header
     }
-    let modal = this.modalCtrl.create(AddBooksPage, addObj)
+    let modal = this.modalCtrl.create('AddBooksPage', addObj)
     modal.present()
   }
   

@@ -13,6 +13,20 @@ import { Geolocation } from '@ionic-native/geolocation';
 import { Camera } from '@ionic-native/camera';
 import { File } from '@ionic-native/file';
 import { Firebase } from '@ionic-native/firebase'
+import { Keyboard } from '@ionic-native/keyboard';
+import { BarcodeScanner } from '@ionic-native/barcode-scanner';
+import { FileOpener } from '@ionic-native/file-opener';
+import { FileTransfer } from '@ionic-native/file-transfer';
+import { FileChooser } from '@ionic-native/file-chooser';
+import { DocumentPicker } from '@ionic-native/document-picker';
+import { FilePath } from '@ionic-native/file-path';
+import { AppMinimize } from '@ionic-native/app-minimize';
+import { BackgroundMode } from '@ionic-native/background-mode';
+import { Badge } from '@ionic-native/badge';
+import { LocationAccuracy } from '@ionic-native/location-accuracy';
+import { ScreenOrientation } from '@ionic-native/screen-orientation';
+import { SpinnerDialog } from '@ionic-native/spinner-dialog';
+
 
 import { MyApp } from './app.component';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
@@ -20,42 +34,13 @@ import { AngularFireStorageModule } from 'angularfire2/storage';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { FormsModule }   from '@angular/forms';
 
-import { LoginPage } from '../pages/login/login';
-import { FeedsPage} from '../pages/feeds/feeds';
-import { PlannerPage } from '../pages/planner/planner';
-import { ChatsPage } from '../pages/chats/chats';
-import { ProfilePage } from '../pages/profile/profile';
-import { HomePage } from '../pages/home/home';
-import { CoverPage } from '../pages/cover/cover';
-import { RegisterPage } from '../pages/register/register';
-import { TabsPage } from '../pages/tabs/tabs';
-import { EventsPage } from '../pages/events/events';
-import { RitClubsPage } from '../pages/rit-clubs/rit-clubs';
-import { RitDealsPage } from '../pages/rit-deals/rit-deals';
-import { RitAthleticsPage } from '../pages/rit-athletics/rit-athletics';
-import { DetailsPage } from '../pages/details/details';
-import { AddEventPage } from '../pages/add-event/add-event';
-import { FacultyPage } from '../pages/faculty/faculty';
-import { TransportationPage } from '../pages/transportation/transportation';
-import { AddpagePage } from '../pages/addpage/addpage';
-import { PlannerModalPage } from '../pages/planner-modal/planner-modal';
-import { AddChatPage } from '../pages/add-chat/add-chat';
-import { MessagePage } from '../pages/message/message';
-import { AddFeedPage } from '../pages/add-feed/add-feed';
-import { AddJobPage } from '../pages/add-job/add-job';
-import { JobsPage } from '../pages/jobs/jobs';
-import { FeedbackPage } from '../pages/feedback/feedback';
-import { ProfileDetailsPage } from '../pages/profile-details/profile-details';
-import { BooksPage } from '../pages/books/books';
-import { AddBooksPage } from '../pages/add-books/add-books';
+
 
 import { NgCalendarModule  } from 'ionic2-calendar';
 import { AngularFireModule } from 'angularfire2';
 import { UserserviceProvider } from '../providers/userservice/userservice';
 import { Pro } from '@ionic/pro';
 import { ChatServiceProvider } from '../providers/chat-service/chat-service';
-import {FilterPipe} from '../pipes/filter/filter';
-import {DocPipe} from '../pipes/doc/doc'
 import { FirestoreProvider } from '../providers/firestore/firestore';
 import { FcmProvider } from '../providers/fcm/fcm';
 
@@ -74,39 +59,7 @@ const firebase = {
 };
 
 @NgModule({
-  declarations: [
-    MyApp,
-    LoginPage,
-    FeedsPage,
-    PlannerPage,
-    HomePage,
-    ChatsPage,
-    CoverPage,
-    RegisterPage,
-    TabsPage,
-    ProfilePage,
-    EventsPage,
-    RitClubsPage,
-    RitDealsPage,
-    RitAthleticsPage,
-    DetailsPage,
-    AddEventPage,
-    AddpagePage,
-    FacultyPage,
-    TransportationPage,
-    PlannerModalPage,
-    AddChatPage,
-    FilterPipe,
-    DocPipe,
-    MessagePage,
-    AddFeedPage,
-    AddJobPage,
-    JobsPage,
-    FeedbackPage,
-    ProfileDetailsPage,
-    BooksPage,
-    AddBooksPage
-  ],
+  declarations: [MyApp],
   imports: [
     NgCalendarModule,
     BrowserModule,
@@ -119,37 +72,7 @@ const firebase = {
     AngularFireStorageModule // imports firebase/storage only needed for storage features
   ],
   bootstrap: [IonicApp],
-  entryComponents: [
-    MyApp,
-    LoginPage,
-    FeedsPage,
-    PlannerPage,
-    HomePage,
-    ChatsPage,
-    CoverPage,
-    RegisterPage,
-    TabsPage,
-    ProfilePage,
-    EventsPage,
-    RitClubsPage,
-    RitDealsPage,
-    RitAthleticsPage,
-    DetailsPage,
-    AddEventPage,
-    AddpagePage,
-    FacultyPage,
-    TransportationPage,
-    PlannerModalPage,
-    AddChatPage,
-    MessagePage,
-    AddFeedPage,
-    AddJobPage,
-    JobsPage,
-    FeedbackPage,
-    ProfileDetailsPage,
-    BooksPage,
-    AddBooksPage
-  ],
+  entryComponents: [MyApp],
   providers: [
     StatusBar,
     SplashScreen,
@@ -159,13 +82,27 @@ const firebase = {
     GoogleMaps,
     Camera,
     File,
+    DocumentPicker,
+    FileOpener,
+    FileTransfer,
     Firebase,
     FcmProvider,
+    FileChooser,
     Geofence,
+    BarcodeScanner,
+    Keyboard,
+    DocumentPicker,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     UserserviceProvider,
     ChatServiceProvider,
-    FirestoreProvider
+    FirestoreProvider,
+    FilePath,
+    AppMinimize,
+    BackgroundMode,
+    Badge,
+    LocationAccuracy,
+    ScreenOrientation,
+    SpinnerDialog
   ]
 })
 

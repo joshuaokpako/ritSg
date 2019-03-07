@@ -7,7 +7,7 @@
 <ion-header>
 
   <ion-navbar color="rit">
-    <ion-title>{{header}}</ion-title>
+    <ion-title>{{header | titlecase}}</ion-title>
   </ion-navbar>
 
 </ion-header>
@@ -16,12 +16,12 @@
 <ion-content>
 
   <div class="backgroundImg">
-    <img *ngIf="img" src="{{img}}">
+    <img class="resize" *ngIf="img" src="{{img}}">
   </div>
 
-  <ion-list>
+  <ion-list inset>
     <ion-item text-center>
-      <h1>{{header}}</h1>
+      <h1>{{header | titlecase}}</h1>
       <p *ngIf="type =='RIT Deals'" text-wrap>{{deal}}</p>
     </ion-item>
 
@@ -31,23 +31,27 @@
     </p>
     </ion-item>
     
-    <div *ngIf="type =='RIT Clubs' || type =='RIT Athletics'  || type =='Jobs';else showMap">
+    <div *ngIf="type =='RIT Clubs' || type =='RIT Athletics';else showMap">
+      <div padding>
+        <button *ngIf ='obj.clubType == "Public"' ion-button block color="secondary" (click)="joinClub()"> Join {{header}}</button>
+        <ion-item *ngIf="type =='RIT Clubs' || type =='RIT Athletics'" text-center (click)="viewMembers()">
+        View {{header}} Members
+        <ion-icon name="arrow-forward" color="primary"  item-end></ion-icon>
+      </ion-item>
+      </div>
       <!--
       <ion-item text-center (click)="itemSelected(item)">
         View {{header}} Posts
         <ion-icon name="arrow-forward" color="primary"  item-end></ion-icon>
       </ion-item>
         
-      <div padding>
-        <button ion-button block color="secondary"> Join {{header}}</button>
-      </div>
       -->
     </div>
     
     
     
     <ng-template #showMap>
-      <div id="map_canvas">
+      <div *ngIf="type !=='Jobs'" id="map_canvas">
 
       </div>
     </ng-template>

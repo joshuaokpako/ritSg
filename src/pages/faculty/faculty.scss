@@ -1,3 +1,11 @@
 page-faculty {
-
+    .resizeimg{
+        object-fit: contain;
+    }
+    .max{
+        max-height: 400px;
+    }
+    .resize{
+        object-fit: cover;
+    }
 }

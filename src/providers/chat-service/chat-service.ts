@@ -4,7 +4,7 @@ import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { FirestoreProvider } from '../../providers/firestore/firestore';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import * as moment from 'moment';
+import * as CryptoJS from 'crypto-js';
 export interface message{
   message: string;
   timestamp: any;
@@ -28,9 +28,30 @@ export class ChatServiceProvider {
 
   }
 
+  encryptMessages(text,salt){
+    return CryptoJS.AES.encrypt(text, salt).toString()
+  }
+  decryptMessages(encryption, salt){
+   return CryptoJS.AES.decrypt(encryption, salt).toString(CryptoJS.enc.Utf8);
+  }
+
   getChats(){
-    this.chat =this.db.col$('users/'+this.uS.uid +'/chats', ref => ref.orderBy('updatedAt','desc'));
-    return this.chat;
+   return this.db.col$('users/'+this.uS.uid +'/chats', ref => ref.orderBy('lastMessTime','desc'))
+   .pipe(map((x:any)=>{
+    if(x){
+      x.forEach(element => {
+        if(element){
+          element.lastMessage = this.decryptMessages(element.lastMessage,this.uS.uid)
+          element.unreadMessages.forEach(myelement => {
+            myelement = this.decryptMessages(myelement,this.uS.uid)
+          })
+        }
+      });
+    }
+    return x
+   })
+  );
+    
   }
 
   getChatPerson(uid){
@@ -52,20 +73,25 @@ export class ChatServiceProvider {
     )
   }
 
-  getMessgages(key){
+  getMessages(key){
     if(key){
-      return this.db.col$('messages/'+key +'/chats', ref => ref.orderBy('createdAt','asc'));
+      return this.db.col$('messages/'+key +'/chats', ref => ref.orderBy('createdAt','asc')).pipe(map((x:any)=>{
+          x.forEach(element => {
+            element.message = this.decryptMessages(element.message,key) 
+          });
+          return x
+        })
+      )
     }
   }
 
   saveMessage(data,key){
-    
     let themessage ={
       sentTo:data.chatUid,
       sentBy: this.uS.userName,
       uid: this.uS.uid,
-      message: data.message,
-      readBy: []
+      message: this.encryptMessages(data.message,key),
+      key: key
     }
     return this.db.add('messages/'+key+'/chats', themessage)
      
@@ -74,29 +100,45 @@ export class ChatServiceProvider {
 
   updateUnreadMessages(chatUid){
     let receiver ={ // the recievers info to put in senders database
-      unreadMessages: []
+      unreadMessages: [],
     }
     this.db.update('users/'+this.uS.uid+'/chats/'+chatUid,receiver)
   }
 
   getReceiverUnreadMessages(chatUid){
-   return this.db.doc$('users/'+chatUid+'/chats/'+this.uS.uid)
+   return this.db.doc$('users/'+chatUid+'/chats/'+this.uS.uid).pipe(map((x:any)=>{
+    if(x){
+        x.unreadMessages.forEach(myelement => {
+          myelement = this.decryptMessages(myelement,chatUid)
+        })
+    }
+    return x
+   })
+  )
   }
 
   getMyUnreadMessages(chatUid){
-    return this.db.doc$('users/'+this.uS.uid+'/chats/'+chatUid)
+    return this.db.doc$('users/'+this.uS.uid+'/chats/'+chatUid).pipe(map((x:any)=>{
+      if(x){
+        x.unreadMessages.forEach(myelement => {
+          myelement = this.decryptMessages(myelement,this.uS.uid)
+        });
+      }
+      return x
+    })
+    )
   }
 
   addChat(data,messageKey,recUnread){
-    recUnread.push(data.message)
-    console.log(recUnread)
+    recUnread.push(this.encryptMessages(data.message,data.chatUid))
     let sender ={ //the senders info to put in receivers database
       name : this.uS.userName,
       uid: this.uS.uid,
       userRef: this.db.doc('users/'+this.uS.uid).ref,
-      lastMessage:data.message,
+      lastMessage:this.encryptMessages(data.message,data.chatUid),
       messageKey:messageKey,
-      unreadMessages:recUnread
+      unreadMessages:recUnread,
+      lastMessTime: this.db.timestamp
 
     }
     let receiver ={ // the recievers info to put in senders database
@@ -104,9 +146,10 @@ export class ChatServiceProvider {
       photoUrl: data.photoUrl,
       uid: data.chatUid,
       userRef: this.db.doc('users/'+data.chatUid).ref,
-      lastMessage:data.message,
+      lastMessage:this.encryptMessages(data.message,this.uS.uid),
       messageKey:messageKey,
-      unreadMessages: []
+      unreadMessages: [],
+      lastMessTime: this.db.timestamp
 
     }
     this.db.upsert('users/'+this.uS.uid+'/chats/'+data.chatUid,receiver).then(()=>{

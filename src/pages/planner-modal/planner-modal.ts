@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, ViewController, AlertController } from 'ionic-angular';
+import { NavController, NavParams, ViewController, AlertController, IonicPage } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import * as moment from 'moment';
- 
+
+@IonicPage()
 @Component({
   selector: 'page-planner-modal',
   templateUrl: 'planner-modal.html',

@@ -1,8 +1,7 @@
 import { Component, OnInit} from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
-import { TabsPage } from '../tabs/tabs';
-import { FormsModule }   from '@angular/forms';
+import { FirestoreProvider }   from '../../providers/firestore/firestore';
 
 /**
  * Generated class for the LoginPage page.
@@ -23,28 +22,20 @@ export class LoginPage implements OnInit {
   public checkUser: void;
 
 
-  constructor(public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
+  constructor(public fs: FirestoreProvider, public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
     public alertCtrl: AlertController,  public navCtrl: NavController, public navParams: NavParams) {
       var that =this
     
-    this.usersService.fireAuth.authState.subscribe(user => {
-      if (user) {
-        that.navCtrl.setRoot(TabsPage);
-        console.log("worked");
-      } 
-      else {
-        console.log("failed");
-      }
-    })
   }
   ngOnInit(){
-
+    
   }
 
   
 
   submitLogin(){
-    let ritemailend = this.email.trim().replace(/\s+/g, " ").slice(-8);//get the last 8 char of email
+    this.email = this.email.trim().replace(/\s+/g, "")
+    let ritemailend = this.email.trim().replace(/\s+/g, "").slice(-8);//get the last 8 char of email
 
     //check if its an rit email ending with @rit.edu
     if(ritemailend!="@rit.edu"){
@@ -65,7 +56,7 @@ export class LoginPage implements OnInit {
       this.usersService.loginUserService(this.email.trim().replace(/\s+/g, " "), this.password).then(authData => {
         //successful
         loader.dismiss();
-        that.navCtrl.setRoot(TabsPage);
+        
       },
       error => {
         loader.dismiss();
@@ -79,7 +70,57 @@ export class LoginPage implements OnInit {
       })
     }
   }
-  forgotPassword(){
 
+  loginGuest(){
+    var loader = this.loadingCtrl.create({
+      content: "Please wait..."
+    });
+    this.usersService.loginAnonymously().then(authData => {
+      //successful
+      loader.dismiss();
+      this.navCtrl.push('HomePage')
+      
+    },
+    error => {
+      loader.dismiss();
+      // Unable to log in
+      let alert = this.alertCtrl.create({
+        subTitle: error,
+        buttons: ['OK']
+      });
+      alert.present();
+    }).catch(error=>{
+      let alert = this.alertCtrl.create({
+        subTitle: error,
+        buttons: ['OK']
+      });
+      alert.present();
+    })
+  }
+  forgotPassword(){
+    if(!this.email){
+      let alert = this.alertCtrl.create({
+        subTitle: 'Fill in your RIT email first',
+        buttons: ['OK']
+      });
+      alert.present();
+    }
+    else{
+      this.email = this.email.trim().replace(/\s+/g, "")
+      this.fs.firebase.auth().sendPasswordResetEmail(this.email).then((success) =>{
+        let alert = this.alertCtrl.create({
+          subTitle: 'Sent Reset Email',
+          buttons: ['OK']
+        });
+        alert.present();
+      }).catch((error) => {
+        let alert = this.alertCtrl.create({
+          subTitle: error,
+          buttons: ['OK']
+        });
+        alert.present();
+      });
+    }
+    
   }
 }

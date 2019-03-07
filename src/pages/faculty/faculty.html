@@ -21,6 +21,9 @@
   <p text-center *ngIf="!(staff | async)">
     <ion-spinner color="rit" name="crescent"></ion-spinner>
   </p>
+    <p text-center *ngIf="(staff | async) == ''">
+      Sorry no faculty staff has signed up
+    </p>
   <div *ngIf="(staff |async) != ''">
 
       <div *ngFor="let st of staff  | async | filter : searchText">
@@ -31,11 +34,12 @@
       st.faculty.department =='Mechanical & Industrial Engineering' ||
       st.faculty.department =='Science and Liberal Arts'">
           <ion-avatar item-start>
-            <img src="{{st.photoUrl}}">
+            <img class="resize" src="{{st.photoUrl}}">
           </ion-avatar>
           <h2>{{st.fullName | titlecase}}</h2>
           <p>{{st.faculty.department}}</p>
           <p>{{st.position}}</p>
+          <p>{{st.office}}</p>
           <!--<button ion-button clear item-end>View</button>-->
         </ion-item>
       </div>

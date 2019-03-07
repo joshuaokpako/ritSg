@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, IonicPage, Keyboard } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 
 /**
@@ -8,7 +8,7 @@ import { UserserviceProvider } from '../../providers/userservice/userservice';
  * See https://ionicframework.com/docs/components/#navigation for more info on
  * Ionic pages and navigation.
  */
-
+@IonicPage()
 @Component({
   selector: 'page-faculty',
   templateUrl: 'faculty.html',
@@ -16,17 +16,22 @@ import { UserserviceProvider } from '../../providers/userservice/userservice';
 export class FacultyPage implements OnInit {
 public staff:any;
 public departments:any;
-  constructor(public uS: UserserviceProvider,public navCtrl: NavController, public navParams: NavParams) {
+tabBarElement;
+  constructor(public uS: UserserviceProvider,public keyboard:Keyboard, public navCtrl: NavController, public navParams: NavParams) {
+    this.tabBarElement = document.querySelector('.tabbar.show-tabbar');
   }
 
   ngOnInit (){
     this.departments = this.uS.getDepartments()
     this.staff = this.uS.getFaculty();
-    this.uS.getFaculty().subscribe(x=>console.log(x))
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad FacultyPage');
+  ionViewWillEnter() {
+    this.tabBarElement.style.display = 'none';
+  }
+
+  ionViewWillLeave() {
+    this.tabBarElement.style.display = 'flex';
   }
 
 }

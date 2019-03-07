@@ -28,7 +28,7 @@ export class AddFeedPage {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad AddFeedPage');
+
   }
 
   dismiss(){
@@ -89,7 +89,11 @@ export class AddFeedPage {
       }, 
       (err) => 
       {
-          console.log(err);
+        let alert = this.alertCtrl.create({
+          subTitle: 'There was an error',
+          buttons: ['OK']
+          });
+        alert.present();
       }); 
     }
 
@@ -110,8 +114,13 @@ export class AddFeedPage {
         
     }, 
     (err) => 
+      
     {
-        console.log(err);
+      let alert = this.alertCtrl.create({
+        subTitle: 'There was an error',
+        buttons: ['OK']
+        });
+      alert.present();
     }); 
   }
   
@@ -130,6 +139,7 @@ export class AddFeedPage {
         this.viewCtrl.dismiss();
         })
         .catch(function(error) {
+          this.presentLoader(false)
           let alert = this.alertCtrl.create({
           subTitle: error,
           buttons: ['OK']
@@ -156,6 +166,7 @@ export class AddFeedPage {
               this.viewCtrl.dismiss();
               })
               .catch(function(error) {
+                this.presentLoader(false)
                 let alert = this.alertCtrl.create({
                 subTitle: error,
                 buttons: ['OK']

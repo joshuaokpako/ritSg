@@ -1,30 +1,38 @@
 import * as functions from 'firebase-functions';
-
 import * as admin from 'firebase-admin';
+import * as CryptoJS from 'crypto-js';
 admin.initializeApp();
 
 
 exports.newMessageNotification = functions.firestore
     .document('messages/{mesKey}/chats/{mesId}')
-    .onCreate(async (event:any) => {
-        
-    const data = event.after.data();
+    .onCreate(async (snap, context) => {
+      const db = admin.firestore()  
+    const data = snap.data();
 
     const name = data.sentBy
-    const userId = data.sentTo
+    const uid = data.sentTo
+    const userId = data.uid
+    const key = data.key
+    const decryptMess = CryptoJS.AES.decrypt(data.message, key ).toString(CryptoJS.enc.Utf8);
+    const message  = decryptMess.length > 100 ? decryptMess.slice(0, 100) + '...' : decryptMess
 
     // Notification content
     const payload = {
       notification: {
-          title: 'New Message',
-          body: `${name} sent you a message!`,
-          icon: 'https://goo.gl/Fz9nrQ'
-      }
+          title: `${name} sent a message!`,
+          body:  message,
+          icon: 'https://goo.gl/Fz9nrQ',
+          sound: 'default',
+          },
+      data: { 
+          userId: userId,
+          type : 'message' 
+          }
     }
 
     // ref to the device collection for the user
-    const db = admin.firestore()
-    const devicesRef = db.collection('devices').where('userId', '==', userId)
+    const devicesRef = db.collection('devices').where('userId', '==', uid)
 
 
     // get the user's tokens and send notifications

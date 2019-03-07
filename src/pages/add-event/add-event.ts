@@ -161,7 +161,7 @@ export class AddEventPage {
               type:header,
               price:this.price
             }
-            this.uS.addEvent(event,this.myDate,this.startTime,this.endTime).then((success)=>{
+            this.uS.addEvent(header,event,this.myDate,this.startTime,this.endTime).then((success)=>{
               this.presentLoader(false)
               let myheader = {
                 header:this.header

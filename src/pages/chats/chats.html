@@ -24,12 +24,15 @@
       </p>
     <div *ngIf="(chats |async) != ''; else noChats" >
      
-      <ion-item *ngFor="let chat of chats | async" (click)="goToMessage(chat.uid,chat.name)">
+      <ion-item *ngFor="let chat of chats | async" (click)="goToMessage(chat.uid,chat.name,chat.messageKey)">
         <ion-avatar item-start>
-          <img *ngIf="chat.userRef.photoUrl" src="{{chat.userRef.photoUrl}}">
+          <img class="resize" *ngIf="(chat.userRef)?.photoUrl" src="{{(chat.userRef)?.photoUrl}}">
+          <img *ngIf="!((chat.userRef)?.photoUrl)" src="assets/imgs/blank-profile-picture.png">
         </ion-avatar>
         <h2>{{chat.userRef.fullName | titlecase}}</h2>
         <p><span *ngIf="chat.unreadMessages?.length != 0; else notBold"><b>{{chat.lastMessage}}</b></span><ng-template #notBold><span>{{chat.lastMessage}}</span></ng-template></p>
+        <button *ngIf= '((chat.userRef)?.admin) =="clubs"' ion-button clear item-end>Club</button>
+        <button *ngIf= '((chat.userRef)?.admin) =="athletics"' ion-button clear item-end>Athletics</button>
         <ion-badge *ngIf="chat.unreadMessages?.length != 0" color="secondary" item-end>{{chat.unreadMessages?.length}}</ion-badge>
       </ion-item>
     </div>

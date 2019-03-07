@@ -3,18 +3,13 @@ import { Injectable} from '@angular/core';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { FirestoreProvider } from '../../providers/firestore/firestore';
 import { AngularFireStorage} from 'angularfire2/storage'
-import { Geofence } from '@ionic-native/geofence';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, Subject} from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
 import * as moment from 'moment';
+import * as CryptoJS from 'crypto-js';
 
 
 
-export interface User{
-  fullName:string;
-  email:string;
-  admin:string;
-}
 
 
 
@@ -47,42 +42,31 @@ export class UserserviceProvider {
   deals: Observable<any>;
   athletics: Observable<any>;
   users: Observable<any>;
+  emailVerified;
   public user;
   public userRef;
 
   
 
-  constructor(private geofence: Geofence,private storage: AngularFireStorage,public http: HttpClient,private firebaseauth:AngularFireAuth,public db:FirestoreProvider) { 
-    /*geofence.initialize().then(
-      // resolved promise does not return a value
-      () => {
-        this.addGeofence()
-        this.geofence.onTransitionReceived().subscribe(()=>{
-          geofence.TransitionType.toString()
-          console.log(geofence.TransitionType.toString())
-        })
-      },
-      (err) => console.log(err)
-    )
-    */
+  constructor(private storage: AngularFireStorage,public http: HttpClient,private firebaseauth:AngularFireAuth,public db:FirestoreProvider) { 
+    
     this.fireAuth = this.firebaseauth;
-    //get user data
+    //get user data 
     
     this.users = this.db.col$("users", ref => ref.orderBy('fullName','asc'));
     // get clubs data
-    this.clubs = this.db.col$("clubs", ref => ref.orderBy('name','asc'));
+    this.clubs = this.db.colWithIds$("users", ref => ref.where('admin', '==','clubs'));
     // get deals data
     this.deals = this.db.col$("RIT Deals", ref => ref.orderBy('name','asc'));
     //get athletics data
-    this.athletics = this.db.col$("RIT Athletics", ref => ref.orderBy('name','asc'));
+    this.athletics = this.db.colWithIds$("users", ref => ref.where('admin', '==','athletics'));
     //get events data
     
-    this.events = this.db.col$("events");
-    this.sgEvents= this.db.colWithIds$("events", ref => ref.where('type', '==', 'SG Events'))
-    this.ritEvents= this.db.colWithIds$("events", ref => ref.where('type', '==', 'RIT Events'))
-    this.comHEvents= this.db.colWithIds$("events", ref => ref.where('type', '==', 'Common Hour Events'))
-    this.otherEvents= this.db.colWithIds$("events", ref => ref.where('type', '==', 'Other Events'))
-    this.sugEvents= this.db.colWithIds$("events", ref => ref.where('type', '==', 'Suggested Events'))
+    this.sgEvents= this.db.colWithIds$("events/SG Events/SG Events", ref => ref.orderBy('createdAt','desc'))
+    this.ritEvents= this.db.colWithIds$("events/RIT Events/RIT Events", ref => ref.orderBy('createdAt','desc'))
+    this.comHEvents= this.db.colWithIds$("events/Common Hour Events/Common Hour Events", ref => ref.orderBy('createdAt','desc'))
+    this.otherEvents= this.db.colWithIds$("events/Other Events/Other Events", ref => ref.orderBy('createdAt','desc'))
+    this.sugEvents= this.db.colWithIds$("events/Suggested Events/Suggested Events", ref => ref.orderBy('createdAt','desc'))
     this.fireAuth.authState.subscribe(user => {
       if (user) {
         this.currentUser = user;
@@ -92,23 +76,47 @@ export class UserserviceProvider {
         this.uid = user.uid;
         this.userRef = this.db.doc('users/'+this.uid).ref
         this.user = this.getUserProfile(this.uid)
+        this.emailVerified = user.emailVerified;
     
       } 
     })
     
 }
 
+getUserRef(user){
+  return this.db.doc('users/'+user).ref
+}
+
+updateClubEmailVerified(id) {
+  let emailVerified ={
+    emailVerified :true
+  }
+  return this.db.update('users/'+id, emailVerified)
+}
+
 updateProfileName(name){
   
   this.currentUser.updateProfile({
-    displayName: name.fullName
+    displayName: name.fullName.toLowerCase()
+    .split(' ')
+    .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+    .join(' ')
   })
   .then((adduser) => {
     this.db.update('users/'+this.uid, name)
-    this.userName= name.fullName;
+    this.userName= name.fullName.toLowerCase()
+    .split(' ')
+    .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+    .join(' ');
   })
 
 }
+
+updateDesc(desc){
+
+  return this.db.update('users/'+this.uid, desc)
+}
+
 updateProfilePic(photo){
   return this.currentUser.updateProfile({
     photoURL: photo.photoUrl
@@ -120,61 +128,86 @@ updateProfilePic(photo){
 
 }
 
-/*private addGeofence() {
-  //options describing geofence
-  let fence = {
-    id: '69ca1b88-6fbe-4e80-a4d4-ff4d3748acdb', //any unique ID
-    latitude:       37.285951, //center of geofence radius
-    longitude:      -121.936650,
-    radius:         100, //radius to edge of geofence in meters
-    transitionType: 3, //see 'Transition Types' below
-    notification: { //notification settings
-        id:             1, //any unique ID
-        title:          'You crossed a fence', //notification title
-        text:           'You just arrived to Gliwice city center.', //notification body
-        openAppOnClick: true //open app when notification is tapped
-    }
-  }
 
-  this.geofence.addOrUpdate(fence).then(
-     () => console.log('Geofence added'),
-     (err) => console.log('Geofence failed to add')
-   );
-}
-*/
   loginUserService(email: string, password: string): any {
     return this.fireAuth.auth.signInWithEmailAndPassword(email, password);
   }
 
+ encrypt(text){
+  return CryptoJS.SHA256(text).toString();  
+ }
 
-  signUpUserService(account:User, password){
+ loginAnonymously(){
+  return this.fireAuth.auth.signInAnonymously()
+  }
+  signUpUserService(account, password){
     return this.fireAuth.auth.createUserWithEmailAndPassword(account['email'], password)
-    .then((newUser) => {
-      //sign in the user
-      this.fireAuth.auth.signInWithEmailAndPassword(account['email'], password)
-      .then((updateProfile) =>{
+    .then(() => {
+      if(account['type']=='club') {
         var cUser = this.fireAuth.auth.currentUser;
-        let url = "https://firebasestorage.googleapis.com/v0/b/rit-sg.appspot.com/o/profilePics%2Fblank-profile-picture.png?alt=media&token=99cf5b81-e1de-4778-912f-885e860142f8"
-        account['photoUrl'] = url
-        account['uid'] = cUser.uid
-        account['groupAdmin'] = []
-        //account['profilePicRef']= 'profilePics/'+account['fullName']+'/'+cUser.uid
+        let url = account['photoUrl'];
+          account['uid'] = cUser.uid
+          account['groupAdmin'] = []
+          cUser.updateProfile({
+            displayName: account['fullName'],
+            photoURL: url
+          })
+          .then(() => {
+            this.db.set('users/'+cUser.uid, account)
+            if(account['admin']==='athletics'){
+              let athletics = {
+                clubRef: this.db.doc('RIT Athletics/'+account['fullName']).ref
+              }
+              this.db.update('RIT Athletics/'+account['fullName'], athletics)
+            }
+            else{
+              let club = {
+                clubRef: this.db.doc('clubs/'+account['fullName']).ref
+              }
+              this.db.update('clubs/'+account['fullName'], club)
+            }
+            
+          })
+      }
+      else{
+        //sign in the user
+        this.fireAuth.auth.signInWithEmailAndPassword(account['email'], password)
+        .then((updateProfile) =>{
+          var cUser = this.fireAuth.auth.currentUser;
+          let user = this.db.firebase.auth().currentUser
+          user.sendEmailVerification().then(() => {
+            // Email sent.
+            
+            let url = account['photoUrl'];
+            account['uid'] = cUser.uid
+            account['groupAdmin'] = []
+            //account['profilePicRef']= 'profilePics/'+account['fullName']+'/'+cUser.uid
 
-        this.userName = cUser.displayName;
-        this.userEmail = cUser.email;
-        this.uid = cUser.uid;
-        this.userRef = this.db.doc('users/'+this.uid).ref
-        this.user = this.getUserProfile(this.uid)
-        
-        cUser.updateProfile({
-          displayName: account['fullName'],
-          photoURL: url
+            
+            this.fireAuth.authState.subscribe(user => {
+              if (user) {
+                this.currentUser = user;
+                this.userName = user.displayName;
+                this.userEmail = user.email;
+                this.userPhotoUrl = user.photoURL;
+                this.uid = user.uid;
+                this.userRef = this.db.doc('users/'+this.uid).ref
+                this.user = this.getUserProfile(this.uid)
+            
+              } 
+            })
+            
+            cUser.updateProfile({
+              displayName: account['fullName'],
+              photoURL: url
+            })
+            .then((adduser) => {
+              this.db.set('users/'+cUser.uid, account)
+              this.userPhotoUrl = cUser.photoURL;
+            })
+          })
         })
-        .then((adduser) => {
-          this.db.set('users/'+cUser.uid, account)
-          this.userPhotoUrl = cUser.photoURL;
-        })
-      })
+      }
     })
   }
  
@@ -182,8 +215,40 @@ updateProfilePic(photo){
     return this.fireAuth.auth.signOut();
   }
  
+  checkStudentId(studentId){
+   return this.db.colWithIds$("users", ref => ref.where('studentId', '==', studentId))
+  }
   uploadImages(filePath){
     return this.storage.ref(filePath)
+  }
+
+  updateParking(type,enterLeave){
+    return this.db.doc$('parking/'+type).subscribe((x:any)=>{
+      let parking
+      if(enterLeave == 'enter'){
+         parking ={
+          carsInParking: x.carParking +1
+        }
+      }
+      else{
+        parking ={
+          carsInParking: x.carParking -1
+        }
+      }
+      this.db.upsert('parking/'+type, parking)
+    })
+  }
+
+  getBuses(type){
+    return this.db.colWithIds$('buses/'+type+'/' +type, ref => ref.orderBy('destination','asc'));
+  }
+
+  getBus(type){ // for dorms and athletics buses
+    return this.db.doc$('buses/'+type);
+  }
+
+  getUsersSpirit(){
+    return this.db.colWithIds$("users", ref => ref.where('spiritPoints', '>',-1).orderBy('spiritPoints','desc'));
   }
 
   getJob(){
@@ -210,12 +275,17 @@ updateProfilePic(photo){
     return this.db.col$('RIT Departments', ref => ref.orderBy('department','asc'))
   }
 
-  getEventFeedback(evId) {
-    return this.db.col$("events/"+evId +"/feedbacks", ref => ref.orderBy('createdAt','asc'))
+  getEventFeedback(evId,type) {
+    return this.db.colWithIds$("events/"+type +'/' +type+'/' +evId +"/feedbacks", ref => ref.orderBy('createdAt','asc'))
   }
 
-  getFeedsComment(evId) {
-    return this.db.col$("feeds/"+evId +"/comments", ref => ref.orderBy('createdAt','asc'))
+  getFeedsComment(evId,type) {
+    if(type ==="Suggested Events"){
+      return this.db.colWithIds$("events/"+type +'/' +type+'/' +evId +"/feedbacks", ref => ref.orderBy('createdAt','asc'))
+    }
+    else{
+      return this.db.col$("feeds/"+evId +"/comments", ref => ref.orderBy('createdAt','asc'))
+    }
   }
 
   getPersonalEvents(){ // for profile page
@@ -247,6 +317,14 @@ updateProfilePic(photo){
     return this.db.doc$('users/'+uid)
     
    }
+
+   getClubMembers(clubId){
+     return this.db.colWithIds$('users/'+clubId +'/members')
+   }
+
+  getUser(email){
+    return this.db.col$("users/",ref => ref.where('email', '==', email))
+  }
    
   updateFeedLike(fd){
     let feed ={
@@ -255,27 +333,86 @@ updateProfilePic(photo){
     return  this.db.update("feeds/"+fd.id,feed)
   }
 
-  updateEventGoing(ev){
+  updateSpiritPoints(header,id,points){
+    let myobserver = new Subject()
+    let n = 0 // number of times it has changed
+    let ev = this.db.doc$("users/"+id).pipe(takeUntil(myobserver))
+    ev.subscribe((user:any)=>{
+      n+=1
+      if(n === 1){
+      let myspiritPoints = {
+        spiritPoints:user.spiritPoints + points,
+
+      }
+      myspiritPoints[header] =this.db.timestamp
+        this.db.update("users/"+id, myspiritPoints).then(()=>{
+          myobserver.next()
+          myobserver.complete()
+        })
+      }
+      
+    })
+    
+    
+  }
+
+  updateEventGoing(ev,header,uid,youGoing){
     let plannerEvent = { 
       startTime: ev.plannerStartTime, 
       endTime: ev.plannerEndTime, 
       allDay: false, 
       title:ev.title, 
       eventType:'public', 
-      eventRef:this.db.doc("events/"+ev.id).ref,
-      rating:0
+      eventRef:this.db.doc("events/"+header +'/'+ header +'/'+ ev.id).ref,
+      rating:0,
+      eventAttended:false
     }
     let event ={
       going:ev.going
     }
-    return  this.db.update("events/"+ev.id,event).then(()=>{
-      if(!ev.youGoing){
-        this.db.set("users/"+this.uid+"/event/"+ev.id,plannerEvent)
+    return  this.db.update("events/"+header +'/'+ header +'/'+ ev.id,event).then(()=>{
+      if(youGoing){
+        this.db.set("users/"+uid+"/event/"+ev.id,plannerEvent)
       }
       else{
-        this.db.delete("users/"+this.uid+"/event/"+ev.id)
+        this.db.delete("users/"+uid+"/event/"+ev.id)
       }
     })
+  }
+
+  updateEventGone(evId,uid){
+    let plannerEvent = { 
+      eventAttended: true
+    }
+    return this.db.update("users/"+uid+"/event/"+evId,plannerEvent)
+  }
+
+  checkEventAttended(ev,uid){
+    return this.db.doc$("users/"+uid+"/event/"+ev.id)
+  }
+
+  addClubMembers(userRef,position,uid){
+    let member ={
+      member: userRef,
+      position: position
+    }
+    return this.db.upsert('users/'+this.uid+'/members/'+uid , member);
+  }
+
+  joinClub(userRef,position,clubId){
+    let member ={
+      member: userRef,
+      position: position
+    }
+    return this.db.upsert('users/'+clubId+'/members/'+this.uid , member);
+  }
+
+  addBuses (type,data){
+    return this.db.add('buses/'+type+'/' +type, data);
+  }
+
+  addBus (type,data){ // dorms amd athletics bus schedule
+    return this.db.upsert('buses/'+type, data);
   }
 
   addJob(job){
@@ -286,10 +423,10 @@ updateProfilePic(photo){
     return  this.db.add("feeds",feed)
   }
   addBooks(book){
-    return  this.db.add("books",book)
+    return  this.db.add('users/'+this.uid+'/books',book)
   }
 
-  addComment(comment, evId, header){
+  addComment(comment, evId,evType, header){
     let type;
     let destination;
     let feedback ={
@@ -297,12 +434,19 @@ updateProfilePic(photo){
       userRef: this.userRef
     }
     if(header=="Feedbacks"){
-      type = "events/"
+      type = "events/" +evType + '/' +evType +'/'
       destination ="/feedbacks"
     }
     else{
-      type = "feeds/"
-      destination ="/comments"
+      if(evType ==="Suggested Events"){
+        type = "events/" +evType + '/' +evType +'/'
+        destination ="/feedbacks"
+      }
+      else{
+        type = "feeds/"
+        destination ="/comments"
+      }
+      
     }
     return this.db.add(type+evId +destination,feedback).then(()=>{
       let sub = this.db.col$(type+evId +destination).subscribe((x)=>{
@@ -310,12 +454,19 @@ updateProfilePic(photo){
         let event ={}
         if(header=="Feedbacks"){
             event ={
-            feedback: x.length
+              feedback: x.length
           }
         }
         else{
-          event ={
-            comment: x.length
+          if(evType ==="Suggested Events"){
+            event ={
+              feedback: x.length
+            }
+          }
+          else{
+            event ={
+              comment: x.length
+            }
           }
         }
         this.db.update(type+evId,event)
@@ -328,7 +479,7 @@ updateProfilePic(photo){
     return this.db.doc$(value.path)
   }
 
-  addEvent(event,date,start,end){
+  addEvent(header,event,date,start,end){
     let eventDate=  moment(date).format('MM/DD/YYYY');
     event['postedBy'] = this.db.doc('users/'+this.uid).ref;
     event['eventDate'] =  moment(date).format('MMMM DD YYYY');
@@ -337,11 +488,11 @@ updateProfilePic(photo){
     event['plannerEndTime'] = moment(eventDate + ' ' + end).format('LLLL')
     event['endTime'] = moment(date +' '+ end).format('hh:mm A')
   
-    return  this.db.add("events",event)
+    return  this.db.add("events/"+header+'/'+header,event)
   }
 
   saveMyEvents(event){
-    return  this.db.set("users/"+this.uid+"/event",event)
+    return  this.db.add("users/"+this.uid+"/event",event)
 
   }
 
@@ -352,18 +503,49 @@ updateProfilePic(photo){
       case "RIT Athletics":
       let athletics={
         about: description,
-        photo: profilePic,
-        name: groupName,
       }
-      return this.db.add("RIT Athletics",athletics);
+      return this.db.set("RIT Athletics/"+groupName,athletics).then(()=>{
+        let email = groupName.trim().replace(/\s+/g, "").toLowerCase() +'@rit.edu';
+        var   account = {
+          fullName: groupName ,
+          email: email,
+          admin: "athletics",
+          type: 'club'
+        };
+        account['clubType'] = "Private";
+        account['description'] =  description;
+        account["staff"] = false;
+        account["spiritPoints"]= -1;
+        account['photoUrl'] = profilePic;
+        account['emailVerified'] = false;
+        let password = groupName.trim().replace(/\s+/g, "").toLowerCase() +'1234';
+        return this.signOut().then(()=>{
+          return this.signUpUserService(account,password)
+        }) 
+      });
       case "RIT Clubs":
       let club={
-        about: description,
-        clubPhoto: profilePic,
-        name:groupName,
         type:type
       }
-      return this.db.add("RIT Clubs",club);
+      return this.db.set("clubs/"+groupName,club).then(()=>{
+        let email = groupName.trim().replace(/\s+/g, "").toLowerCase() +'@rit.edu';
+        var   account = {
+          fullName: groupName ,
+          email: email,
+          admin: "clubs",
+          type: 'club'
+        };
+        account['clubType'] = type;
+        account['description'] =  description;
+        account["staff"] = false;
+        account["spiritPoints"]= -1;
+        account['photoUrl'] = profilePic;
+        account['emailVerified'] = false;
+        let password = groupName.trim().replace(/\s+/g, "").toLowerCase() +'1234';
+        return this.signOut().then(()=>{
+          return this.signUpUserService(account,password)
+        }) 
+      });
       case "RIT Deals":
       const geopoint = this.db.geopoint(location.latitude, location.longitude)
         let deals={

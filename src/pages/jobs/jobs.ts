@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
-import { AddJobPage } from '../add-job/add-job';
 import { map} from 'rxjs/operators';
-import { DetailsPage } from '../details/details';
 
 /**
  * Generated class for the JobsPage page.
@@ -54,7 +52,7 @@ export class JobsPage implements OnInit {
    }
 
   addJobs(){
-    let modal = this.modalCtrl.create(AddJobPage)
+    let modal = this.modalCtrl.create('AddJobPage')
     modal.present()
   }
 
@@ -65,7 +63,7 @@ export class JobsPage implements OnInit {
       about: about,
       type: pageType
     }
-    this.navCtrl.push(DetailsPage,clubsObj)
+    this.navCtrl.push('DetailsPage',clubsObj)
   }
   ionViewDidLoad() {
     console.log('ionViewDidLoad JobsPage');

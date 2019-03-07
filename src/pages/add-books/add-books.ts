@@ -115,7 +115,8 @@ export class AddBooksPage {
     }); 
   }
 
-  AddBooks(){
+  addBooks(){
+    this.presentLoader(true)
     let randName = new Date().getTime().toString()
     const ref = this.uS.uploadImages('Books Images/'+this.uS.userName+'/'+this.uS.uid+'/'+randName);
       const task = ref.putString(this.previewImg,'data_url');
@@ -135,6 +136,7 @@ export class AddBooksPage {
               this.viewCtrl.dismiss();
               })
               .catch(function(error) {
+                this.presentLoader(false)
                 let alert = this.alertCtrl.create({
                 subTitle: error,
                 buttons: ['OK']

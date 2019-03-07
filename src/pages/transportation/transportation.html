@@ -7,22 +7,20 @@
 <ion-header>
 
   <ion-navbar color="rit">
-    <ion-title>Transportation</ion-title>
+    <ion-title>RIT Buses</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
-    <ion-segment color="rit" [(ngModel)]="type">
-        <ion-segment-button value="RIT Bus">
-          RIT Bus
-        </ion-segment-button>
-        <ion-segment-button value="Parking">
-          Parking
-        </ion-segment-button>
-    </ion-segment>
-
-    <p text-center> This Feature is coming soon</p>
-
+      <ion-item detail-push (click)="toBus('Dorms')">
+        Dorms Schedule
+      </ion-item>
+      <ion-item detail-push (click)="toBus('Athletics')">
+        Athletics Schedule
+      </ion-item>
+      <ion-item detail-push (click)="toBus('Other Buses')">
+        Other Buses Schedule
+      </ion-item>
 </ion-content>

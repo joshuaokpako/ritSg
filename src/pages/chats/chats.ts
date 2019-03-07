@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController, ModalController} from 'ionic-angular';
+import { IonicPage, NavController, ModalController, Events, AlertController} from 'ionic-angular';
 import { ChatServiceProvider} from '../../providers/chat-service/chat-service';
-import { AddChatPage } from '../add-chat/add-chat';
-import { MessagePage } from '../message/message';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { map, share,takeUntil } from 'rxjs/operators';
 
+@IonicPage()
 @Component({
   selector: 'page-chats',
   templateUrl: 'chats.html',
@@ -15,53 +14,51 @@ import { map } from 'rxjs/operators';
 export class ChatsPage implements OnInit{
   sub;
   public chats:Observable<any>;
-
-  constructor(public uS:UserserviceProvider, public chServ:ChatServiceProvider,public navCtrl: NavController,public modalCtrl: ModalController) {
+  observer:Subject<any> 
+  test:number;
+  constructor(public events: Events,public uS:UserserviceProvider, public chServ:ChatServiceProvider,public navCtrl: NavController,public modalCtrl: ModalController, public alertCtrl:AlertController) {
   }
 
 ionViewWillEnter(){
+  this.test= 0
+  this.observer = new Subject();
+  this.events.publish('chat entered', false,'noId');
   this.chats =this.chServ.getChats().pipe(map((ch:any)=>{
+   //Only get the users info on page entry and keep it until page leave
     ch.forEach(myelement => {
-      //Only get the users info on page entry and keep it until page leave
-          
           this.uS.getRef(myelement.userRef).subscribe(x=>{
             myelement.userRef =x;
         })
-    })
+      })
     return ch
-    })
+    }),share()
   )
 }
+
 
   ngOnInit(){
     
   }
+
   ionViewWillLeave(){
-    if(this.sub){
-      this.sub.unsubscribe()
-    }
+    this.events.publish('chat entered', true,'noId');
+    this.observer.next()
+    this.observer.complete()
   }
 
   addMessage(){
-    this.navCtrl.push(AddChatPage)
+    this.navCtrl.push('AddChatPage')
 
   }
-  goToMessage(uid,name){
+  goToMessage(uid,name,key){
     let that =this
     let messageObj
-    this.sub = this.chServ.getConvo(uid).subscribe(result=>{
-      if(result){
-      messageObj = {
-        name:name,
-        uid: uid,
-        key: result.messageKey,
-        receiverUnread: result.unreadMessages,
-      }
-      that.navCtrl.push(MessagePage, messageObj) 
-    }
-    else{
-      this.goToMessage(uid,name)
-    }
-    })
-  }
+          messageObj = {
+            name:name,
+            uid: uid,
+            key:key
+          }
+          that.navCtrl.push('MessagePage', messageObj) 
+        }
+        
 }

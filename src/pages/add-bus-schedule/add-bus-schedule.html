@@ -1,0 +1,64 @@
+<!--
+  Generated template for the AddBusSchedulePage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar color="rit">
+    <ion-title>Add Bus Schedule</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <div *ngIf="header =='Other Buses' ;else pdf">
+    <ion-list >
+      <ion-item>
+        <ion-label stacked>Bus Destination from RIT (e.g Abu Dhabi)</ion-label>
+        <ion-input [(ngModel)]="destination" name="destination" class="form-control" type="text"></ion-input>
+      </ion-item>
+      <ion-item>
+      <ion-label stacked>Arrival at Campus</ion-label>
+      <ion-datetime displayFormat="hh:mm A" [(ngModel)]="arrival"></ion-datetime>
+      </ion-item>
+      <ion-item>
+      <ion-label stacked>First Departure</ion-label>
+      <ion-datetime displayFormat="hh:mm A" [(ngModel)]="departure_1"></ion-datetime>
+      </ion-item>
+      <ion-item>
+        <ion-label stacked>Second Departure (optional)</ion-label>
+        <ion-datetime displayFormat="hh:mm A" [(ngModel)]="departure_2"></ion-datetime>
+      </ion-item>
+      <ion-item>
+        <ion-label stacked>Third Departure (optional)</ion-label>
+        <ion-datetime displayFormat="hh:mm A" [(ngModel)]="departure_3"></ion-datetime>
+      </ion-item>
+      <ion-item>
+      <ion-label stacked>Driver Name</ion-label>
+        <ion-input [(ngModel)]="driverName" name="driverName" type="text"></ion-input>
+      </ion-item>
+      <ion-item>
+      <ion-label stacked>Driver Number</ion-label>
+        <ion-input [(ngModel)]="driverNumber" name="driverNumber" type="number"></ion-input>
+      </ion-item>
+      
+    </ion-list>
+  
+    <button block outline [disabled]="!destination|| !departure_1 || !driverName || !arrival|| !driverNumber " color="rit" ion-button (click)="addBus()">
+      Add Bus
+    </button>
+  </div>
+
+  <ng-template #pdf>
+    <p text-center (click)="uploadPdf()">
+      <button color="danger" round ion-button icon-end>
+        Add {{header}} Schedule
+      <ion-icon name="paper"></ion-icon>
+      </button>
+    </p>
+  </ng-template>
+
+</ion-content>

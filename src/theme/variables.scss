@@ -48,6 +48,8 @@ $colors: (
 
 // App iOS Variables
 // --------------------------------------------------
+// all platforms
+$refresher-icon-color:#F36E21 ;
 // iOS only Sass variables can go here
 $tabs-ios-tab-icon-color-active :#F36E21 ;
 $toolbar-ios-title-text-color :#F36E21 ;
@@ -60,13 +62,15 @@ $toolbar-ios-title-text-color :#F36E21 ;
 
 $tabs-md-tab-color-active:#F36E21 ;
 $toolbar-md-title-text-color :#F36E21 ;
+$item-md-detail-push-show: true;
+
 
 
 
 // App Windows Variables
 // --------------------------------------------------
 // Windows only Sass variables can go here
-
+$item-wp-detail-push-show:true;
 $grid-padding-width:         2px;
 
 

@@ -17,13 +17,13 @@
   <ion-fab bottom right edge>
     <button [hidden]="user.admin!='main'&& user.admin!=jobs" color="primary" ion-fab mini (click)="addJobs()"><ion-icon name="add"></ion-icon></button>
   </ion-fab>
-  <p text-center *ngIf="!(jobs | async)">
-    <ion-spinner color="rit" name="crescent"></ion-spinner>
+  <p text-center *ngIf="(jobs | async) === ''">
+    Sorry there are no jobs at the moment
   </p>
     <div *ngIf="(jobs |async) != ''">
-      <ion-item *ngFor="let job of jobs  | async" (click)="toDetails(job.name, job.photoUrl, job.description,'Jobs' )">
+      <ion-item *ngFor="let job of jobs  | async" (click)="toDetails(job.companyName, job.photoUrl, job.description,'Jobs' )">
         <ion-avatar *ngIf="job.photoUrl != ''" item-start>
-          <img src="{{job.photoUrl}}">
+          <img class="resize" src="{{job.photoUrl}}">
         </ion-avatar>
         <h2>{{job.companyName | titlecase}}</h2>
         <p>{{job.description}}</p>

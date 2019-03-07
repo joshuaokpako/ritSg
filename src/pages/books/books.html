@@ -26,7 +26,7 @@
       </p>
     <ion-card *ngFor="let book  of books |async">
     
-      <img *ngIf="(book)?.postImg" class="max" src="{{book?.postImg}}">
+      <img *ngIf="(book)?.postImg" class="max resizeImg" src="{{book?.postImg}}">
     
       <ion-card-content>
         <p>{{book.description}}</p>

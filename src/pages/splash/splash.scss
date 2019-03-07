@@ -1,0 +1,53 @@
+page-splash {
+    @import url('https://fonts.googleapis.com/css?family=Pacifico');
+        
+    
+        .background{
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(10deg,#f28a21 10%,#fff 90%);
+            animation-name: mybackground;
+            animation-duration: 10s;
+            animation-iteration-count: infinite;
+        }
+        .head {
+            position: absolute;
+            display: block;
+            color: #f28a21;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            animation-name: mytext;
+            animation-duration: 10s;
+            animation-iteration-count: infinite;
+        }
+        .bottom {
+            position: absolute;
+            display: block;
+            color: #f28a21;
+            top: 80%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+        }
+        .head h1 {
+            font-size: 7vh!important;
+            font-weight: lighter!important;
+            font-family: 'Pacifico', cursive;
+        }
+        /* The animation code */
+        @keyframes mybackground {
+            0%   {background:color($colors,rit)}
+            50%  {background: #fff}
+            100% {background: color($colors,rit)}
+        }
+    
+        @keyframes mytext {
+            0%   {color:#fff}
+            50%  {color: color($colors,rit)}
+            100% {color:#fff }
+        }
+        
+    
+}

@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
-import { DetailsPage } from '../details/details';
-import { map, flatMap, filter } from 'rxjs/operators';
-import { AddpagePage } from '../addpage/addpage';
+import { IonicPage, NavController, NavParams, ModalController,AlertController } from 'ionic-angular';
+import { map } from 'rxjs/operators';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 /**
  * Generated class for the RitClubsPage page.
@@ -19,12 +17,15 @@ import { UserserviceProvider } from '../../providers/userservice/userservice';
 })
 export class RitClubsPage implements OnInit {
   subscription;
-  public user;
+  public user:any;
   public clubs:any;
 
-  constructor(public uS : UserserviceProvider,public navCtrl: NavController, public navParams: NavParams,public modalCtrl: ModalController) {
+  constructor(public alertCtrl:AlertController, public uS : UserserviceProvider,public navCtrl: NavController, public navParams: NavParams,public modalCtrl: ModalController) {
     this.user= "";
-    this.clubs = this.uS.clubs
+    this.clubs = this.uS.clubs.pipe(map(club=>{
+      return club.sort()
+    })
+    )
   }
 
   ionViewDidLoad() {
@@ -46,22 +47,31 @@ export class RitClubsPage implements OnInit {
   }
 
 
-  toDetails(headerName,photo,about,pageType){
+  toDetails(headerName,photo,about,pageType,id,club){
     let clubsObj = {
       header: headerName, 
       pic:photo,
       about: about,
-      type: pageType
+      type: pageType,
+      id: id,
+      obj:club
     }
-    this.navCtrl.push(DetailsPage,clubsObj)
+    this.navCtrl.push('DetailsPage',clubsObj)
   }
 
   addGroupModal(header){
     let addObj ={
       header:  header
     }
-    let modal = this.modalCtrl.create(AddpagePage,addObj)
+    let modal = this.modalCtrl.create('AddpagePage',addObj)
     modal.present()
+    modal.onDidDismiss(data=>{
+      let alert = this.alertCtrl.create({
+        subTitle: 'Club email is: ' +data.email.trim().replace(/\s+/g, "").toLowerCase() + ' and password is ' +data.password,
+        buttons: ['OK']
+        });
+      alert.present();
+    })
   }
 }
 

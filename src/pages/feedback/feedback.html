@@ -6,30 +6,57 @@
 </ion-header>
 
 
-<ion-content>
+<ion-content>    
+    <ion-segment color="rit" [(ngModel)]="feedHeaderType">
+        <ion-segment-button *ngIf="header=='Feedbacks'" value="going">
+          Going
+        </ion-segment-button>
+        <ion-segment-button *ngIf="header=='Feedbacks'" value="feedback">
+          Feedback
+        </ion-segment-button>
+        <ion-segment-button *ngIf="header=='Comments'" value="likes">
+          Likes
+        </ion-segment-button>
+        <ion-segment-button *ngIf="header=='Comments'" value="comments">
+          Comments
+        </ion-segment-button>
+    </ion-segment>
 <ion-list inset>  
   <p text-center *ngIf="!(feedback | async)">
     <ion-spinner color="rit" name="crescent"></ion-spinner>
   </p>
-  <!--Show when there are no events-->
-  <p text-center *ngIf="header=='Feedbacks';else noComment" [hidden]="(feedback | async) != ''">
-    Be the first to give a feedback 
-  </p>
-  <ng-template #noComment>
-    <p text-center [hidden]="(feedback | async) != ''">
-      Be the first to give a comment
-    </p>
-  </ng-template>
-
-  <div *ngIf="(feedback |async) != ''">
-    <ion-item *ngFor="let fb of feedback | async; let last = last">
-      <ion-avatar item-start>
-        <img src="{{fb.userRef.photoUrl}}">
-      </ion-avatar>
-      <p text-wrap><span *ngIf="fb.userRef.uid!= userId; else you"><b>{{fb.userRef.fullName | titlecase}}</b></span><ng-template #you><span><b>You</b></span></ng-template> {{fb.comment}}</p>
-      {{last ? toBottom() : ''}}   
-    </ion-item> 
+  <div [hidden]='feedHeaderType !== "going" && feedHeaderType !== "likes"'>
+      <ion-item *ngFor="let lik of myLikes ; let last = last">
+          <ion-avatar item-start>
+            <img class="resize" src="{{(lik| doc|async)?.photoUrl}}">
+          </ion-avatar>
+          <p text-wrap><span *ngIf="((lik| doc|async)?.uid)!= userId; else you"><b>{{(lik| doc |async )?.fullName| titlecase}}</b></span><ng-template #you><span><b>You</b></span></ng-template></p>
+          {{last ? toBottom() : ''}}   
+        </ion-item> 
   </div>
+
+  <div [hidden]='feedHeaderType !== "feedback" && feedHeaderType !== "comments"'>
+    <!--Show when there are no events-->
+    <p text-center *ngIf="header=='Feedbacks';else noComment" [hidden]="(feedback | async) != ''">
+      Be the first to give a feedback 
+    </p>
+    <ng-template #noComment>
+      <p text-center [hidden]="(feedback | async) != ''">
+        Be the first to give a comment
+      </p>
+    </ng-template>
+  
+    <div *ngIf="(feedback |async) != ''">
+      <ion-item *ngFor="let fb of feedback | async; let last = last">
+        <ion-avatar item-start>
+          <img class="resize" src="{{fb.userRef.photoUrl}}">
+        </ion-avatar>
+        <p text-wrap><span *ngIf="fb.userRef.uid!= userId; else you"><b>{{fb.userRef.fullName | titlecase}}</b></span><ng-template #you><span><b>You</b></span></ng-template> {{fb.comment}}</p>
+        {{last ? toBottom() : ''}}   
+      </ion-item> 
+    </div>
+  </div>
+  
   
 </ion-list>
 
@@ -42,7 +69,7 @@
             <ion-icon name="send"></ion-icon>
           </button>
         </ion-buttons>
-          <ion-input type="text" placeholder="Add a comment" name="comment" [(ngModel)]="comment"></ion-input>
+          <ion-textarea autocomplete="on" autocorrect="on" type="text" placeholder="Add a comment" name="comment" [(ngModel)]="comment"></ion-textarea>
         
   </ion-toolbar>
 

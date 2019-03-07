@@ -33,7 +33,7 @@
     </ion-list>
      
     <ion-card *ngIf="previewImg">
-    <img src="{{previewImg}}">
+    <img class ="resizeImg" src="{{previewImg}}">
     </ion-card>
     <p text-center>
     <button block outline  [disabled]="book =='' || previewImg=='' " color="rit" ion-button (click)="addBooks()">

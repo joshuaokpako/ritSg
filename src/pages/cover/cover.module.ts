@@ -9,5 +9,6 @@ import { CoverPage } from './cover';
   imports: [
     IonicPageModule.forChild(CoverPage),
   ],
+  exports: [CoverPage]
 })
 export class CoverPageModule {}

@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicPage, NavController, NavParams,ViewController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams,ViewController, AlertController, Keyboard } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { ChatServiceProvider} from '../../providers/chat-service/chat-service';
-import { MessagePage } from '../message/message';
-import { map} from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { map, takeUntil, share} from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
 
 /**
  * Generated class for the AddChatPage page.
@@ -24,10 +23,14 @@ export class AddChatPage implements OnInit{
   public user;
   subscription;
   sub;
+  observer:Subject<any> 
+  test:number;
+  tabBarElement;
 
-  constructor(public uS:UserserviceProvider,public chatServ:ChatServiceProvider, public navCtrl: NavController, public navParams: NavParams,
-  public viewCtrl: ViewController) {
+  constructor(public uS:UserserviceProvider, public keyboard:Keyboard, public chatServ:ChatServiceProvider, public navCtrl: NavController, public navParams: NavParams,
+  public viewCtrl: ViewController,public alertCtrl:AlertController) {
     this.user ="";
+    this.tabBarElement = document.querySelector('.tabbar.show-tabbar');
   }
 
   ngOnInit(){
@@ -53,10 +56,16 @@ export class AddChatPage implements OnInit{
     
    }
 
+   ionViewWillEnter(){
+    this.test= 0
+    this.observer = new Subject();
+    this.tabBarElement.style.display = 'none';
+   }
+
    ionViewWillLeave(){
-    if(this.sub){
-      this.sub.unsubscribe()
-    }
+    this.tabBarElement.style.display = 'flex';
+    this.observer.next()
+    this.observer.complete()
   }
  
    ngOnDestroy() { 
@@ -65,26 +74,34 @@ export class AddChatPage implements OnInit{
      }
   }
   ionViewDidLoad() {
-    console.log('ionViewDidLoad AddChatPage');
   }
 
   goToMessage(uid,name){
+    this.test+=1
     let that =this
     let messageObj
-    this.sub = this.chatServ.getConvo(uid).subscribe(result=>{
-      if(result){
-      messageObj = {
-        name:name,
-        uid: uid,
-        key: result.messageKey,
-        receiverUnread: result.unreadMessages,
+    this.sub = this.chatServ.getConvo(uid).pipe(takeUntil(this.observer)).subscribe(result=>{
+      if (this.test ===1){
+        if(result){
+          messageObj = {
+            name:name,
+            uid: uid,
+            key: result.messageKey,
+          }
+          this.test = 0
+          that.navCtrl.push('MessagePage', messageObj) 
+        }
+        else{
+          let alert = this.alertCtrl.create({
+            title: 'Error',
+            subTitle:'There was an error in getting chat info, please try again later',
+            buttons: ['OK']
+          })
+          this.test = 0
+          alert.present();
+        }
       }
-      that.navCtrl.push(MessagePage, messageObj) 
-    }
-    else{
-      this.goToMessage(uid,name)
-    }
-    })
-
+  
+    },share())
   }
 }

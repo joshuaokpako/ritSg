@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicPage, NavController, NavParams,ModalController } from 'ionic-angular';
-import { DetailsPage } from '../details/details';
-import { map, flatMap, filter } from 'rxjs/operators';
-import { AddpagePage } from '../addpage/addpage';
+import { IonicPage, NavController, NavParams,ModalController, AlertController } from 'ionic-angular';
+import { map} from 'rxjs/operators';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 
 /**
@@ -20,12 +18,15 @@ import { UserserviceProvider } from '../../providers/userservice/userservice';
 })
 export class RitAthleticsPage implements OnInit {
   public athletics:any;
-  public user;
+  public user:any;
   subscription;
 
-  constructor(public uS:UserserviceProvider,public navCtrl: NavController, public navParams: NavParams,public modalCtrl: ModalController) {
+  constructor(public uS:UserserviceProvider, public alertCtrl: AlertController, public navCtrl: NavController, public navParams: NavParams,public modalCtrl: ModalController) {
     this.user= "";
-    this.athletics = this.uS.athletics
+    this.athletics = this.uS.athletics.pipe(map(ath=>{
+      return ath.sort()
+    })
+    )
   }
 
   
@@ -49,20 +50,29 @@ export class RitAthleticsPage implements OnInit {
 
   
 
-  toDetails(headerName,photo,about,pageType){
+  toDetails(headerName,photo,about,pageType,id,athletic){
     let clubsObj = {
       header: headerName, 
       pic:photo,
       about: about,
-      type: pageType
+      type: pageType,
+      id:id,
+      obj:athletic
     }
-    this.navCtrl.push(DetailsPage,clubsObj)
+    this.navCtrl.push('DetailsPage',clubsObj)
   }
   addEventModal(header){
     let addObj ={
       header:  header
     }
-    let modal = this.modalCtrl.create(AddpagePage,addObj)
+    let modal = this.modalCtrl.create('AddpagePage',addObj)
     modal.present()
+    modal.onDidDismiss(data=>{
+      let alert = this.alertCtrl.create({
+        subTitle: 'Group email is: ' +data.email.trim().replace(/\s+/g, "").toLowerCase() + ' and password is ' +data.password,
+        buttons: ['OK']
+        });
+      alert.present();
+    })
   }
 }

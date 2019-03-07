@@ -1,0 +1,67 @@
+<!--
+  Generated template for the BusSchedulesPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar color ="rit">
+    <ion-title>{{header}}</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+    <ion-fab bottom right edge [hidden]="user?.admin!='main'&& user?.admin!='RIT'">
+      <button  color="secondary" ion-fab mini (click)="addBus(header)"><ion-icon name="add"></ion-icon></button>
+    </ion-fab>
+<ion-list *ngIf="header == 'Other Buses'; else dormsAthletics">
+  <p text-center *ngIf="!(buses| async)">
+    <ion-spinner color="rit" name="crescent"></ion-spinner>
+  </p>
+    <ion-item *ngFor="let bus of buses  | async">
+      <h2 text-wrap>{{bus.destination | titlecase}}</h2>
+      <p *ngIf="!(bus.departure_1 | timeFilter: 'difFromNow') && (bus.arrival | timeFilter: 'difFromNow'); ">Departing from RIT {{bus.departure_1 | timeFilter: 'true'}}</p>
+      <span *ngIf= "bus.departure_2">
+        <p *ngIf="((bus.departure_1 | timeFilter: 'difFromNow') && !(bus.departure_2 | timeFilter: 'difFromNow') && (bus.arrival | timeFilter: 'difFromNow')) ">Departing from RIT {{bus.departure_2 | timeFilter: 'true'}}</p>
+      </span>
+      <span *ngIf= "bus.departure_3">
+          <p *ngIf="((bus.departure_2 | timeFilter: 'difFromNow')) && !(bus.departure_3 | timeFilter: 'difFromNow') && (bus.arrival | timeFilter: 'difFromNow'); ">Departing from RIT {{bus.departure_3 | timeFilter: 'true'}}</p>
+        </span>
+    
+      <p *ngIf="!(bus.arrival | timeFilter: 'difFromNow')">Arriving at RIT {{bus.arrival | timeFilter:'true'}}</p>
+      <p *ngIf="(bus.arrival | timeFilter: 'difFromNow') && (!(bus.departure_1 | timeFilter: 'difFromNow') && !(bus.departure_2 | timeFilter: 'difFromNow') && !(bus.departure_3 | timeFilter: 'difFromNow'))">Bus has departed</p>
+      <p>Driver is {{bus.driver}}</p>
+      <p>{{bus.driverNumber}}</p>
+    </ion-item>
+</ion-list>
+<ng-template #dormsAthletics>
+  <ion-list>
+    <ion-item (click)="downloadAndOpenPdf()">
+      <ion-grid>
+        <ion-row>
+          <ion-col *ngIf="header =='Athletics';else dorms">
+            <ion-icon color="danger" name="paper" item-start></ion-icon>
+            {{header}} Bus Schedule
+          </ion-col>
+          <ng-template #dorms>
+            <ion-col>
+                <ion-icon color="danger" name="paper" item-start></ion-icon>
+                {{header}} Bus Schedule
+            </ion-col>
+          </ng-template>
+          <ion-col [hidden]="show === true" padding-left >
+            <span id='progressBar' class="progressBar"></span>
+          </ion-col>
+          <button [hidden]="show === false" ion-button clear item-end>View</button>
+        </ion-row>
+      </ion-grid>
+    </ion-item>
+    
+  </ion-list>
+
+</ng-template>
+
+</ion-content>

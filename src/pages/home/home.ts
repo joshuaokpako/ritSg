@@ -1,56 +1,75 @@
 import { Component, OnInit } from '@angular/core';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
-import { NavController } from 'ionic-angular';
-import { EventsPage } from '../events/events';
-import { RitClubsPage } from '../rit-clubs/rit-clubs';
-import { RitDealsPage } from '../rit-deals/rit-deals';
-import { RitAthleticsPage } from '../rit-athletics/rit-athletics';
-import { TransportationPage } from '../transportation/transportation';
-import { FacultyPage } from '../faculty/faculty';
-import { JobsPage } from '../jobs/jobs';
-import { FcmProvider } from '../../providers/fcm/fcm';
+import { NavController, ToastController, IonicPage, Events } from 'ionic-angular';
+import { SpinnerDialog } from '@ionic-native/spinner-dialog';
+import { UserserviceProvider } from '../../providers/userservice/userservice';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
+@IonicPage()
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
 })
 export class HomePage implements OnInit {
-
-  constructor(public fcm:FcmProvider, public navCtrl: NavController,private iab: InAppBrowser) {
-
+toast;
+anonymous = false;
+  constructor(public events:Events, public uS:UserserviceProvider,public toastCtrl:ToastController, private spinnerDialog: SpinnerDialog,public navCtrl: NavController,private iab: InAppBrowser) {
   }
 
   ngOnInit(){
-    this.fcm.getToken()
+    this.uS.fireAuth.authState.subscribe(user => {
+      if (user) {
+        this.anonymous = user.isAnonymous;
+      }
+    })
+     
   }
 
   openBrowser(link){
-    const browser = this.iab.create(link,'_blank', 'location=yes,hideurlbar=yes,toolbarcolor=#F36E21');
+    const browser = this.iab.create(link,'_blank', 'location=yes,hideurlbar=yes,hidespinner=yes,toolbarcolor=#F36E21');
+    browser.on('loadstart').subscribe(event => {
+      this.spinnerDialog.show();
+   });
+    browser.on('loadstop').subscribe(event => {
+    this.spinnerDialog.hide();
+    });
+    browser.on('loaderror').subscribe(event => {
+      this.spinnerDialog.hide();
+    });
+    
     browser.show()
   }
   
   toEvents(){
-    this.navCtrl.push(EventsPage)
+    this.navCtrl.push('EventsPage')
   }
 
   toClubs(){
-    this.navCtrl.push(RitClubsPage)
+    this.navCtrl.push('RitClubsPage')
   }
 
   toDeals(){
-    this.navCtrl.push(RitDealsPage)
+    this.navCtrl.push('RitDealsPage')
   }
 
   toAthletics(){
-    this.navCtrl.push(RitAthleticsPage)
+    this.navCtrl.push('RitAthleticsPage')
   }
   toFaculty(){
-    this.navCtrl.push(FacultyPage)
+    this.navCtrl.push('FacultyPage')
   }
   toTransportation(){
-    this.navCtrl.push(TransportationPage)
+    this.navCtrl.push('TransportationPage')
   }
   toJobs(){
-    this.navCtrl.push(JobsPage)
+    this.navCtrl.push('JobsPage')
+  }
+  logout(){
+    this.uS.signOut().then(()=>{
+      this.navCtrl.setRoot('CoverPage')
+    }).catch((error) => {
+      this.navCtrl.setRoot('CoverPage')
+    });
   }
 }

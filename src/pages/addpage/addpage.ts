@@ -1,6 +1,5 @@
-import { Component, ViewChild,ElementRef } from '@angular/core';
-import { NavController, NavParams, AlertController, ViewController, LoadingController} from 'ionic-angular';
-import { Geolocation } from '@ionic-native/geolocation';
+import { Component } from '@angular/core';
+import { NavController, NavParams, AlertController, ViewController, LoadingController, IonicPage} from 'ionic-angular';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -8,6 +7,7 @@ import { UserserviceProvider } from '../../providers/userservice/userservice';
 
 declare var google: any;
 
+@IonicPage()
 @Component({
   selector: 'page-addpage',
   templateUrl: 'addpage.html',
@@ -89,9 +89,6 @@ export class AddpagePage {
     // reference : https://github.com/driftyco/ionic/issues/7223
     this.addressElement = <HTMLInputElement>document.getElementsByClassName("text-input")[3]
     this.createAutocomplete(this.addressElement).subscribe((location) => {
-      console.log('Searchdata', location);
-      console.log(this.chosenLoc)
-      console.log(this.location)
     });
   }
 
@@ -187,7 +184,6 @@ export class AddpagePage {
       }, 
       (err) => 
       {
-          console.log(err);
       }); 
     }
 
@@ -215,14 +211,6 @@ export class AddpagePage {
   
   
   addGroup(header){
-    if(this.address != this.inputlocation){
-      let alert = this.alertCtrl.create({
-        title: 'Choose a Picture',
-        buttons: ['OK']
-      })
-      alert.present();
-    }
-    else{
     this.presentLoader(true)
     const ref = this.uS.uploadImages(header+'/'+this.groupName);
     const task = ref.putString(this.previewImg,'data_url');
@@ -235,15 +223,18 @@ export class AddpagePage {
    
               this.uS.addGroup(header,this.groupName,this.description,this.uploadUrl, this.type, this.location,this.deal).then((success)=>{
                 this.presentLoader(false)
-                this.viewCtrl.dismiss();
+                let email = this.groupName.trim().replace(/\s+/g, "").toLowerCase() +'@rit.edu';
+                let password = this.groupName.trim().replace(/\s+/g, "").toLowerCase() +'1234';
+                let data  ={email:email,password:password}
+                this.viewCtrl.dismiss(data);
                 })
-                .catch(function(error) {
+                .catch((error)=> {
                   this.presentLoader(false)
                   let alert = this.alertCtrl.create({
                   subTitle: error,
                   buttons: ['OK']
                   });
-                alert.present();
+                  alert.present();
               })
          
         })
@@ -252,6 +243,5 @@ export class AddpagePage {
          
   }
    
-  }
   
 }

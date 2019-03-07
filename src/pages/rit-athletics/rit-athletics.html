@@ -19,12 +19,12 @@
       </ion-fab>
   <ion-list>
     <div *ngFor="let athletic of athletics | async">
-      <ion-item (click)="toDetails(athletic.name, athletic.photo, athletic.about,'RIT Athletics' )" >
+      <ion-item (click)="toDetails(athletic.fullName, athletic.photoUrl, athletic.description,'RIT Athletics',athletic.id,athletic )" >
           <ion-avatar item-start>
-              <img src="{{athletic.photo}}">
+              <img class="resize" src="{{athletic.photoUrl}}">
           </ion-avatar>
-          <h2>{{athletic.name}}</h2>
-          <p>{{athletic.about}}</p>
+          <h2>{{athletic.fullName}}</h2>
+          <p>{{athletic.description}}</p>
           <button ion-button clear item-end>View</button>
       </ion-item>
     </div>

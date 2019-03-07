@@ -35,28 +35,36 @@
         <ion-label floating>Position (optional) e.g Lab Assitant</ion-label>
         <ion-input [(ngModel)]="position" name="email" type="text"></ion-input>
       </ion-item>
+      <ion-item>
+        <ion-label floating>Office room number e.g 217-12</ion-label>
+        <ion-input [(ngModel)]="office" name="office" type="text"></ion-input>
+      </ion-item>
   </div>
   <ion-item>
     <ion-label floating>Email</ion-label>
     <ion-input [(ngModel)]="email" name="email" type="text"></ion-input>
   </ion-item>
-<br>
   <ion-item>
     <ion-label floating>Password</ion-label>
     <ion-input type="password" [(ngModel)]="password" name="password"></ion-input>
   </ion-item>
   
-  <div padding text-center>
-       
-     
-     <!-- Show dead button if form is not filled -->
-     <!--<button *ngIf="!email && !password" ion-button color="danger" clear round>Login Now</button>-->
-     
-     
+  <div [hidden]="type == 'staff'">  
+    <button  clear color="light" ion-item (click)="scan()" >
+      <ion-icon item-start name="barcode"></ion-icon>
+      Scan Student ID Card
+    </button>
+    <p>OR</p>
+    <ion-item class="marginReduce">
+      <ion-label floating>Input your student ID (your ID number)</ion-label>
+      <ion-input [(ngModel)]="studentId" name="studentId" type="text"></ion-input>
+    </ion-item>
   </div>
-  <button  ion-button [hidden]="type == 'staff'" [disabled]="!email || !password || !name" color="rit" block (click)="submitLogin()">
+  <!--Student button-->
+  <button  ion-button [hidden]="type == 'staff'" [disabled]="!email || !password || !name ||!studentId" color="rit" block (click)="submitLogin()">
     Sign up</button>
-  <button  ion-button [hidden]="type == 'student'" [disabled]="!email || !password || !name || !faculty" color="rit" block (click)="submitLogin()">
+    <!--Staff Button-->
+  <button  ion-button [hidden]="type == 'student'" [disabled]="!email || !password || !name || !faculty || !office" color="rit" block (click)="submitLogin()">
       Sign up</button>
 </ion-list>
 

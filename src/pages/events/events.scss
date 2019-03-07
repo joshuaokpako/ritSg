@@ -1,4 +1,13 @@
 page-events {
+.resizeimg{
+    object-fit: contain;
+}
+.max{
+    max-height: 400px;
+}
+.resize{
+    object-fit: cover;
+}
   .noEvents{
     text-align: center;
     padding:10px;

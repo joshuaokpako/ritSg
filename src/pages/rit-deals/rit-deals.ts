@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
-import { DetailsPage } from '../details/details';
-import { map, flatMap, filter } from 'rxjs/operators';
-import { AddpagePage } from '../addpage/addpage';
+import { map} from 'rxjs/operators';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 
 /**
@@ -52,13 +50,13 @@ export class RitDealsPage implements OnInit {
       type: headerType,
       location: location
     }
-    this.navCtrl.push(DetailsPage,dealsObj)
+    this.navCtrl.push('DetailsPage',dealsObj)
   }
   addGroupModal(header){
     let addObj ={
       header:  header
     }
-    let modal = this.modalCtrl.create(AddpagePage,addObj)
+    let modal = this.modalCtrl.create('AddpagePage',addObj)
     modal.present()
   }
 }

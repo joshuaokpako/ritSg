@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController, ModalController, AlertController } from 'ionic-angular';
-import { PlannerModalPage } from '../planner-modal/planner-modal';
+import { NavController, ModalController, AlertController, IonicPage } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import * as moment from 'moment';
 import { map } from 'rxjs/operators';
 
+@IonicPage()
 @Component({
   selector: 'page-planner',
   templateUrl: 'planner.html'
@@ -29,7 +29,6 @@ export class PlannerPage implements OnInit{
     .pipe(
       map((ev:any)=>{
         ev.forEach(e => {
-          console.log(e.startTime)
           e.startTime =  new Date(e.startTime);
           e.endTime = new Date(e.endTime);
         }); 
@@ -43,7 +42,7 @@ export class PlannerPage implements OnInit{
   }
 
   addEvent() {
-    let modal = this.modalCtrl.create(PlannerModalPage, {selectedDay: this.selectedDay});
+    let modal = this.modalCtrl.create('PlannerModalPage', {selectedDay: this.selectedDay});
     modal.present();
    
   }

@@ -21,7 +21,7 @@
       <div *ngFor="let deal of deals | async">
         <ion-item (click)="toDetails(deal.name, deal.image, deal.about, deal.deal, deal.location,'RIT Deals')" >
           <ion-thumbnail item-start>
-            <img src="{{deal.image}}">
+            <img class='resize' src="{{deal.image}}">
           </ion-thumbnail>
           <h2>{{deal.name}}</h2>
           <p>{{deal.deal}}</p>
@@ -29,26 +29,6 @@
           <button ion-button clear item-end>View</button>
         </ion-item>
       </div>
-
-  <ion-item>
-    <ion-thumbnail item-start>
-      <img src="assets/imgs/thumbnail-totoro.png">
-    </ion-thumbnail>
-    <h2>ASME</h2>
-    <p>Hayao Miyazaki • 1988</p>
-    <p>We are all about this and that</p>
-    <button ion-button clear item-end>View</button>
-  </ion-item>
-
-  <ion-item>
-      <ion-thumbnail item-start>
-        <img src="assets/imgs/thumbnail-totoro.png">
-      </ion-thumbnail>
-      <h2>Music</h2>
-      <p>Hayao Miyazaki • 1988</p>
-      <p>We are all about this and that</p>
-      <button ion-button clear item-end>View</button>
-    </ion-item>
 </ion-list>
 
 </ion-content>

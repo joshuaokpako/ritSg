@@ -33,7 +33,7 @@
       </p>
      
     <ion-card *ngIf="previewImg">
-    <img src="{{previewImg}}">
+    <img class='resizeImg max' src="{{previewImg}}">
     </ion-card>
     <p text-center>
     <button block outline  [disabled]="post =='' && previewImg=='' " color="rit" ion-button (click)="addFeeds()">

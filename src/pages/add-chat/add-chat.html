@@ -7,7 +7,7 @@
 <ion-header>
 
   <ion-navbar color="rit">
-    <ion-title>addChat</ion-title>
+    <ion-title>Add Chat</ion-title>
   </ion-navbar>
   <ion-toolbar color="rit">
     <ion-searchbar [(ngModel)]="searchText"></ion-searchbar>
@@ -24,9 +24,12 @@
       <div *ngFor="let us of users  | async | filter : searchText">
         <ion-item *ngIf="us.email!=user.email" (click)="goToMessage(us.uid,us.name)">
           <ion-avatar item-start>
-            <img *ngIf="us.photoUrl" src="{{us.photoUrl}}">
+            <img *ngIf="us.photoUrl" class="resize" src="{{us.photoUrl}}">
+            <img [hidden]="us.photoUrl" src="assets/imgs/blank-profile-picture.png">
           </ion-avatar>
           <h2>{{us.fullName |titlecase}}</h2>
+          <button *ngIf= 'us.admin =="clubs"' ion-button clear item-end>Club</button>
+          <button *ngIf= 'us.admin =="athletics"' ion-button clear item-end>Athletics</button>
         </ion-item>
       </div>
     </div>

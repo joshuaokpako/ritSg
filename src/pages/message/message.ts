@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewChild} from '@angular/core';
-import { IonicPage, NavController, NavParams, Content, Navbar } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Content, Navbar,Events } from 'ionic-angular';
 import { ChatServiceProvider} from '../../providers/chat-service/chat-service';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
-import { map } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
 
 /**
  * Generated class for the MessagePage page.
@@ -20,11 +21,12 @@ export class MessagePage implements OnInit{
 data = { name:'', chatUid:'', message:'',photoUrl:'' };
 message ='';
 receiver:any;
-chats:any;
+chats;
 key:string;
 subscription;
 receiverUnreadMessages:any;
 myUnreadMessages:any;
+getUnreadSub;
 sub;
 now;
 tabBarElement:any;
@@ -32,18 +34,21 @@ tabBarElement:any;
 @ViewChild(Content) content: Content;
 public user;
 public name:string;
-  constructor(public uS: UserserviceProvider,public chatServ:ChatServiceProvider, public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public events: Events,public uS: UserserviceProvider,public chatServ:ChatServiceProvider, public navCtrl: NavController, public navParams: NavParams) {
     this.data.chatUid= this.navParams.get('uid');
     this.key= this.navParams.get('key');
     this.name= this.navParams.get('name');
     this.now = new Date().getTime()
-
     this.user= "";
     this.tabBarElement = document.querySelector('.tabbar.show-tabbar');
   }
 
   ionViewWillEnter() {
+    this.events.publish('chat entered', true, this.data.chatUid);
     this.tabBarElement.style.display = 'none';
+    let observer = new Subject()
+    
+      
   }
  
   ionViewWillLeave() {
@@ -55,31 +60,36 @@ public name:string;
   }
 
   ngOnInit(){
-    this.chatServ.getReceiverUnreadMessages(this.data.chatUid).subscribe((x:any)=>{
-      console.log(x)
-      this.receiverUnreadMessages = x.unreadMessages;
-    });
-
-    this.chatServ.getMyUnreadMessages(this.data.chatUid).subscribe((my:any)=>{
-      console.log(my)
-      this.myUnreadMessages = my.unreadMessages;
-      if (this.key !=" ") { // if there is a chat convo
-        if(this.myUnreadMessages.length!= 0){
-          this.chatServ.updateUnreadMessages(this.data.chatUid)
+    this.user = this.uS.uid
+     this.chats = this.chatServ.getMessages(this.key)
+      this.chatServ.getReceiverUnreadMessages(this.data.chatUid).subscribe((x:any)=>{
+        if(x){
+          this.receiverUnreadMessages = x.unreadMessages;
         }
-      }
-    });
-   
-    
-    this.sub = this.chatServ.getChatPerson(this.data.chatUid).subscribe(recOutput=>{
-      this.receiver = recOutput 
-    })
-    this.subscription = this.uS.user.pipe(map((user:any)=>{
-       return user    
-     })).subscribe(x=>this.user=x )
-     console.log(this.key)
-      this.chats = this.chatServ.getMessgages(this.key)
+      });
+  
+      //get my unread messages with the other party and empty it
+      this.getUnreadSub =this.chatServ.getMyUnreadMessages(this.data.chatUid).subscribe((my:any)=>{ 
+        if (my) { // if there is a chat convo
+          this.myUnreadMessages = my.unreadMessages;
+          if(this.myUnreadMessages.length!= 0){
+            this.chatServ.updateUnreadMessages(this.data.chatUid)
+          }
+        }
+      });
+     
+      
+      this.sub = this.chatServ.getChatPerson(this.data.chatUid).subscribe((recOutput:any)=>{
+        let recName:string = recOutput.fullName
+        if (recName.length>18){
+         recOutput.fullName = recName.slice(0,18) + '...'
+        }
+        this.receiver = recOutput 
+      })
 
+    
+    
+     
   }
 
   ngOnDestroy() { 
@@ -90,10 +100,13 @@ public name:string;
       this.sub.unsubscribe();
     }
    
+    if(this.getUnreadSub){
+      this.getUnreadSub.unsubscribe()
+    }
    }
 
   sendMessage(){
-    if (this.key ==" ") { // create key and call getMessages because it is the first message between the two people
+    if (this.key ===' ') { // create key and call getMessages because it is the first message between the two people
       this.key = this.data.chatUid + this.uS.uid
       this.data.message=this.message.trim()
       this.message = ""
@@ -101,7 +114,7 @@ public name:string;
       if (this.data.message!="") {
         this.chatServ.saveMessage(this.data,this.key).then((x)=>{
           this.chatServ.addChat(this.data,this.key,this.receiverUnreadMessages)
-          this.chats = this.chatServ.getMessgages(this.key)
+          this.chats = this.chatServ.getMessages(this.key)
         })
       }
     }

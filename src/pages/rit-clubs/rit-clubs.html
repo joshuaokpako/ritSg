@@ -19,36 +19,15 @@
       </ion-fab>
     <ion-list>
       <div *ngFor="let club of clubs | async">
-        <ion-item (click)="toDetails(club.name, club.clubPhoto, club.about,'RIT Clubs' )" >
+        <ion-item (click)="toDetails(club.fullName, club.photoUrl, club.description,'RIT Clubs',club.id,club)" >
             <ion-avatar item-start>
-                <img src="{{club.clubPhoto}}">
+                <img class="resize" src="{{club.photoUrl}}">
             </ion-avatar>
-            <h2>{{club.name}}</h2>
-            <p>Hayao Miyazaki • 1988</p>
-            <p>{{club.about}}</p>
+            <h2>{{club.fullName}}</h2>
+            <p>{{club.description}}</p>
             <button ion-button clear item-end>View</button>
         </ion-item>
       </div>
-
-  <ion-item>
-    <ion-avatar item-start>
-      <img src="assets/imgs/thumbnail-totoro.png">
-    </ion-avatar>
-    <h2>ASME</h2>
-    <p>Hayao Miyazaki • 1988</p>
-    <p>We are all about this and that</p>
-    <button ion-button clear item-end>View</button>
-  </ion-item>
-
-  <ion-item>
-      <ion-avatar item-start>
-        <img src="assets/imgs/thumbnail-totoro.png">
-      </ion-avatar>
-      <h2>Music Club</h2>
-      <p>Hayao Miyazaki • 1988</p>
-      <p>We are all about this and that</p>
-      <button ion-button clear item-end>View</button>
-    </ion-item>
 </ion-list>
 
 </ion-content>

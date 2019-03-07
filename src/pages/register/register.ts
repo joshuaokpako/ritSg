@@ -1,8 +1,10 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component} from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 
-import { TabsPage } from '../tabs/tabs';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 
 
 /**
@@ -21,24 +23,31 @@ import { TabsPage } from '../tabs/tabs';
   providers: [UserserviceProvider]
 })
 export class RegisterPage {
+  public studentId: string ='';
   public email: string;
   public password: string;
   public name:string;
   public type:any;
   public staff:string;
+  public office:string;
   public departments:any;
   public faculty:any = "";
   public position:any = "";
+  test:boolean = false; // if student ID has not been used return true else false
+  observer:Subject<any> = new Subject();
 
 
-  constructor(public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
+  constructor(private barcodeScanner: BarcodeScanner,public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
     public alertCtrl: AlertController,  public navCtrl: NavController, public navParams: NavParams) {
       this.type ="student"
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad RegisterPage');
     this.getDepartment()
+  }
+  ionViewWillLeave(){
+    this.observer.next()
+    this.observer.complete()
   }
 
   getDepartment(){
@@ -48,60 +57,134 @@ export class RegisterPage {
   compareFn(e1, e2): boolean {
     return e1 && e2 ? e1.id === e2.id : e1 === e2;
   }
-
+  signUpUser(data){
+    
+  }
   submitLogin(){
-    var   account = {
-      fullName: this.name,
-      email: this.email.trim().replace(/\s+/g, " "),
-      admin: "none",
-      type: this.type
-    };
-    if(this.type=="staff"){
-      account["staff"] = true;
-      account["faculty"] = this.faculty;
-      account["position"] = this.position;
+    if(this.studentId.length<10){
+     let len = 10 - this.studentId.length
+     for (let index = 0; index <len; index++) {
+       this.studentId = this.studentId + '0'
+     }
     }
-    else{
-      account["staff"] = false;
-    }
-    
-    let ritemailend = this.email.trim().replace(/\s+/g, "").slice(-8);//get the last 8 char of email
-
-    //check if its an rit email ending with @rit.edu
-    if(ritemailend!="@rit.edu"){
-      let alert = this.alertCtrl.create({
-        subTitle: 'email must be an rit email ending with @rit.edu',
-        buttons: ['OK']
-      });
-      alert.present();
-      this.password = ""//empty the password field
-    }
-
-    else{
-      var that = this;
-    
-      var loader = this.loadingCtrl.create({
-        content: "Please wait..."
-      });
-      loader.present();
-      this.usersService.signUpUserService(account,this.password).then(authData => {
-        //successful
+    var loader = this.loadingCtrl.create({
+      content: "Please wait..."
+    });
+    loader.present();
+    let test = false
+    let data =this.usersService.encrypt(this.studentId)
+    this.usersService.checkStudentId(data).pipe(takeUntil(this.observer)).subscribe((student:any)=>{
+      if(student.length===0){
+        if(test ===false){
+          var   account = {
+            fullName: this.name.toLowerCase()
+            .split(' ')
+            .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+            .join(' '),
+            email: this.email.trim().replace(/\s+/g, "").toLowerCase(),
+            admin: "none",
+            type: this.type,
+          };
+          if(this.type=="staff"){
+            account["staff"] = true;
+            account["faculty"] = this.faculty;
+            account["position"] = this.position;
+            account["office"] = this.office;
+            account["spiritPoints"]= -1;
+          }
+          else{
+            account["staff"] = false;
+            account["spiritPoints"]= 0;
+            account["studentId"]= data;
+          }
+          let url = "https://firebasestorage.googleapis.com/v0/b/rit-sg.appspot.com/o/profilePics%2Fblank-profile-picture.png?alt=media&token=99cf5b81-e1de-4778-912f-885e860142f8"
+          account['photoUrl'] = url;
+        
+          let ritemailend = this.email.trim().replace(/\s+/g, "").slice(-8);//get the last 8 char of email
+      
+          //check if its an rit email ending with @rit.edu
+          if(ritemailend!="@rit.edu"){
+            loader.dismiss();
+            let alert = this.alertCtrl.create({
+              subTitle: 'email must be an rit email ending with @rit.edu',
+              buttons: ['OK']
+            });
+            alert.present();
+            this.password = ""//empty the password field
+          }
+          
+          else{
+            if(this.email.trim().replace(/\s+/g, "").length > 8){
+              var that = this;
+              this.usersService.signUpUserService(account,this.password).then(authData => {
+                //successful
+                loader.dismiss();
+              },
+              error => {
+                loader.dismiss();
+                // Unable to log in
+                let alert = this.alertCtrl.create({
+                  subTitle: error,
+                  buttons: ['OK']
+                });
+                alert.present();
+                that.password = ""//empty the password field
+              }).catch(error=>{
+                loader.dismiss();
+                // Unable to log in
+                let alert = this.alertCtrl.create({
+                  subTitle: error,
+                  buttons: ['OK']
+                });
+                alert.present();
+                that.password = ""//empty the password field
+              })
+            }
+            else{
+              let alert = this.alertCtrl.create({
+                subTitle: 'email is invalid',
+                buttons: ['OK']
+              });
+              alert.present();
+              this.password = ""//empty the password field
+            }
+          }
+          this.test = true
+        }
+      }
+      else{
         loader.dismiss();
-        that.navCtrl.setRoot(TabsPage);
-      },
-      error => {
-        loader.dismiss();
-        // Unable to log in
         let alert = this.alertCtrl.create({
-          subTitle: error,
+          subTitle: 'This student ID has already been used',
           buttons: ['OK']
         });
         alert.present();
-        that.password = ""//empty the password field
-      })
-    }
+        this.password = ""//empty the password field
+        this.studentId =""
+      }
+    })
+    
     
   }
-
+  scan(){
+    this.barcodeScanner.scan({resultDisplayDuration:0,showTorchButton:true}).then(barcodeData => {
+      let data = this.usersService.encrypt(barcodeData.text)
+      if(!barcodeData.cancelled){
+        this.usersService.checkStudentId(data).pipe(takeUntil(this.observer)).subscribe((student:any)=>{
+          if(student.length===0){
+            this.studentId = barcodeData.text
+          }
+          else{
+            let alert = this.alertCtrl.create({
+              subTitle: 'This student ID has already been used',
+              buttons: ['OK']
+            });
+            alert.present();
+            this.password = ""//empty the password field
+          }
+        })
+      }
+    })
+  }
 }
 

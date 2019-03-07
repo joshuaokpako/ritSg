@@ -1,53 +1,69 @@
 <ion-header>
-  <ion-navbar color="rit">
-    <ion-title>
-      {{eventHeaderName}}
-    </ion-title>
-  </ion-navbar>
-</ion-header>
-
-<ion-content>
-
-  <ion-fab bottom right edge>
-      <button  color="rit" ion-fab mini (click)="addFeedModal(eventHeaderName)"><ion-icon name="add"></ion-icon></button>
-    </ion-fab>
-  <ion-card *ngFor="let feed  of feeds |async">
-
-    <ion-item>
-      <ion-avatar item-start>
-        <img *ngIf="feed.postedBy.photoUrl" src="{{feed.postedBy.photoUrl}}">
-      </ion-avatar>
-      <h2>{{feed.postedBy.fullName | titlecase}}</h2>
-      <p>{{(feed.createdAt)?.seconds * 1000 | date :'mediumDate'}}</p>
-    </ion-item>
+    <ion-navbar color="rit">
+      <ion-title>
+        {{eventHeaderName}}
+      </ion-title>
+    </ion-navbar>
+  </ion-header>
   
-    <img *ngIf="(feed)?.postImg" class="max" src="{{feed?.postImg}}">
-  
-    <ion-card-content>
-      <p>{{feed.description}}</p>
-    </ion-card-content>
-  
-    <ion-row>
-      <ion-col>
-        <button ion-button icon-left [color]="feed.youLike==true ? 'danger': 'inactive'" (click)="like(feed)" clear small>
-          <ion-icon name="heart"></ion-icon>
-          <div ><span *ngIf="feed.likes.length!=1; else oneLike">{{feed.likes.length}} likes </span> <ng-template #oneLike>{{feed.likes.length}} like<span></span></ng-template></div>
+  <ion-content>
+    
+        <ion-refresher (ionRefresh)="doRefresh($event)">
+            <ion-refresher-content color="rit"></ion-refresher-content>
+          </ion-refresher>
+      
+      <ion-fab *ngIf='(user | async)?.admin =="RIT" || (user | async)?.admin =="clubs"  || (user | async)?.admin =="athletics"|| (user | async)?.staff ==true || (user | async)?.admin =="main" ' bottom right edge>
+          <button color="rit" ion-fab mini (click)="addFeedModal(eventHeaderName)"><ion-icon name="add"></ion-icon></button>
+        </ion-fab>
+        <p text-center *ngIf="!(feeds |async)">
           
-        </button>
-      </ion-col>
-      <ion-col>
-        <button ion-button icon-left clear color="inactive" small (click)="toComments('Comments',feed.id)">
-          <ion-icon name="text"></ion-icon>
-          <div *ngIf="feed.comment;else noComment"><span *ngIf="feed.comment!=1;else oneComment">{{feed.comment}} Comments</span><ng-template #oneComment>{{feed.comment}} Comment</ng-template></div>
-          <ng-template #noComment>0 Comments</ng-template>
-        </button>
-      </ion-col>
-      <ion-col center text-center>
-        <ion-note>
-          11h ago
-        </ion-note>
-      </ion-col>
-    </ion-row>
+          <ion-spinner color="rit" name="crescent"></ion-spinner>
+        </p>
+        <p class="noFeeds" text-center [hidden]="(feeds | async) != ''">
+          Sorry there are no Feeds right now 
+        </p>
+        
+      <ion-card *ngFor="let feed  of feeds |async; trackBy : trackId">
+          
+        <ion-item >
+          <ion-avatar item-start>
+            <img class="resize" *ngIf="feed.postedBy.photoUrl" src="{{feed.postedBy.photoUrl}}">
+          </ion-avatar>
+          <h2>{{(feed.postedBy)?.fullName | titlecase}}</h2>
+          <p>{{(feed.createdAt)?.seconds * 1000 | date :'mediumDate'}}</p>
+          <button ion-button icon-only item-end *ngIf='theUser?.uid === feed.postedByUid' color='danger' (click)="delete(feed.id)" clear small>
+            <ion-icon name="trash"></ion-icon>
+          </button>
+        </ion-item>
+      
+        <img class="resizeImg max" *ngIf="(feed)?.postImg" src="{{feed?.postImg}}">
+      
+        <ion-card-content>
+          <p>{{feed.description}}</p>
+        </ion-card-content>
+      
+        <ion-row>
+          <ion-col>
+            <button ion-button icon-left [color]="feed.youLike==true ? 'danger': 'inactive'" (click)="like(feed)" clear small>
+              <ion-icon name="heart"></ion-icon>
+              <div ><span *ngIf="feed.likes.length!=1; else oneLike">{{feed.likes.length}} likes </span> <ng-template #oneLike>{{feed.likes.length}} like<span></span></ng-template></div>
+              
+            </button>
+          </ion-col>
+          <ion-col>
+            <button ion-button icon-left clear color="inactive" small (click)="toComments('Comments',feed.id,feed.likes)">
+              <ion-icon name="text"></ion-icon>
+              <div *ngIf="feed.comment;else noComment"><span *ngIf="feed.comment!=1;else oneComment">{{feed.comment}} Comments</span><ng-template #oneComment>{{feed.comment}} Comment</ng-template></div>
+              <ng-template #noComment>0 Comments</ng-template>
+            </button>
+          </ion-col>
+          <ion-col center text-center>
+            <ion-note>
+              {{(feed.createdAt)?.seconds * 1000 | dateFormat :'true'}}
+            </ion-note>
+          </ion-col>
+        </ion-row>
+      
+      </ion-card>
+  </ion-content>
   
-  </ion-card>
-</ion-content>

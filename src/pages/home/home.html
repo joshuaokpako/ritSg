@@ -1,13 +1,16 @@
 <ion-header>
   <ion-toolbar color="rit">
     <ion-title>RIT Dubai</ion-title>
+    <ion-buttons *ngIf="anonymous !== false" end>
+        <button ion-button clear color="light" (click) = "logout()"> Logout</button>
+    </ion-buttons>
   </ion-toolbar>
   
 </ion-header>
 
 
 <ion-content class="card-background-page">
-  <ion-grid>
+  <ion-grid *ngIf="anonymous === false">
     <!--Row 2 of card buttons-->
     <ion-row>
       <ion-col>
@@ -32,9 +35,9 @@
     <!--Row 2 of card buttons-->
     <ion-row>
       <ion-col>
-          <ion-card (click)="toAthletics()" padding-right padding-left  color="rit" class="myHeight">
+          <ion-card (click)="toAthletics()" padding-right padding-left padding-bottom color="rit" class="myHeight">
             <ion-icon name="football"></ion-icon>
-            <p>RIT Athletics</p> 
+            <p>Athletics</p> 
           </ion-card>
       </ion-col>
       <ion-col>
@@ -60,7 +63,7 @@
         <ion-col>
           <ion-card (click)="openBrowser('https://mycourses.rit.edu')">
             <img src="assets/imgs/card-saopaolo.png"/>
-            <div  class="card-title">My courses</div>
+            <div class="card-title">My courses</div>
           </ion-card>
         </ion-col> 
         <ion-col>

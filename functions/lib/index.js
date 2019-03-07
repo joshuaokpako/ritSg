@@ -10,24 +10,34 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const CryptoJS = require("crypto-js");
 admin.initializeApp();
 exports.newMessageNotification = functions.firestore
     .document('messages/{mesKey}/chats/{mesId}')
-    .onCreate((event) => __awaiter(this, void 0, void 0, function* () {
-    const data = event.after.data();
+    .onCreate((snap, context) => __awaiter(this, void 0, void 0, function* () {
+    const db = admin.firestore();
+    const data = snap.data();
     const name = data.sentBy;
-    const userId = data.sentTo;
+    const uid = data.sentTo;
+    const userId = data.uid;
+    const key = data.key;
+    const decryptMess = CryptoJS.AES.decrypt(data.message, key).toString(CryptoJS.enc.Utf8);
+    const message = decryptMess.length > 100 ? decryptMess.slice(0, 100) + '...' : decryptMess;
     // Notification content
     const payload = {
         notification: {
-            title: 'New Message',
-            body: `${name} sent you a message!`,
-            icon: 'https://goo.gl/Fz9nrQ'
+            title: `${name} sent a message!`,
+            body: message,
+            icon: 'https://goo.gl/Fz9nrQ',
+            sound: 'default',
+        },
+        data: {
+            userId: userId,
+            type: 'message'
         }
     };
     // ref to the device collection for the user
-    const db = admin.firestore();
-    const devicesRef = db.collection('devices').where('userId', '==', userId);
+    const devicesRef = db.collection('devices').where('userId', '==', uid);
     // get the user's tokens and send notifications
     const devices = yield devicesRef.get();
     const tokens = [];
