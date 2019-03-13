@@ -18,7 +18,6 @@ import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { FileOpener } from '@ionic-native/file-opener';
 import { FileTransfer } from '@ionic-native/file-transfer';
 import { FileChooser } from '@ionic-native/file-chooser';
-import { DocumentPicker } from '@ionic-native/document-picker';
 import { FilePath } from '@ionic-native/file-path';
 import { AppMinimize } from '@ionic-native/app-minimize';
 import { BackgroundMode } from '@ionic-native/background-mode';
@@ -82,7 +81,6 @@ const firebase = {
     GoogleMaps,
     Camera,
     File,
-    DocumentPicker,
     FileOpener,
     FileTransfer,
     Firebase,
@@ -91,7 +89,6 @@ const firebase = {
     Geofence,
     BarcodeScanner,
     Keyboard,
-    DocumentPicker,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     UserserviceProvider,
     ChatServiceProvider,
