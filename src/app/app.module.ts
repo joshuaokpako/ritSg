@@ -25,6 +25,7 @@ import { Badge } from '@ionic-native/badge';
 import { LocationAccuracy } from '@ionic-native/location-accuracy';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { SpinnerDialog } from '@ionic-native/spinner-dialog';
+import { IOSFilePicker } from '@ionic-native/file-picker';
 
 
 import { MyApp } from './app.component';
@@ -99,7 +100,8 @@ const firebase = {
     Badge,
     LocationAccuracy,
     ScreenOrientation,
-    SpinnerDialog
+    SpinnerDialog,
+    IOSFilePicker
   ]
 })
 
