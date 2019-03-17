@@ -46,19 +46,19 @@
       </ion-item>
       
     </ion-list>
-  
-    <button block outline [disabled]="!destination|| !departure_1 || !driverName || !arrival|| !driverNumber " color="rit" ion-button (click)="addBus()">
-      Add Bus
-    </button>
+      <button  block outline [disabled]="!destination|| !departure_1 || !driverName || !arrival|| !driverNumber " color="rit" ion-button (click)="addBus()">
+        Add Bus
+      </button>
   </div>
 
   <ng-template #pdf>
-    <p text-center (click)="uploadPdf()">
-      <button color="danger" round ion-button icon-end>
-        Add {{header}} Schedule
-      <ion-icon name="paper"></ion-icon>
-      </button>
-    </p>
+      <p text-center >
+        <input type="file" id="fileUpload" class="ios-file-input" (change)="onFileFromStorageChosen($event)" />
+        <button class="top-button" color="danger" round ion-button icon-end>
+          Add {{header}} Schedule
+        <ion-icon name="paper"></ion-icon>
+        </button>
+      </p>
   </ng-template>
 
 </ion-content>

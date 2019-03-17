@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, AlertController, ViewController, Platform } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { File, FileEntry } from '@ionic-native/file';
@@ -21,7 +21,8 @@ import { FilePath } from '@ionic-native/file-path';
   selector: 'page-add-bus-schedule',
   templateUrl: 'add-bus-schedule.html',
 })
-export class AddBusSchedulePage {
+
+export class AddBusSchedulePage implements OnInit {
  header;
  type;
  destination;
@@ -32,13 +33,16 @@ export class AddBusSchedulePage {
  departure_2;
  departure_3;
 loading;
+
+
   constructor(private filePath: FilePath,private platform:Platform, public docPicker: IOSFilePicker, private fileChooser: FileChooser, private file: File, public viewCtrl: ViewController, public uS:UserserviceProvider,public loadingCtrl: LoadingController, public navCtrl: NavController, public navParams: NavParams,public alertCtrl: AlertController) {
     this.header = this.navParams.get('header')
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad AddBusSchedulePage');
+  ngOnInit() {
+
   }
+
   presentLoader(toggle){
     
     if (toggle ==true){
@@ -52,6 +56,30 @@ loading;
       this.loading.dismiss();
     }
 
+  }
+
+  
+  public onFileFromStorageChosen(filesEvent: any) {
+    this.processFileFromStorage(filesEvent);
+  }
+
+  public processFileFromStorage(event: any) {
+    let file = event.target.files[0];
+    //you can read various properties of the file (like mimetype and size) from the file object.
+    console.log(file);
+    this.readfile(file);
+ }
+
+//this one reads the contents of the file as a URL that contains its data:
+
+  public readfile(file: any): void {
+    let reader = new FileReader();
+    reader.onload = (e) => {
+      let dataUrl = reader.result;
+      //and do something with the reader.
+    };
+   
+   this.uploadPdf(file)
   }
 
   addBus(){
@@ -86,26 +114,18 @@ loading;
     })
   }
 
-  uploadPdf(){
+  uploadPdf(thefile){
     let alert = this.alertCtrl.create({
       subTitle: 'there was an error',
       buttons: ['OK']
       });
     
-    let fileChooser;
-    if (this.platform.is('ios')) {
-      fileChooser = this.docPicker.pickFile()
-    .then((uri) => {    
-      var type = uri.substr(uri.lastIndexOf('.') + 1);   
-         var currentName = uri.substr(uri.lastIndexOf('/') + 1);    
-        var correctPath = uri.substr(0, uri.lastIndexOf('/') + 1); 
-        
-          this.makeFileIntoBlob(correctPath, currentName,"application/pdf").then((fileblob:any) => {
-            let file = fileblob
+
+     var type = thefile.name.substr(thefile.name.lastIndexOf('.') + 1);      
             if(type == "pdf"){
             this.presentLoader(true)
             const ref = this.uS.uploadImages('Bus Schedules/'+this.header +'/'+this.header+'BusSchedules');
-            const task = ref.put(file);
+            const task = ref.put(thefile);
             // get notified when the download URL is available
             task.snapshotChanges().pipe(
               finalize(() => {
@@ -136,103 +156,13 @@ loading;
               buttons: ['OK']
             });
             alert.present();
-            this.presentLoader(false)
           }
-        }).catch((error)=> {
-          alert = this.alertCtrl.create({
-            subTitle: error.message,
-            buttons: ['OK']
-          });
-          alert.present();
-          this.presentLoader(false)
-      })
 
     
     
-    }).catch((e) =>{
-        alert = this.alertCtrl.create({
-        subTitle: e.message ,
-        buttons: ['OK']
-      });
-      alert.present();
-      this.presentLoader(false)
-    });
+   
       
-    } else if (this.platform.is('android')) {
-      fileChooser = this.fileChooser.open()
-      fileChooser
-    .then((uri) => { 
-      this.filePath.resolveNativePath(uri)       
-      .then(filePath => {       
-          var type = filePath.substr(filePath.lastIndexOf('.') + 1);
-          var correctPath = filePath.substr(0, filePath.lastIndexOf('/') + 1); 
-          var currentName =filePath.replace(/^.*[\\\/]/, '');   
-        
-          this.makeFileIntoBlob(filePath, currentName,"application/pdf").then((fileblob:any) => {
-            let file = fileblob
-            if(type == "pdf"){
-            this.presentLoader(true)
-            const ref = this.uS.uploadImages('Bus Schedules/'+this.header +'/'+this.header+'BusSchedules');
-            const task = ref.put(file);
-            // get notified when the download URL is available
-            task.snapshotChanges().pipe(
-              finalize(() => {
-                ref.getDownloadURL().subscribe((myUrl) =>{
-                  console.log(myUrl)
-                  let busSchedule={
-                    file:myUrl
-                  }
-                  this.uS.addBus(this.header,busSchedule).then(()=>{
-                    this.presentLoader(false)
-                    this.viewCtrl.dismiss();
-                    })
-                    .catch((error)=>  {
-                      this.presentLoader(false)
-                      alert = this.alertCtrl.create({
-                      subTitle: error.message,
-                      buttons: ['OK']
-                      });
-                    alert.present();
-                  })
-                })
-              })
-            ).subscribe()
-          }
-          else{
-            alert = this.alertCtrl.create({
-              subTitle: 'The file is not a pdf file. Choose a pdf file',
-              buttons: ['OK']
-            });
-            alert.present();
-            this.presentLoader(false)
-          }
-        }).catch((error)=> {
-          alert = this.alertCtrl.create({
-            subTitle: error.message,
-            buttons: ['OK']
-          });
-          alert.present();
-          this.presentLoader(false)
-      })
-
-      }).catch((error)=>  {
-        alert = this.alertCtrl.create({
-        subTitle: error.message,
-        buttons: ['OK']
-        });
-      alert.present();
-      this.presentLoader(false)
-    })
     
-    }).catch((e) =>{
-        alert = this.alertCtrl.create({
-        subTitle: e.message ,
-        buttons: ['OK']
-      });
-      alert.present();
-      this.presentLoader(false)
-    });
-    }
     
   }
 
