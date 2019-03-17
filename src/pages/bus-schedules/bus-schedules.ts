@@ -60,7 +60,7 @@ public user;
   }
 
   downloadAndOpenPdf() {
-    this.progress = '1%'
+    this.progress = 1
     this.show = false
    
     let path = null;
@@ -72,14 +72,15 @@ public user;
     }
  console.log(path)
     const transfer = this.transfer.create();
-    transfer.onProgress((listener)=>{
-      for (let index = 0;this.progress <= 100; index++) {
-        this.progress = (Math.ceil((listener.loaded / listener.total)*100).toString()) + '%';
-        document.getElementById('progressBar').style.width = this.progress
-      }
-  })
+    
   this.pdfBus =  this.uS.getBus(this.header).pipe(takeUntil(this.observer)).subscribe((x:any)=>{
     transfer.download(x.file, path + 'BusScheduleAthletics.pdf').then(entry => {
+      transfer.onProgress((listener)=>{
+        while (this.progress <= 100) {
+          this.progress = (Math.ceil((listener.loaded / listener.total)*100).toString()) + '%';
+          document.getElementById('progressBar').style.width = this.progress
+        }
+    })
     let url = entry.toURL();
     this.fileOpener.open(url, 'application/pdf')
       .then(() => {

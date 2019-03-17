@@ -4,7 +4,6 @@ import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { File, FileEntry } from '@ionic-native/file';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { finalize } from 'rxjs/operators';
-import { IOSFilePicker } from '@ionic-native/file-picker';
 import { FilePath } from '@ionic-native/file-path';
 
 
