@@ -34,7 +34,7 @@ export class AddBusSchedulePage implements OnInit {
 loading;
 
 
-  constructor(private filePath: FilePath,private platform:Platform, public docPicker: IOSFilePicker, private fileChooser: FileChooser, private file: File, public viewCtrl: ViewController, public uS:UserserviceProvider,public loadingCtrl: LoadingController, public navCtrl: NavController, public navParams: NavParams,public alertCtrl: AlertController) {
+  constructor(private filePath: FilePath,private platform:Platform, private fileChooser: FileChooser, private file: File, public viewCtrl: ViewController, public uS:UserserviceProvider,public loadingCtrl: LoadingController, public navCtrl: NavController, public navParams: NavParams,public alertCtrl: AlertController) {
     this.header = this.navParams.get('header')
   }
 
