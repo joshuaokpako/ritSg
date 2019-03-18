@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="edu.ritdubaisg.www" version="0.0.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name short ="RITD SG">RITDSG</name>
+    <name>RITD SG</name>
     <description>An RIT SG App to make life easier for students </description>
     <author email="j.jpax35@gmail.com" href="http://www.rit.edu/dubai/">Joshua Okpako</author>
     <content src="index.html" />
@@ -42,9 +42,6 @@
         <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.png" />
     </platform>
     <platform name="ios">
-        <edit-config file="*-Info.plist" mode="overwrite" target="CFBundleDisplayName">
-            <string>RITD SG</string>
-        </edit-config>
         <config-file parent="NSCameraUsageDescription" platform="ios" target="*-Info.plist">
             <string>You can take photos</string>
         </config-file>
