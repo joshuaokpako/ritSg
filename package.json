@@ -58,7 +58,7 @@
     "@types/crypto-js": "^3.1.43",
     "angular-moment-timezone": "^1.7.1",
     "angularfire2": "^5.0.0-rc.10",
-    "cordova-android": "^7.1.1",
+    "cordova-android": "6.3.0",
     "cordova-android-support-gradle-release": "^1.4.4",
     "cordova-ios": "4.5.5",
     "cordova-plugin-add-swift-support": "^1.6.1",
@@ -73,7 +73,6 @@
     "cordova-plugin-file-transfer": "^1.7.1",
     "cordova-plugin-filechooser": "^1.0.1",
     "cordova-plugin-filepath": "^1.4.2",
-    "cordova-plugin-firebase": "^1.0.5",
     "cordova-plugin-geolocation": "^4.0.1",
     "cordova-plugin-googlemaps": "^2.3.11",
     "cordova-plugin-googlemaps-sdk": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps-sdk.git#2.7.0",
@@ -117,7 +116,6 @@
   "description": "An Ionic project",
   "cordova": {
     "plugins": {
-      "cordova-plugin-firebase": {},
       "cordova-plugin-inappbrowser": {},
       "cordova-plugin-whitelist": {},
       "cordova-plugin-device": {},

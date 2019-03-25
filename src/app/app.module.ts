@@ -12,7 +12,6 @@ import { GoogleMaps } from "@ionic-native/google-maps";
 import { Geolocation } from '@ionic-native/geolocation';
 import { Camera } from '@ionic-native/camera';
 import { File } from '@ionic-native/file';
-import { Firebase } from '@ionic-native/firebase'
 import { Keyboard } from '@ionic-native/keyboard';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { FileOpener } from '@ionic-native/file-opener';
