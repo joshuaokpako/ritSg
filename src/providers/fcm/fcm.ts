@@ -9,7 +9,6 @@ import { FCM } from '@ionic-native/fcm';
 export class FcmProvider {
 token: string ='';
   constructor(
-    public firebaseNative: Firebase,
     public db: FirestoreProvider,
     public uS: UserserviceProvider,
     private platform: Platform,
