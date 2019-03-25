@@ -26,7 +26,6 @@ token: string ='';
 
   if (this.platform.is('ios')) {
     token = await this.fcm.getToken();
-    await this.firebaseNative.grantPermission();
   } 
   this.token = token;
   

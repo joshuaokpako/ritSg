@@ -83,7 +83,6 @@ const firebase = {
     File,
     FileOpener,
     FileTransfer,
-    Firebase,
     FcmProvider,
     FileChooser,
     Geofence,
