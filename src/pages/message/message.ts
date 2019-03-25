@@ -29,6 +29,7 @@ myUnreadMessages:any;
 getUnreadSub;
 sub;
 now;
+hasRead= false;
 tabBarElement:any;
 @ViewChild(Navbar) navBar: Navbar;
 @ViewChild(Content) content: Content;
@@ -44,6 +45,7 @@ public name:string;
   }
 
   ionViewWillEnter() {
+    this.uS.updateChatActivity(this.data.chatUid);
     this.events.publish('chat entered', true, this.data.chatUid);
     this.tabBarElement.style.display = 'none';
     let observer = new Subject()
@@ -53,6 +55,7 @@ public name:string;
  
   ionViewWillLeave() {
     this.tabBarElement.style.display = 'flex';
+    this.uS.updateChatActivity('');
   }
 
   toBottom(){
@@ -64,6 +67,12 @@ public name:string;
      this.chats = this.chatServ.getMessages(this.key)
       this.chatServ.getReceiverUnreadMessages(this.data.chatUid).subscribe((x:any)=>{
         if(x){
+          if(x.unreadMessages.length ==0){
+            this.hasRead = true;
+          }
+          else{
+            this.hasRead = false;
+          }
           this.receiverUnreadMessages = x.unreadMessages;
         }
       });
@@ -106,6 +115,7 @@ public name:string;
    }
 
   sendMessage(){
+    this.hasRead = false;
     if (this.key ===' ') { // create key and call getMessages because it is the first message between the two people
       this.key = this.data.chatUid + this.uS.uid
       this.data.message=this.message.trim()

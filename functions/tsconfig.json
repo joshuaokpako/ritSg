@@ -5,10 +5,16 @@
     "noImplicitReturns": true,
     "outDir": "lib",
     "sourceMap": true,
-    "target": "es6"
+    "target": "es6",
+	 // "isolatedModules": true,               /* Transpile each file as a separate module (similar to 'ts.transpileModule'). */
+
+    "skipLibCheck": true,
+    /* Strict Type-Checking Options */
+    "strict": false,
   },
   "compileOnSave": true,
   "include": [
     "src"
   ]
+  
 }

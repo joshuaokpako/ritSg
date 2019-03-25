@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
-import {Events, Keyboard, IonicPage} from 'ionic-angular';
+import {Events, Keyboard, IonicPage, App} from 'ionic-angular';
 import { ChatServiceProvider} from '../../providers/chat-service/chat-service';
-import { map, share } from 'rxjs/operators';
+import { map, share, takeUntil } from 'rxjs/operators';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
+import { Subject } from 'rxjs';
 
 @IonicPage()
 @Component({
@@ -17,7 +18,7 @@ export class TabsPage {
   tab3Root = 'FeedsPage';
   tab4Root = 'ChatsPage';
   tab5Root = 'ProfilePage';
-  constructor(public uS:UserserviceProvider, public events: Events,public chatServ:ChatServiceProvider,public keyboard: Keyboard) {
+  constructor(public uS:UserserviceProvider, public events: Events,public chatServ:ChatServiceProvider,public keyboard: Keyboard, public app: App) {
     
     this.uS.fireAuth.authState.subscribe(user => {
       if (user) {
@@ -45,6 +46,7 @@ export class TabsPage {
       }),share()
      )
      this.chatNotification.subscribe()
+     
   }
 
   

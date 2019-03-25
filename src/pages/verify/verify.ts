@@ -20,6 +20,7 @@ export class VerifyPage implements OnInit{
 user:Observable<any>;
 password;
 myUser;
+userSubs;
 
   constructor(public events:Events, public uS : UserserviceProvider, public fs:FirestoreProvider, public loadingCtrl:LoadingController, public alertCtrl:AlertController, public navCtrl: NavController, public navParams: NavParams) {
   
@@ -31,7 +32,8 @@ myUser;
   }
 
   ionViewWillLoad() {
-    this.uS.fireAuth.authState.subscribe(user => {
+    this.userSubs=this.uS.fireAuth.authState
+    this.userSubs.subscribe(user => {
       if (user) {
         this.user = this.uS.db.doc$('users/'+user.uid);
       }
@@ -70,4 +72,12 @@ myUser;
     });
   }
 
+  ngOnDestroy(){
+    if (this.userSubs){
+      this.userSubs.unsubscribe();
+    }
+  }
+
 }
+
+

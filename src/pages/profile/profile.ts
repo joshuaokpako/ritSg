@@ -58,11 +58,37 @@ export class ProfilePage implements OnInit {
   }
 
   signOut(){
-    this.usersService.signOut().then(()=>{
-      this.app.getRootNav().setRoot('CoverPage')
-    }).catch((error) => {
-      this.app.getRootNav().setRoot('CoverPage')
-    });
+    let observer = new Subject();
+    this.observer = observer;
+    let n = 0;
+    this.usersService.db.colWithIds$("devices", ref => ref.where('userId', '==',this.usersService.uid)).pipe(takeUntil(this.observer),
+      map((tokens:any)=>{
+        n = n+1;
+        console.log(n);
+        if(n===1){
+          console.log(n);
+          this.observer.next()
+          this.observer.complete()
+        }
+        if (tokens.length!= 0){
+        tokens.forEach(token=> {
+          this.usersService.signOut().then(()=>{
+            this.app.getRootNav().setRoot('CoverPage').then(()=>{
+              this.usersService.db.delete("devices/"+token.id)
+            })
+          })
+        })
+        }
+        else{
+          this.usersService.signOut().then(()=>{
+            this.navCtrl.setRoot('CoverPage')
+          }).catch((error) => {
+            this.app.getRootNav().setRoot('CoverPage')
+          });
+          }
+        
+      })
+    ).subscribe()
   }
   
   openEditAlert(){
@@ -242,7 +268,6 @@ export class ProfilePage implements OnInit {
     let message;
     let observer = new Subject()
     let test = false
-    console.log('here')
     let worked; // show alert depending on if scan failed or worked
     let sub; // subscription
     let subs;

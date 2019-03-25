@@ -3,8 +3,7 @@ import { InAppBrowser } from '@ionic-native/in-app-browser';
 import { NavController, ToastController, IonicPage, Events } from 'ionic-angular';
 import { SpinnerDialog } from '@ionic-native/spinner-dialog';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+
 
 @IonicPage()
 @Component({

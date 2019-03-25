@@ -27,6 +27,7 @@
             <img *ngIf="us.photoUrl" class="resize" src="{{us.photoUrl}}">
             <img [hidden]="us.photoUrl" src="assets/imgs/blank-profile-picture.png">
           </ion-avatar>
+          <ion-card class="myHeight" *ngIf="us?.activity=='online'" color="secondary"></ion-card>
           <h2>{{us.fullName |titlecase}}</h2>
           <button *ngIf= 'us.admin =="clubs"' ion-button clear item-end>Club</button>
           <button *ngIf= 'us.admin =="athletics"' ion-button clear item-end>Athletics</button>

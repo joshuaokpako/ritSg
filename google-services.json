@@ -8,16 +8,12 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:137730014280:android:86b3a93f23023379",
+        "mobilesdk_app_id": "1:137730014280:android:22634c4b598f8afc",
         "android_client_info": {
-          "package_name": "com.RIT.Ritsg"
+          "package_name": "edu.ritdubaisg.www"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "137730014280-qaq9et8iid07gc9dp0g44aavfdafn0c0.apps.googleusercontent.com",
-          "client_type": 3
-        },
         {
           "client_id": "137730014280-qaq9et8iid07gc9dp0g44aavfdafn0c0.apps.googleusercontent.com",
           "client_type": 3

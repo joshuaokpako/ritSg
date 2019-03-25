@@ -1,7 +1,8 @@
 import { Component, OnInit} from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, AlertController, App } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { FirestoreProvider }   from '../../providers/firestore/firestore';
+import { FcmProvider } from '../../providers/fcm/fcm';
 
 /**
  * Generated class for the LoginPage page.
@@ -22,8 +23,8 @@ export class LoginPage implements OnInit {
   public checkUser: void;
 
 
-  constructor(public fs: FirestoreProvider, public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
-    public alertCtrl: AlertController,  public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public fs: FirestoreProvider,public fcm:FcmProvider, public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
+    public alertCtrl: AlertController,  public navCtrl: NavController, public navParams: NavParams, public app:App) {
       var that =this
     
   }
@@ -55,7 +56,9 @@ export class LoginPage implements OnInit {
       loader.present();
       this.usersService.loginUserService(this.email.trim().replace(/\s+/g, " "), this.password).then(authData => {
         //successful
-        loader.dismiss();
+        this.fcm.getToken()
+          loader.dismiss();
+          this.app.getRootNav().setRoot('TabsPage')
         
       },
       error => {
@@ -78,7 +81,7 @@ export class LoginPage implements OnInit {
     this.usersService.loginAnonymously().then(authData => {
       //successful
       loader.dismiss();
-      this.navCtrl.push('HomePage')
+      this.app.getRootNav().setRoot('TabsPage')
       
     },
     error => {

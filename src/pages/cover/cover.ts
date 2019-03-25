@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { UserserviceProvider } from '../../providers/userservice/userservice';
 
 
 
@@ -17,9 +18,17 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class CoverPage implements OnInit {
 
-  constructor( public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public uS: UserserviceProvider, public navCtrl: NavController, public navParams: NavParams) {
    
     
+  }
+
+  ionViewWillEnter(){
+    this.uS.fireAuth.authState.subscribe(user => {
+      if (user) {
+        this.navCtrl.setRoot('TabsPage');
+      }
+    })
   }
   
   ngOnInit(){

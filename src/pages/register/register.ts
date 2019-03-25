@@ -1,7 +1,7 @@
 import { Component} from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, AlertController, App } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
-
+import { FcmProvider } from '../../providers/fcm/fcm';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
@@ -37,8 +37,8 @@ export class RegisterPage {
   observer:Subject<any> = new Subject();
 
 
-  constructor(private barcodeScanner: BarcodeScanner,public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
-    public alertCtrl: AlertController,  public navCtrl: NavController, public navParams: NavParams) {
+  constructor(private barcodeScanner: BarcodeScanner,public fcm:FcmProvider,public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
+    public alertCtrl: AlertController,  public navCtrl: NavController, public navParams: NavParams, public app : App) {
       this.type ="student"
   }
 
@@ -118,7 +118,9 @@ export class RegisterPage {
               var that = this;
               this.usersService.signUpUserService(account,this.password).then(authData => {
                 //successful
-                loader.dismiss();
+                this.fcm.getToken()
+                  loader.dismiss();
+                  this.app.getRootNav().setRoot('TabsPage')
               },
               error => {
                 loader.dismiss();

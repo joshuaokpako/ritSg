@@ -45,6 +45,8 @@ export class UserserviceProvider {
   emailVerified;
   public user;
   public userRef;
+  public login= true;
+  
 
   
 
@@ -79,6 +81,15 @@ export class UserserviceProvider {
         this.emailVerified = user.emailVerified;
     
       } 
+      else{
+        this.currentUser = '';
+        this.userName = '';
+        this.userEmail = '';
+        this.userPhotoUrl = '';
+        this.uid = '';
+        this.userRef = ''
+        this.user = ''
+      }
     })
     
 }
@@ -130,7 +141,35 @@ updateProfilePic(photo){
 
 
   loginUserService(email: string, password: string): any {
-    return this.fireAuth.auth.signInWithEmailAndPassword(email, password);
+    let n = 0;
+    return this.fireAuth.auth.signInWithEmailAndPassword(email, password).then(()=>{
+      this.fireAuth.authState.subscribe(user => {
+        if (user) {
+          n+=1;
+          this.currentUser = user;
+          this.userName = user.displayName;
+          this.userEmail = user.email;
+          this.userPhotoUrl = user.photoURL;
+          this.uid = user.uid;
+          this.userRef = this.db.doc('users/'+this.uid).ref
+          this.user = this.getUserProfile(this.uid)
+          if (n==1){
+            this.updateUserActivity('online')
+          }
+      
+        }
+        else{
+          this.currentUser = '';
+          this.userName = '';
+          this.userEmail = '';
+          this.userPhotoUrl = '';
+          this.uid = '';
+          this.userRef = ''
+          this.user = ''
+        }
+      })
+    })
+    ;
   }
 
  encrypt(text){
@@ -143,6 +182,7 @@ updateProfilePic(photo){
   signUpUserService(account, password){
     return this.fireAuth.auth.createUserWithEmailAndPassword(account['email'], password)
     .then(() => {
+      let n = 0;
       if(account['type']=='club') {
         var cUser = this.fireAuth.auth.currentUser;
         let url = account['photoUrl'];
@@ -173,6 +213,7 @@ updateProfilePic(photo){
         //sign in the user
         this.fireAuth.auth.signInWithEmailAndPassword(account['email'], password)
         .then((updateProfile) =>{
+          this.login = false;
           var cUser = this.fireAuth.auth.currentUser;
           let user = this.db.firebase.auth().currentUser
           user.sendEmailVerification().then(() => {
@@ -186,6 +227,7 @@ updateProfilePic(photo){
             
             this.fireAuth.authState.subscribe(user => {
               if (user) {
+                n+=1;
                 this.currentUser = user;
                 this.userName = user.displayName;
                 this.userEmail = user.email;
@@ -193,8 +235,20 @@ updateProfilePic(photo){
                 this.uid = user.uid;
                 this.userRef = this.db.doc('users/'+this.uid).ref
                 this.user = this.getUserProfile(this.uid)
-            
-              } 
+                if (n==1){
+                  console.log(n)
+                  this.updateUserActivity('online')
+                }
+              }
+              else{
+                this.currentUser = '';
+                this.userName = '';
+                this.userEmail = '';
+                this.userPhotoUrl = '';
+                this.uid = '';
+                this.userRef = ''
+                this.user = ''
+              }
             })
             
             cUser.updateProfile({
@@ -212,7 +266,9 @@ updateProfilePic(photo){
   }
  
   signOut(){
-    return this.fireAuth.auth.signOut();
+    return this.updateUserActivity('offline').then(()=>{
+      this.fireAuth.auth.signOut();
+    })
   }
  
   checkStudentId(studentId){
@@ -354,6 +410,25 @@ updateProfilePic(photo){
     })
     
     
+  }
+
+  updateUserActivity(status) {
+    let result:any = ''
+    if(this.currentUser!==''){
+      let activity  = {
+        activity: status
+      } 
+      result = this.db.update("users/"+this.uid, activity)
+    }
+    console.log(result)
+    return result
+  }
+
+  updateChatActivity(status) {
+    let activity  = {
+      chatactivity: status
+    } 
+    return this.db.update("users/"+this.uid, activity)
   }
 
   updateEventGoing(ev,header,uid,youGoing){

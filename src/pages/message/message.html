@@ -48,6 +48,7 @@
                   <span *ngIf="(chat.createdAt)?.seconds" class="msg-date"> {{(chat.createdAt)?.seconds * 1000 | date:'shortTime'}}</span>
                   <p text-wrap>{{chat.message}}</p>
               </div>
+              <p text-right class="read right" *ngIf="chat.uid == user && last && hasRead" small >seen</p>
               
               {{last ? toBottom() : ''}} 
             </ion-item>

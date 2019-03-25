@@ -25,6 +25,7 @@ import { Badge } from '@ionic-native/badge';
 import { LocationAccuracy } from '@ionic-native/location-accuracy';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { SpinnerDialog } from '@ionic-native/spinner-dialog';
+import { FCM } from '@ionic-native/fcm';
 
 
 import { MyApp } from './app.component';
@@ -100,6 +101,7 @@ const firebase = {
     LocationAccuracy,
     ScreenOrientation,
     SpinnerDialog,
+    FCM,
   ]
 })
 
