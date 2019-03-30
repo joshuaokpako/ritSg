@@ -71,11 +71,11 @@ export class ProfilePage implements OnInit {
         if (tokens.length!= 0){
         tokens.forEach(token=> {
         this.usersService.db.delete("devices/"+token.id)
-        }).then(()=>{
-          this.usersService.signOut().then(()=>{
+        })
+          this.usersService.signOut()
+          .then(()=>{
             this.events.publish('loggedIn','loggedOut')
             this.app.getRootNav().setRoot('CoverPage')
-          })
         })
         }
         else{
