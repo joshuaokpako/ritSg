@@ -4,6 +4,7 @@ page-chats {
       }
     .resizeimg{
         object-fit: contain;
+        z-index:-1;
     }
     .max{
         max-height: 400px;
@@ -12,10 +13,13 @@ page-chats {
         object-fit: cover;
     }
     .myHeight{
+        z-index:1000;
         height: 10px;
         border-radius: 100%;
         width: 10px;
         float: right;
+        margin-top:30px;
+        margin-left:-10px;
     
         
       }

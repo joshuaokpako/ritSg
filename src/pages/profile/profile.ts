@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController, NavParams, AlertController, App, LoadingController, ToastController, IonicPage } from 'ionic-angular';
+import { NavController, NavParams, AlertController, App, LoadingController, ToastController, IonicPage, Events } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { finalize, map, takeUntil } from 'rxjs/operators';
@@ -29,7 +29,7 @@ export class ProfilePage implements OnInit {
   public userSpirit;
   subscription
 
-  constructor(private barcodeScanner: BarcodeScanner,public loadingCtrl: LoadingController,public usersService : UserserviceProvider, public navCtrl: NavController, public navParams: NavParams, public alertCtrl:AlertController,public toastCtrl:ToastController,public app:App, public camera: Camera) {
+  constructor(private barcodeScanner: BarcodeScanner,public loadingCtrl: LoadingController,public events:Events, public usersService : UserserviceProvider, public navCtrl: NavController, public navParams: NavParams, public alertCtrl:AlertController,public toastCtrl:ToastController,public app:App, public camera: Camera) {
   }
 
   ionViewDidLoad() {
@@ -64,18 +64,17 @@ export class ProfilePage implements OnInit {
     this.usersService.db.colWithIds$("devices", ref => ref.where('userId', '==',this.usersService.uid)).pipe(takeUntil(this.observer),
       map((tokens:any)=>{
         n = n+1;
-        console.log(n);
         if(n===1){
-          console.log(n);
           this.observer.next()
           this.observer.complete()
         }
         if (tokens.length!= 0){
         tokens.forEach(token=> {
+        this.usersService.db.delete("devices/"+token.id)
+        }).then(()=>{
           this.usersService.signOut().then(()=>{
-            this.app.getRootNav().setRoot('CoverPage').then(()=>{
-              this.usersService.db.delete("devices/"+token.id)
-            })
+            this.events.publish('loggedIn','loggedOut')
+            this.app.getRootNav().setRoot('CoverPage')
           })
         })
         }

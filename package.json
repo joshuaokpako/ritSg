@@ -152,6 +152,8 @@
       "cordova-plugin-screen-orientation": {},
       "cordova-plugin-native-spinner": {},
       "cordova-plugin-document-viewer": {},
+      "cordova-plugin-add-swift-support": {},
+      "es6-promise-plugin": {},
       "cordova-plugin-fcm-with-dependecy-updated": {}
     },
     "platforms": []

@@ -8,8 +8,7 @@ import { tap } from 'rxjs/operators';
 import { UserserviceProvider } from '../providers/userservice/userservice';
 import { Badge } from '@ionic-native/badge';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
-import { map, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+
 
 
 
@@ -24,6 +23,8 @@ export class MyApp {
   Fcm;
   timer = 0; // timer for splash screen
   currentUser;
+  notif = undefined;
+  log = false; // check if user is logged in
   constructor(private screenOrientation: ScreenOrientation,public app: App,private badge: Badge,public events: Events, public uS : UserserviceProvider,modalCtrl: ModalController, platform: Platform, statusBar: StatusBar,  fcm: FcmProvider, toastCtrl: ToastController, private appMinimize: AppMinimize) {
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
@@ -40,6 +41,17 @@ export class MyApp {
       }, 4000);
      
       let n = 0
+      let p =0;
+      let w = 0;
+
+      events.subscribe('loggedIn',(log)=>{
+        if(log === 'logged In'){
+          this.log = true;
+        }
+        else if(log === 'loggedOut'){
+          this.log = false;
+        }
+      })
       // Check if user is authenticated
       uS.fireAuth.authState.subscribe(user => {
         if (user) {
@@ -57,34 +69,50 @@ export class MyApp {
               if (theuser) {
                 if (theuser.type == 'club') {
                   if(theuser.emailVerified){
+                    p += 1;
+                    this.rootPage = 'TabsPage';
+                    if (p===1){
+                      uS.updateUserActivity('online')
+                    }
+                    // for increasing badge number on new chat
+                    events.subscribe('notif', (badgeNumber) => {
+                      this.notif = badgeNumber;
+                      this.badge.set(badgeNumber);
+                    });
+                    
                     fcm.getToken().then(()=>{
-                            this.rootPage = 'TabsPage';
-                            this.Fcm = fcm.listenToNotifications().pipe(
-                              tap(msg => {
-                                console.log('true')
-                                if(msg.wasTapped){
-                                  console.log('tapped')
-                                  this.nav.push('ChatsPage');
-                                }
-                                else{
-                                if(this.notifyToast == true && this.chatId != msg.userId){
-                                    // show a toast
-                                    const toast = toastCtrl.create({
-                                      message: msg.title,
-                                      duration: 5000,
-                                      position: "top",
-                                    });
-                                    toast.present();
-                                  }
-                                }
-                              })
-                              
-                            ).subscribe()
-                            if (this.timer===4){
-                              splash.dismiss();
+                      this.log = true;
+                      this.Fcm = fcm.listenToNotifications().pipe(
+                        tap(msg => {
+                          console.log('true')
+                          if(msg.wasTapped){
+                            console.log('tapped')
+                           
+                          }
+                          else{
+                          if(this.notifyToast == true && this.chatId != msg.userId){
+                              // show a toast
+                              const toast = toastCtrl.create({
+                                message: msg.title,
+                                duration: 5000,
+                                position: "top",
+                              });
+                              toast.present();
                             }
+                          }
+                        })
+                        
+                      ).subscribe()
+                      if (this.timer===4){
+                        splash.dismiss();
+                      }
                           
                     })
+                    events.subscribe('chat entered', (entered,id) => {
+                      this.notifyToast = entered
+                      this.chatId = id;
+                      this.badge.clear();
+                    });
                     
                   }
                   else{
@@ -111,14 +139,24 @@ export class MyApp {
             
           }
           else{
+            w += 1;
+            this.log = true;
+            this.rootPage = 'TabsPage';
+            if (w===1){
+              uS.updateUserActivity('online')
+            }
+            // for increasing badge number on new chat
+            events.subscribe('notif', (badgeNumber) => {
+              this.notif = badgeNumber;
+              this.badge.set(badgeNumber);
+            });
+            console.log(this.log)
             fcm.getToken().then(()=>{
-                  this.rootPage = 'TabsPage';
                   this.Fcm = fcm.listenToNotifications().pipe(
                     tap(msg => {
                       console.log('true')
                       if(msg.wasTapped){
                         console.log('tapped')
-                        this.nav.push('ChatsPage');
                       }
                       else{
                       if(this.notifyToast == true && this.chatId != msg.userId){
@@ -169,21 +207,21 @@ export class MyApp {
               this.badge.clear();
             });
             
-            // for increasing badge number on new chat
-            events.subscribe('notif', (badgeNumber) => {
-              this.badge.set(badgeNumber);
-            });
+            
             
           }) 
         }
       }
         else {
+          console.log(this.log)
           n+= 1;
           if(this.Fcm){
             this.Fcm.unsubscribe()
           }
           if(n==1){
-            this.rootPage  = 'CoverPage';
+            if(this.log == false){
+              this.rootPage  = 'CoverPage';
+            }
           }
           if (this.timer===4){
             splash.dismiss();

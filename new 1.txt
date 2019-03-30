@@ -1,0 +1,3 @@
+match /messages/{message}/chats/{chat} {
+      allow read, write: if request.auth.uid == resource.data.sentTo || request.auth.uid == resource.data.uid;
+    }allow read, write: if request.auth.uid == null;

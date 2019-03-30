@@ -1,12 +1,26 @@
 page-message {
   .resizeimg{
     object-fit: contain;
+    z-index: -1;
 }
 .max{
     max-height: 400px;
 }
 .resize{
     object-fit: cover;
+}
+.myHeight{
+  z-index:1000;
+  height: 10px;
+  border-radius: 100%;
+  width: 10px;
+  float: right;
+  margin-top:6px;
+
+  
+}
+.titleicon{
+  margin-top:8px;
 }
     .body {
         background-color: #dedfdd;

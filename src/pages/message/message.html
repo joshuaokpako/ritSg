@@ -8,7 +8,7 @@
 
   <ion-navbar color="rit">
       <img class="roundImg resize" *ngIf="receiver" src="{{receiver.photoUrl}}" width="40px" style="display:inline-block" height="40px"/>
-      <ion-title class="titleicon" *ngIf="receiver" style="display:inline-block" >{{receiver.fullName | titlecase}}</ion-title>
+      <ion-title class="titleicon" *ngIf="receiver" style="display:inline-block" >{{receiver.fullName | titlecase}}<span><ion-card class="myHeight" *ngIf="receiver?.activity=='online'" color="secondary"></ion-card></span></ion-title>
 
   </ion-navbar>
   

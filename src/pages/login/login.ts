@@ -1,5 +1,5 @@
 import { Component, OnInit} from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, AlertController, App } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, AlertController, App, Events } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { FirestoreProvider }   from '../../providers/firestore/firestore';
 import { FcmProvider } from '../../providers/fcm/fcm';
@@ -24,7 +24,7 @@ export class LoginPage implements OnInit {
 
 
   constructor(public fs: FirestoreProvider,public fcm:FcmProvider, public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
-    public alertCtrl: AlertController,  public navCtrl: NavController, public navParams: NavParams, public app:App) {
+    public alertCtrl: AlertController,  public navCtrl: NavController, public events: Events, public navParams: NavParams, public app:App) {
       var that =this
     
   }
@@ -57,6 +57,7 @@ export class LoginPage implements OnInit {
       this.usersService.loginUserService(this.email.trim().replace(/\s+/g, " "), this.password).then(authData => {
         //successful
         this.fcm.getToken()
+        this.events.publish('loggedIn', 'logged in')
           loader.dismiss();
           this.app.getRootNav().setRoot('TabsPage')
         

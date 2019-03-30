@@ -24,10 +24,16 @@
       <div *ngFor="let us of users  | async | filter : searchText">
         <ion-item *ngIf="us.email!=user.email" (click)="goToMessage(us.uid,us.name)">
           <ion-avatar item-start>
-            <img *ngIf="us.photoUrl" class="resize" src="{{us.photoUrl}}">
-            <img [hidden]="us.photoUrl" src="assets/imgs/blank-profile-picture.png">
+            <ion-row>
+              <ion-col col-11>
+                <img *ngIf="us.photoUrl" class="resize" src="{{us.photoUrl}}">
+                <img [hidden]="us.photoUrl" src="assets/imgs/blank-profile-picture.png">
+              </ion-col>
+              <ion-col col-1>
+                  <span> <ion-card class="myHeight" *ngIf="us?.activity=='online'" color="secondary"></ion-card></span>
+              </ion-col>
+            </ion-row>
           </ion-avatar>
-          <ion-card class="myHeight" *ngIf="us?.activity=='online'" color="secondary"></ion-card>
           <h2>{{us.fullName |titlecase}}</h2>
           <button *ngIf= 'us.admin =="clubs"' ion-button clear item-end>Club</button>
           <button *ngIf= 'us.admin =="athletics"' ion-button clear item-end>Athletics</button>
