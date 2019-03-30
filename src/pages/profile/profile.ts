@@ -80,7 +80,7 @@ export class ProfilePage implements OnInit {
         }
         else{
           this.usersService.signOut().then(()=>{
-            this.navCtrl.setRoot('CoverPage')
+            this.app.getRootNav().setRoot('CoverPage')
           }).catch((error) => {
             this.app.getRootNav().setRoot('CoverPage')
           });
