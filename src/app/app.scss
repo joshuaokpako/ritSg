@@ -26,8 +26,8 @@
 .failedToast { .toast-wrapper { color:color($colors, light) !important; background: color($colors, danger) } }
 .alertToast { 
     .toast-wrapper {
-         color:color($colors, dark) !important; 
-         background: color($colors, light);
+         color:color($colors, light) !important; 
+         background: color($colors, dark);
          border-radius: 30px; 
          padding: 5px;
     }

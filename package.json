@@ -74,8 +74,7 @@
     "cordova-plugin-filechooser": "^1.0.1",
     "cordova-plugin-filepath": "^1.4.2",
     "cordova-plugin-geolocation": "^4.0.1",
-    "cordova-plugin-googlemaps": "^2.3.11",
-    "cordova-plugin-googlemaps-sdk": "git+https://github.com/mapsplugin/cordova-plugin-googlemaps-sdk.git#2.7.0",
+    "cordova-plugin-googlemaps": "^2.5.3",
     "cordova-plugin-inappbrowser": "^3.0.0",
     "cordova-plugin-ionic": "^5.1.5",
     "cordova-plugin-ionic-keyboard": "^2.0.5",
@@ -130,12 +129,6 @@
       },
       "cordova-plugin-camera": {},
       "cordova-plugin-file": {},
-      "cordova-plugin-googlemaps": {
-        "API_KEY_FOR_ANDROID": "AIzaSyBZ6sPl873T2mmKdyc7LA6EeqXAhXfZ0dQ",
-        "API_KEY_FOR_IOS": "AIzaSyBZ6sPl873T2mmKdyc7LA6EeqXAhXfZ0dQ",
-        "PLAY_SERVICES_VERSION": "15.0.1",
-        "ANDROID_SUPPORT_V4_VERSION": "27.+"
-      },
       "cordova-plugin-statusbar": {},
       "phonegap-plugin-barcodescanner": {
         "ANDROID_SUPPORT_V4_VERSION": "27.+"
@@ -154,7 +147,15 @@
       "cordova-plugin-document-viewer": {},
       "cordova-plugin-add-swift-support": {},
       "es6-promise-plugin": {},
-      "cordova-plugin-fcm-with-dependecy-updated": {}
+      "cordova-plugin-fcm-with-dependecy-updated": {},
+      "cordova-plugin-googlemaps": {
+        "API_KEY_FOR_ANDROID": "AIzaSyBZ6sPl873T2mmKdyc7LA6EeqXAhXfZ0dQ",
+        "API_KEY_FOR_IOS": "AIzaSyBZ6sPl873T2mmKdyc7LA6EeqXAhXfZ0dQ",
+        "PLAY_SERVICES_VERSION": "15.0.1",
+        "ANDROID_SUPPORT_V4_VERSION": "27.+",
+        "LOCATION_WHEN_IN_USE_DESCRIPTION": "This app wants to get your location while this app runs only.",
+        "LOCATION_ALWAYS_USAGE_DESCRIPTION": "This app wants to get your location always, even this app runs in background."
+      }
     },
     "platforms": []
   }
