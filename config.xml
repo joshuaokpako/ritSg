@@ -113,13 +113,14 @@
     <plugin name="cordova-plugin-document-viewer" spec="^0.9.10" />
     <plugin name="cordova-plugin-add-swift-support" spec="^1.6.1" />
     <plugin name="es6-promise-plugin" spec="^4.2.2" />
-    <plugin name="cordova-plugin-fcm-with-dependecy-updated" spec="^2.4.0" />
     <plugin name="cordova-plugin-googlemaps" spec="^2.5.3">
         <variable name="API_KEY_FOR_ANDROID" value="AIzaSyBZ6sPl873T2mmKdyc7LA6EeqXAhXfZ0dQ" />
         <variable name="API_KEY_FOR_IOS" value="AIzaSyBZ6sPl873T2mmKdyc7LA6EeqXAhXfZ0dQ" />
-        <variable name="PLAY_SERVICES_VERSION" value="15.0.1" />
+        <variable name="PLAY_SERVICES_VERSION" value="12.0.1" />
         <variable name="ANDROID_SUPPORT_V4_VERSION" value="27.+" />
         <variable name="LOCATION_WHEN_IN_USE_DESCRIPTION" value="This app wants to get your location while this app runs only." />
         <variable name="LOCATION_ALWAYS_USAGE_DESCRIPTION" value="This app wants to get your location always, even this app runs in background." />
     </plugin>
+    <plugin name="cordova-plugin-x-toast" spec="^2.7.2" />
+    <plugin name="cordova-plugin-fcm-with-dependecy-updated" spec="^2.4.0" />
 </widget>

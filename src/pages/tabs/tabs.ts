@@ -1,9 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import {Events, Keyboard, IonicPage, App, Tabs, ToastController, NavController} from 'ionic-angular';
+import {Events, Keyboard, IonicPage, App, Tabs, NavController} from 'ionic-angular';
 import { ChatServiceProvider} from '../../providers/chat-service/chat-service';
 import { map, share, takeUntil, tap } from 'rxjs/operators';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { FcmProvider } from '../../providers/fcm/fcm';
+import { Toast } from '@ionic-native/toast';
 
 @IonicPage()
 @Component({
@@ -24,7 +25,7 @@ export class TabsPage implements OnInit {
   notifyToast =true;
   chatId="";
   Fcm;
-  constructor(public uS:UserserviceProvider, public events: Events,public fcm: FcmProvider,public toastCtrl: ToastController,public chatServ:ChatServiceProvider,public keyboard: Keyboard, public app: App,public navCtrl: NavController) {
+  constructor(public uS:UserserviceProvider, public events: Events,public fcm: FcmProvider,public toast:Toast,public chatServ:ChatServiceProvider,public keyboard: Keyboard, public app: App,public navCtrl: NavController) {
     
     this.uS.fireAuth.authState.subscribe(user => {
       if (user) {
@@ -96,26 +97,42 @@ export class TabsPage implements OnInit {
           if(msg.type=== 'message'){
             if(this.notifyToast == true && this.chatId != msg.userId){
               // show a toast
-              const toast = this.toastCtrl.create({
-                message: msg.title +' \n'+ msg.body,
-                duration: 5000,
-                position: "top",
-                cssClass: 'alertToast',
-                dismissOnPageChange: true
-              });
-              toast.present();
+              this.toast.show(msg.title +' \n'+ msg.body, '5000', 'center').subscribe(
+                toast => {
+                  if(toast.event ==='touch'){
+                    this.navCtrl.parent.select(3)
+                  }
+                })
             }
           }
           else{
             // show a toast
-            const toast = this.toastCtrl.create({
-              message: msg.title +' \n'+ msg.body,
-              duration: 5000,
-              position: "top",
-              cssClass: 'alertToast',
-              dismissOnPageChange: true
-            });
-            toast.present();
+            switch (msg.type) {
+              case 'feed':
+                // show a toast
+              this.toast.show(msg.title +' \n'+ msg.body, '5000', 'center').subscribe(
+                toast => {
+                  if(toast.event ==='touch'){
+                    if(this.navCtrl.parent){
+                      this.navCtrl.parent.select(2)
+                    }
+                    else{
+                      this.tabRef.select(2);
+                    }
+                  }
+                })
+                break;
+              case 'job':
+                this.navCtrl.push('JobsPage')
+                break;
+              case 'event':
+              this.navCtrl.push('EventsPage')
+                break;
+            
+              default:
+                this.tabRef.select(0);
+                break;
+            }
           }
         }
       })

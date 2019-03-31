@@ -25,6 +25,8 @@ import { LocationAccuracy } from '@ionic-native/location-accuracy';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { SpinnerDialog } from '@ionic-native/spinner-dialog';
 import { FCM } from '@ionic-native/fcm';
+import { Toast } from '@ionic-native/toast';
+
 
 
 import { MyApp } from './app.component';
@@ -100,6 +102,7 @@ const firebase = {
     ScreenOrientation,
     SpinnerDialog,
     FCM,
+    Toast,
   ]
 })
 
