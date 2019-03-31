@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController, LoadingController } from 'ionic-angular';
 import { GoogleMaps, GoogleMap, GoogleMapOptions, Marker } from '@ionic-native/google-maps';
 import { Subject } from 'rxjs';
@@ -14,7 +14,7 @@ import { UserserviceProvider } from '../../providers/userservice/userservice';
   selector: 'page-details',
   templateUrl: 'details.html',
 })
-export class DetailsPage implements OnInit {
+export class DetailsPage implements AfterViewInit {
 
   public header:string;
   public img:string;
@@ -39,7 +39,7 @@ export class DetailsPage implements OnInit {
  
   }
 
-  ionViewDidLoad(){
+  ngAfterViewInit(){
     if (this.type=="RIT Deals"){
       this.loadMap();
     }

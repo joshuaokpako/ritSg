@@ -82,27 +82,6 @@ export class MyApp {
                     
                     fcm.getToken().then(()=>{
                       this.log = true;
-                      this.Fcm = fcm.listenToNotifications().pipe(
-                        tap(msg => {
-                          console.log('true')
-                          if(msg.wasTapped){
-                            console.log('tapped')
-                           
-                          }
-                          else{
-                          if(this.notifyToast == true && this.chatId != msg.userId){
-                              // show a toast
-                              const toast = toastCtrl.create({
-                                message: msg.title,
-                                duration: 5000,
-                                position: "top",
-                              });
-                              toast.present();
-                            }
-                          }
-                        })
-                        
-                      ).subscribe()
                       if (this.timer===4){
                         splash.dismiss();
                       }
@@ -152,66 +131,18 @@ export class MyApp {
             });
             console.log(this.log)
             fcm.getToken().then(()=>{
-                  this.Fcm = fcm.listenToNotifications().pipe(
-                    tap(msg => {
-                      console.log('true')
-                      if(msg.wasTapped){
-                        console.log('tapped')
-                      }
-                      else{
-                      if(this.notifyToast == true && this.chatId != msg.userId){
-                          // show a toast
-                          const toast = toastCtrl.create({
-                            message: msg.title,
-                            duration: 5000,
-                            position: "top",
-                          });
-                          toast.present();
-                        }
-                        else{
-                          this.rootPage = 'TabsPage';
-                          this.Fcm = fcm.listenToNotifications().pipe(
-                            tap(msg => {
-                              console.log('true')
-                              if(msg.wasTapped){
-                                console.log('tapped')
-                                this.nav.push('ChatsPage');
-                              }
-                              else{
-                              if(this.notifyToast == true && this.chatId != msg.userId){
-                                  // show a toast
-                                  const toast = toastCtrl.create({
-                                    message: msg.title,
-                                    duration: 5000,
-                                    position: "top",
-                                  });
-                                  toast.present();
-                                }
-                              }
-                            })
-                            
-                          ).subscribe()
-                          if (this.timer===4){
-                            splash.dismiss();
-                            
-                          }
-                        }
-                      }
-                    })
-                    
-                  ).subscribe()
-            
-            events.subscribe('chat entered', (entered,id) => {
-              this.notifyToast = entered
-              this.chatId = id;
-              this.badge.clear();
-            });
-            
-            
-            
-          }) 
+              if (this.timer===4){
+                splash.dismiss();  
+              }     
+              events.subscribe('chat entered', (entered,id) => {
+                this.notifyToast = entered
+                this.chatId = id;
+                this.badge.clear();
+              });
+              
+            }) 
+          }
         }
-      }
         else {
           console.log(this.log)
           n+= 1;

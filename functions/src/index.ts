@@ -74,13 +74,16 @@ exports.newEventNotification = functions.firestore
     const title = data.title
    
     const payload = {
-      notification: {
-          title: type,
-          body: title,
-          icon: 'https://goo.gl/Fz9nrQ',
-          sound: 'default',
-          click_action: "FCM_PLUGIN_ACTIVITY"
-          }
+		notification: {
+		  title: type,
+		  body: title,
+		  icon: 'https://goo.gl/Fz9nrQ',
+		  sound: 'default',
+		  click_action: "FCM_PLUGIN_ACTIVITY"
+		  }
+		data: { 
+          type : 'event' 
+        }
     }
 
     // ref to the device collection for the user
@@ -127,6 +130,9 @@ exports.newFeedNotification = functions.firestore
           sound: 'default',
           click_action: "FCM_PLUGIN_ACTIVITY"
           }
+		data: { 
+          type : 'feed' 
+        }
     }
 
     // ref to the device collection for the user
@@ -169,6 +175,9 @@ exports.newJobNotification = functions.firestore
           sound: 'default',
           click_action: "FCM_PLUGIN_ACTIVITY"
           }
+		data: { 
+          type : 'job' 
+        }
     }
 
     // ref to the device collection for the user

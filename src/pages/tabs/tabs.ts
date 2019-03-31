@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import {Events, Keyboard, IonicPage, App, Tabs} from 'ionic-angular';
+import {Events, Keyboard, IonicPage, App, Tabs, ToastController, NavController} from 'ionic-angular';
 import { ChatServiceProvider} from '../../providers/chat-service/chat-service';
-import { map, share, takeUntil } from 'rxjs/operators';
+import { map, share, takeUntil, tap } from 'rxjs/operators';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
-import { Subject } from 'rxjs';
+import { FcmProvider } from '../../providers/fcm/fcm';
 
 @IonicPage()
 @Component({
@@ -21,7 +21,10 @@ export class TabsPage implements OnInit {
   tab5Root = 'ProfilePage';
   tab ='0';
   notif = 0;
-  constructor(public uS:UserserviceProvider, public events: Events,public chatServ:ChatServiceProvider,public keyboard: Keyboard, public app: App) {
+  notifyToast =true;
+  chatId="";
+  Fcm;
+  constructor(public uS:UserserviceProvider, public events: Events,public fcm: FcmProvider,public toastCtrl: ToastController,public chatServ:ChatServiceProvider,public keyboard: Keyboard, public app: App,public navCtrl: NavController) {
     
     this.uS.fireAuth.authState.subscribe(user => {
       if (user) {
@@ -66,6 +69,63 @@ export class TabsPage implements OnInit {
   }
 
   ngOnInit(){
+    this.Fcm = this.fcm.listenToNotifications().pipe(
+      tap(msg => {
+        if(msg.wasTapped){
+          switch (msg.type) {
+            case 'message':
+              this.tabRef.select(3);
+              break;
+            case 'feed':
+              this.tabRef.select(2);
+              break;
+            case 'job':
+              this.navCtrl.push('JobsPage')
+              break;
+            case 'event':
+            this.navCtrl.push('EventsPage')
+              break;
+          
+            default:
+              this.tabRef.select(0);
+              break;
+          }
+          
+        }
+        else{
+          if(msg.type=== 'message'){
+            if(this.notifyToast == true && this.chatId != msg.userId){
+              // show a toast
+              const toast = this.toastCtrl.create({
+                message: msg.title +' \n'+ msg.body,
+                duration: 5000,
+                position: "top",
+                cssClass: 'alertToast',
+                dismissOnPageChange: true
+              });
+              toast.present();
+            }
+          }
+          else{
+            // show a toast
+            const toast = this.toastCtrl.create({
+              message: msg.title +' \n'+ msg.body,
+              duration: 5000,
+              position: "top",
+              cssClass: 'alertToast',
+              dismissOnPageChange: true
+            });
+            toast.present();
+          }
+        }
+      })
+      
+    ).subscribe()
+
+    this.events.subscribe('chat entered', (entered,id) => {
+      this.notifyToast = entered
+      this.chatId = id;
+    });
   }
   ionViewWillLeave(){
     if(this.chatNotification){

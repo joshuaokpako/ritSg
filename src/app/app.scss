@@ -24,4 +24,15 @@
 
 .successToast { .toast-wrapper { color:color($colors, light) !important; background: color($colors, secondary) } }
 .failedToast { .toast-wrapper { color:color($colors, light) !important; background: color($colors, danger) } }
-.alertToast { .toast-wrapper { color:#000000 !important; background: color($colors, light) } }
+.alertToast { 
+    .toast-wrapper {
+         color:color($colors, dark) !important; 
+         background: color($colors, light);
+         border-radius: 30px; 
+         padding: 5px;
+    }
+    .toast-message{
+        white-space: pre-line;
+    } 
+    
+}
