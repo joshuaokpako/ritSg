@@ -1,5 +1,5 @@
 page-events {
-.resizeimg{
+.resizeImg{
     object-fit: contain;
 }
 .max{
@@ -36,11 +36,6 @@ page-events {
         height: 3px;
         background-color: color($colors,primary);
         border: 3px solid color($colors,primary);
-        
-      }
-      .max{
-        max-height:400px;
-
       }
 
       .myborder{

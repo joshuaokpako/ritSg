@@ -62,7 +62,7 @@
             <p>Upcoming Event</p>
           </ng-template>
         </ion-item>
-        <img *ngIf="sgEv.postImg" class="resize max" src="{{sgEv.postImg}}">
+        <img *ngIf="sgEv.postImg" class="resizeImg max" src="{{sgEv.postImg}}">
         <ion-card-content>
           <h2><b>{{sgEv.title |titlecase}} - {{sgEv.eventDate}}</b></h2>
           <h3 *ngIf="sgEv.price !=''">Entry Fee: {{sgEv.price | currency:'AED' :'code'}}</h3>

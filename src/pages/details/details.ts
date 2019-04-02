@@ -1,12 +1,12 @@
-import { Component, AfterViewInit } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, LoadingController } from 'ionic-angular';
+import { Component, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { IonicPage, NavController, NavParams, AlertController, LoadingController, Platform } from 'ionic-angular';
 import { GoogleMaps, GoogleMap, GoogleMapOptions, Marker } from '@ionic-native/google-maps';
 import { Subject } from 'rxjs';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 
 
 
-
+declare var google
 
 
 @IonicPage()
@@ -16,6 +16,8 @@ import { UserserviceProvider } from '../../providers/userservice/userservice';
 })
 export class DetailsPage implements AfterViewInit {
 
+  @ViewChild('map_canvas') mapElement: ElementRef;
+  iosMap: any;
   public header:string;
   public img:string;
   public about:string;
@@ -27,7 +29,7 @@ export class DetailsPage implements AfterViewInit {
   public obj:any ='';
   
 
-  constructor(public uS:UserserviceProvider, public loadingCtrl:LoadingController, public navCtrl: NavController, public navParams: NavParams, public alertCtrl:AlertController) {
+  constructor(public uS:UserserviceProvider, public loadingCtrl:LoadingController, public navCtrl: NavController, public navParams: NavParams, public alertCtrl:AlertController,public platform:Platform) {
     this.header= this.navParams.get('header');
     this.img = this.navParams.get('pic');
     this.about = this.navParams.get('about');
@@ -48,32 +50,46 @@ export class DetailsPage implements AfterViewInit {
   ngOnInit(){}
 
   loadMap() {
-    
-    let mapOptions: GoogleMapOptions = {
-      camera: {
-         target: {
-           lat: this.location.latitude,
-           lng: this.location.longitude
-         },
-         zoom: 18,
-         tilt: 30
-       }
-    };
-    // Create a map after the view is ready and the native platform is ready.
-    this.map = GoogleMaps.create('map_canvas', mapOptions);
+    if(!this.platform.is('ios')){
+      let mapOptions: GoogleMapOptions = {
+        camera: {
+          target: {
+            lat: this.location.latitude,
+            lng: this.location.longitude
+          },
+          zoom: 18,
+          tilt: 30
+        }
+      };
+      // Create a map after the view is ready and the native platform is ready.
+      this.map = GoogleMaps.create('map_canvas', mapOptions);
+        let marker: Marker = this.map.addMarkerSync({
+        title: this.header,
+        icon: 'red',
+        animation: 'BOUNCE',
+        position: {
+          lat: this.location.latitude,
+          lng:  this.location.longitude
+        },
+        tilt: 30
+        
+      });
+      
+      marker.showInfoWindow();
+    }
+    else{
+      let latLng = new google.maps.LatLng(-34.9290, 138.6010);
 
-
-      let marker: Marker = this.map.addMarkerSync({
-      title: this.header,
-      icon: 'red',
-      animation: 'BOUNCE',
-      position: {
-        lat: this.location.latitude,
-        lng:  this.location.longitude
+      let mapOptions = {
+        center: latLng,
+        zoom: 18,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
       }
-    });
-    
-    marker.showInfoWindow();
+
+      this.iosMap = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+      var marker = new google.maps.Marker({position: latLng, map: this.iosMap, animation: google.maps.Animation.BOUNCE});
+
+    }
   }
 
   viewMembers(){
