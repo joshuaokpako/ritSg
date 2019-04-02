@@ -80,7 +80,7 @@ exports.newEventNotification = functions.firestore
 		  icon: 'https://goo.gl/Fz9nrQ',
 		  sound: 'default',
 		  click_action: "FCM_PLUGIN_ACTIVITY"
-		  }
+		  },
 		data: { 
           type : 'event' 
         }
@@ -129,7 +129,7 @@ exports.newFeedNotification = functions.firestore
           icon: 'https://goo.gl/Fz9nrQ',
           sound: 'default',
           click_action: "FCM_PLUGIN_ACTIVITY"
-          }
+          },
 		data: { 
           type : 'feed' 
         }
@@ -174,7 +174,7 @@ exports.newJobNotification = functions.firestore
           icon: 'https://goo.gl/Fz9nrQ',
           sound: 'default',
           click_action: "FCM_PLUGIN_ACTIVITY"
-          }
+          },
 		data: { 
           type : 'job' 
         }
@@ -202,3 +202,57 @@ exports.newJobNotification = functions.firestore
     
     return admin.messaging().sendToDevice(tokens, payload)
 });
+
+exports.newFeedLikeNotification = functions.firestore
+    .document('feeds/{feedKey}')
+    .onUpdate(async (change, context) => {
+    const db = admin.firestore()  
+    const dataAfter = change.after.data();
+    const dataBefore = change.before.data();
+    const likesAfter = dataAfter.likes
+
+    const pwl = likesAfter[likesAfter.length-1].id //personWhoLiked
+    const pwlNamesRef = db.collection('users').where('uid', '==', pwl);
+    const postedBy = dataBefore.postedBy.id;
+
+    const pwl_names = await pwlNamesRef.get();
+    let pwl_name = '';
+
+
+    pwl_names.forEach(result => {
+      pwl_name = result.data().fullName;
+   })
+
+    const message = `${pwl_name} liked your post`
+   
+    const payload = {
+      notification: {
+          title: pwl_name ,
+          body: message,
+          icon: 'https://goo.gl/Fz9nrQ',
+          sound: 'default',
+          click_action: "FCM_PLUGIN_ACTIVITY"
+          },
+		data: { 
+          type : 'feed' 
+        }
+    }
+
+    // ref to the device collection for the user
+    const devicesRef = db.collection('devices')
+
+
+    // get the user's tokens and send notifications
+    const devices = await devicesRef.get();
+
+    const tokens = [];
+
+    // send a notification to each device token
+    devices.forEach(result => {
+      if(result.data().userId!== postedBy){
+        const token = result.data().token;
+        tokens.push( token )
+      }
+
+      
+    })

@@ -270,6 +270,15 @@ updateProfilePic(photo){
       this.fireAuth.auth.signOut();
     })
   }
+
+  anonymousSignOut(){
+    let user = this.db.firebase.auth().currentUser
+    return user.delete().then(()=>{
+      this.fireAuth.auth.signOut();
+    }). catch(()=>{
+      this.fireAuth.auth.signOut();
+    })
+  }
  
   checkStudentId(studentId){
    return this.db.colWithIds$("users", ref => ref.where('studentId', '==', studentId))

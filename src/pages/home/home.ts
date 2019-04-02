@@ -65,7 +65,7 @@ anonymous = false;
     this.navCtrl.push('JobsPage')
   }
   logout(){
-    this.uS.signOut().then(()=>{
+    this.uS.anonymousSignOut().then(()=>{
       this.navCtrl.setRoot('CoverPage')
     }).catch((error) => {
       this.navCtrl.setRoot('CoverPage')
