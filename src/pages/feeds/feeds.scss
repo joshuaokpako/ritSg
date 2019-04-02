@@ -3,10 +3,10 @@ page-feeds {
         margin-bottom:30px;
       }
       .resizeImg{
-        object-fit: contain;
+        object-fit: cover;
     }
     .max{
-        max-height: 400px;
+        max-height: 500px;
     }
     .resize{
         object-fit: cover;
