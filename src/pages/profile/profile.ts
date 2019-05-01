@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController, NavParams, AlertController, App, LoadingController, ToastController, IonicPage, Events } from 'ionic-angular';
+import { NavController, NavParams, AlertController, App, LoadingController, ToastController, IonicPage, Events, ActionSheetController } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { finalize, map, takeUntil } from 'rxjs/operators';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
+import { InAppBrowser } from '@ionic-native/in-app-browser';
+import { SpinnerDialog } from '@ionic-native/spinner-dialog';
 import * as moment from 'moment';
 import { Subject } from 'rxjs';
 
@@ -29,7 +31,7 @@ export class ProfilePage implements OnInit {
   public userSpirit;
   subscription
 
-  constructor(private barcodeScanner: BarcodeScanner,public loadingCtrl: LoadingController,public events:Events, public usersService : UserserviceProvider, public navCtrl: NavController, public navParams: NavParams, public alertCtrl:AlertController,public toastCtrl:ToastController,public app:App, public camera: Camera) {
+  constructor(private barcodeScanner: BarcodeScanner,private spinnerDialog: SpinnerDialog,private iab: InAppBrowser,public loadingCtrl: LoadingController, public actionSheetCtrl: ActionSheetController, public events:Events, public usersService : UserserviceProvider, public navCtrl: NavController, public navParams: NavParams, public alertCtrl:AlertController,public toastCtrl:ToastController,public app:App, public camera: Camera) {
   }
 
   ionViewDidLoad() {
@@ -89,6 +91,47 @@ export class ProfilePage implements OnInit {
       })
     ).subscribe()
   }
+
+  showMore() {
+    const actionSheet = this.actionSheetCtrl.create({
+      buttons: [
+        {
+          text: 'Change Password',
+          handler: () => {
+            this.presentAlertPassword()
+          }
+        },{
+          text: 'Contact Developer',
+          role: 'destructive',
+          handler: () => {
+            this.openBrowser('https://ritdsgwordpresscom.wordpress.com/contact/')
+          }
+        },{
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+            console.log('Cancel clicked');
+          }
+        }
+      ]
+    });
+    actionSheet.present();
+  }
+
+  openBrowser(link){
+    const browser = this.iab.create(link,'_blank', 'location=yes,hideurlbar=yes,hidespinner=yes,toolbarcolor=#F36E21');
+    browser.on('loadstart').subscribe(event => {
+      this.spinnerDialog.show();
+   });
+    browser.on('loadstop').subscribe(event => {
+    this.spinnerDialog.hide();
+    });
+    browser.on('loaderror').subscribe(event => {
+      this.spinnerDialog.hide();
+    });
+    
+    browser.show()
+  }
   
   openEditAlert(){
     const prompt = this.alertCtrl.create({
@@ -142,6 +185,48 @@ export class ProfilePage implements OnInit {
       ]
     });
     prompt.present();
+  }
+
+  presentAlertPassword(){
+    let alert = this.alertCtrl.create({
+      title: 'Change Password',
+      message: "Change your Password",
+      inputs: [
+        {
+          name: 'oldPassword',
+          placeholder: 'Current Password',
+          type: 'password'
+        },
+        {
+          name: 'newPassword',
+          placeholder: 'New Password',
+          type: 'password'
+        }
+      ],
+      buttons: [
+          {
+          text: 'Change Password',
+          handler: (data) => {
+            this.verifyPassword(data.oldPassword,data.newPassword) 
+          }
+        }
+      ]
+    })
+    alert.present()
+  }
+
+  verifyPassword(old,newpass){
+    this.usersService.reauthenticateUser(old,newpass).then(()=>{
+      let alert = this.alertCtrl.create({
+        subTitle: 'Password Succesfully changed',
+      })
+      alert.present()
+    }).catch((error)=>{
+      let alert = this.alertCtrl.create({
+        subTitle: error,
+      })
+      alert.present()
+    })
   }
 
   presentConfirm() {

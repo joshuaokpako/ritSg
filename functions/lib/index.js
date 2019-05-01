@@ -74,6 +74,9 @@ exports.newEventNotification = functions.firestore
             icon: 'https://goo.gl/Fz9nrQ',
             sound: 'default',
             click_action: "FCM_PLUGIN_ACTIVITY"
+        },
+        data: {
+            type: 'event'
         }
     };
     // ref to the device collection for the user
@@ -108,6 +111,9 @@ exports.newFeedNotification = functions.firestore
             icon: 'https://goo.gl/Fz9nrQ',
             sound: 'default',
             click_action: "FCM_PLUGIN_ACTIVITY"
+        },
+        data: {
+            type: 'feed'
         }
     };
     // ref to the device collection for the user
@@ -139,6 +145,9 @@ exports.newJobNotification = functions.firestore
             icon: 'https://goo.gl/Fz9nrQ',
             sound: 'default',
             click_action: "FCM_PLUGIN_ACTIVITY"
+        },
+        data: {
+            type: 'job'
         }
     };
     // ref to the device collection for the user
@@ -154,5 +163,51 @@ exports.newJobNotification = functions.firestore
         }
     });
     return admin.messaging().sendToDevice(tokens, payload);
+}));
+exports.newFeedLikeNotification = functions.firestore
+    .document('feeds/{feedKey}')
+    .onUpdate((change, context) => __awaiter(this, void 0, void 0, function* () {
+    const db = admin.firestore();
+    const dataAfter = change.after.data();
+    const dataBefore = change.before.data();
+    const likesAfter = dataAfter.likes;
+    const likesBefore = dataBefore.likes;
+    const pwl = likesAfter[(likesAfter.length) - 1].id; //personWhoLiked
+    const pwlNamesRef = db.collection('users').where('uid', '==', pwl);
+    const postedBy = dataBefore.postedBy.id;
+    const pwl_names = yield pwlNamesRef.get();
+    let pwl_name = '';
+    pwl_names.forEach(result => {
+        pwl_name = result.data().fullName;
+    });
+    const message = `${pwl_name} liked your post`;
+    const payload = {
+        notification: {
+            title: pwl_name,
+            body: message,
+            icon: 'https://goo.gl/Fz9nrQ',
+            sound: 'default',
+            click_action: "FCM_PLUGIN_ACTIVITY"
+        },
+        data: {
+            type: 'feedlike'
+        }
+    };
+    // ref to the device collection for the user
+    const devicesRef = db.collection('devices').where('userId', '==', postedBy);
+    // get the user's tokens and send notifications
+    const devices = yield devicesRef.get();
+    const tokens = [];
+    // send a notification to each device token
+    devices.forEach(result => {
+        const token = result.data().token;
+        tokens.push(token);
+    });
+    if (likesAfter.length > likesBefore.length) {
+        return admin.messaging().sendToDevice(tokens, payload);
+    }
+    else {
+        return '';
+    }
 }));
 //# sourceMappingURL=index.js.map

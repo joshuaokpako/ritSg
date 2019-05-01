@@ -23,6 +23,7 @@ export class ProfileDetailsPage implements OnInit {
   public myEvents;
   public userSpirit;
   public members;
+  public reports;
 
   constructor(public loadingCtrl:LoadingController, public uS:UserserviceProvider, public alertCtrl:AlertController, public navCtrl: NavController, public navParams: NavParams) {
     this.header = this.navParams.get('header')
@@ -55,6 +56,9 @@ export class ProfileDetailsPage implements OnInit {
     }
     if (this.header == "Members") {
       this.members = this.uS.getClubMembers(this.uS.uid)
+    }
+    if (this.header == "Reports") {
+      this.reports = this.uS.getReports()
     }
   }
 

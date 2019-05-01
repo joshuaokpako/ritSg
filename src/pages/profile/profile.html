@@ -7,9 +7,15 @@
 <ion-header>
 
   <ion-navbar color="rit">
-    <ion-title>Profile</ion-title>
+    <ion-toolbar>
+        <ion-title>Profile</ion-title>
+        <ion-buttons end>
+          <button ion-button icon-only color='light' (click)="showMore()" clear small>
+              <ion-icon name="settings"></ion-icon>
+          </button>
+        </ion-buttons>
+    </ion-toolbar>
   </ion-navbar>
-
 </ion-header>
 
 
@@ -55,6 +61,10 @@
     <ion-item *ngIf="(user)?.admin =='main' || (user)?.admin =='SG'"  (click)="presentOptions()">
       <ion-icon  color="rit" name="barcode" item-start></ion-icon>
       Scan Barcode
+    </ion-item>
+    <ion-item *ngIf="(user)?.admin =='main' || (user)?.admin =='RIT'"  (click)="toProfileDetailsPage('Reports')">
+      <ion-icon  color="danger" name="sad" item-start></ion-icon>
+      Reports
     </ion-item>
     <ion-item [hidden]="(user)?.admin!='main'&& (user)?.SG!=true" (click)="toProfileDetailsPage('Spirit Points')">
       <ion-icon  color="dark" name="stats" item-start></ion-icon>

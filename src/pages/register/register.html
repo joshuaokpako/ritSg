@@ -30,7 +30,7 @@
         <ion-select [(ngModel)]="faculty" [compareWith]="compareFn">
             <ion-option *ngFor="let dep of departments | async" [value]="dep">{{dep.department}}</ion-option>
         </ion-select>
-      </ion-item>
+      </ion-item>     
       <ion-item>
         <ion-label floating>Position (optional) e.g Lab Assistant</ion-label>
         <ion-input [(ngModel)]="position" name="email" type="text"></ion-input>

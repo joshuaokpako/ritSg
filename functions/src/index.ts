@@ -210,8 +210,9 @@ exports.newFeedLikeNotification = functions.firestore
     const dataAfter = change.after.data();
     const dataBefore = change.before.data();
     const likesAfter = dataAfter.likes
+    const likesBefore = dataBefore.likes
 
-    const pwl = likesAfter[likesAfter.length-1].id //personWhoLiked
+    const pwl = likesAfter[(likesAfter.length)-1].id //personWhoLiked
     const pwlNamesRef = db.collection('users').where('uid', '==', pwl);
     const postedBy = dataBefore.postedBy.id;
 
@@ -234,12 +235,12 @@ exports.newFeedLikeNotification = functions.firestore
           click_action: "FCM_PLUGIN_ACTIVITY"
           },
 		data: { 
-          type : 'feed' 
+          type : 'feedlike' 
         }
     }
 
     // ref to the device collection for the user
-    const devicesRef = db.collection('devices')
+    const devicesRef = db.collection('devices').where('userId', '==', postedBy)
 
 
     // get the user's tokens and send notifications
@@ -249,10 +250,16 @@ exports.newFeedLikeNotification = functions.firestore
 
     // send a notification to each device token
     devices.forEach(result => {
-      if(result.data().userId!== postedBy){
-        const token = result.data().token;
-        tokens.push( token )
-      }
+      const token = result.data().token;
+
+      tokens.push( token )
 
       
     })
+    if(likesAfter.length > likesBefore.length){
+      return admin.messaging().sendToDevice(tokens, payload)
+    }
+    else{
+      return '';
+    }
+});

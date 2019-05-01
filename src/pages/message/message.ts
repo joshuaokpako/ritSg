@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild} from '@angular/core';
-import { IonicPage, NavController, NavParams, Content, Navbar,Events } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Content, Navbar,Events, AlertController, ModalController, ActionSheetController } from 'ionic-angular';
 import { ChatServiceProvider} from '../../providers/chat-service/chat-service';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
-import { map, takeUntil } from 'rxjs/operators';
-import { Observable, Subject } from 'rxjs';
+import { map, takeUntil, take } from 'rxjs/operators';
+import { Observable, Subject, pipe } from 'rxjs';
 
 /**
  * Generated class for the MessagePage page.
@@ -31,11 +31,14 @@ sub;
 now;
 hasRead= false;
 tabBarElement:any;
+blockedUsers;
+blocked = false;
+youblocked = false;
 @ViewChild(Navbar) navBar: Navbar;
 @ViewChild(Content) content: Content;
 public user;
 public name:string;
-  constructor(public events: Events,public uS: UserserviceProvider,public chatServ:ChatServiceProvider, public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public events: Events,public uS: UserserviceProvider,public chatServ:ChatServiceProvider, public navCtrl: NavController, public navParams: NavParams, private alertCtrl: AlertController,public modalCtrl: ModalController, public actionSheetCtrl: ActionSheetController,) {
     this.data.chatUid= this.navParams.get('uid');
     this.key= this.navParams.get('key');
     this.name= this.navParams.get('name');
@@ -63,7 +66,63 @@ public name:string;
   }
 
   ngOnInit(){
+    let n= 0;
+    let p = 0;
     this.user = this.uS.uid
+    this.uS.getBlockedUser().pipe(take(1)).subscribe(x=>{
+      this.blockedUsers = x;
+      this.blockedUsers.forEach(element => {
+        if(element.blocked === this.data.chatUid){ 
+          this.blocked = true;
+          n += 1;
+          let alert = this.alertCtrl.create({
+            title: 'Blocked',
+            message: 'This user has been blocked by you',
+            buttons: [
+              {
+                text: 'Ok',
+                role: 'cancel',
+                handler: () => {
+                }
+              }
+            ]
+          });
+          if(n ===1){
+            n += 1;
+            console.log(n)
+            alert.present();
+            this.chats = ' '
+          }
+        }
+      });
+    })
+    this.uS.getOtherBlockedUser().pipe(take(1)).subscribe(x=>{
+      this.blockedUsers = x;
+      this.blockedUsers.forEach(element => {
+        if(element.blockedBy === this.data.chatUid){ 
+          this.youblocked = true;
+          p += 1;
+          let alert = this.alertCtrl.create({
+            title: 'Blocked',
+            message: 'You have been blocked by this user',
+            buttons: [
+              {
+                text: 'Ok',
+                role: 'cancel',
+                handler: () => {
+                }
+              }
+            ]
+          });
+          if(p ===1){
+            console.log('yh')
+            alert.present()
+            this.chats = ' '
+            
+          }
+        }
+      });
+    })
      this.chats = this.chatServ.getMessages(this.key)
       this.chatServ.getReceiverUnreadMessages(this.data.chatUid).subscribe((x:any)=>{
         if(x){
@@ -147,4 +206,122 @@ public name:string;
     };
   }
 
+  showMore(blocked,reportName, reportEmail) {
+    let blockText
+    if(this.blocked){
+      blockText= 'Unblock'
+    }
+    else{
+      blockText = 'Block'
+    }
+    
+    const actionSheet = this.actionSheetCtrl.create({
+      buttons: [
+        {
+          text: blockText,
+          role: 'destructive',
+          handler: () => {
+            this.presentConfirm(blocked)
+          }
+        },{
+          text: 'Report',
+          role: 'destructive',
+          handler: () => {
+            let people = {
+              reportName: reportName,
+              reportEmail: reportEmail,
+              reportId: blocked
+              
+            }
+            if(blocked ===this.uS.uid){
+              let alert = this.alertCtrl.create({
+                title: 'Error',
+                message: "You can't report yourself",
+                buttons: [
+                  {
+                    text: 'Ok',
+                    role: 'cancel',
+                    handler: () => {
+                    }
+                  }
+                ]
+              });
+              alert.present();
+            }
+            else{
+            this.addReportModal(people)
+            }
+          }
+        },{
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+            console.log('Cancel clicked');
+          }
+        }
+      ]
+    });
+    actionSheet.present();
+  }
+
+  presentConfirm(blocked) {
+    if(!this.blocked){
+    let alert = this.alertCtrl.create({
+      title: 'Confirm Block',
+      message: 'Do you want to block this user?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Block',
+          handler: () => {
+            this.blockUser(blocked);
+          }
+        }
+      ]
+    });
+    alert.present();
+  }
+  else{
+    this.uS.unBlockUser(blocked).then(()=>{
+      this.blocked= false
+      this.ngOnInit();
+    })
+  }
+  }
+  blockUser(blocked){
+    if (blocked === this.uS.uid){
+      let alert = this.alertCtrl.create({
+        title: 'Error',
+        message: "You can't block yourself",
+        buttons: [
+          {
+            text: 'Ok',
+            role: 'cancel',
+            handler: () => {
+            }
+          }
+        ]
+      });
+      alert.present();
+    }
+    else{
+      this.uS.blockUser(blocked).then(()=>{
+        this.blocked=true
+        this.ngOnInit();
+      })
+    }
+  }
+
+  addReportModal(person){
+    let modal = this.modalCtrl.create('ReportPage', person)
+    modal.present()
+  }
+
 }
+

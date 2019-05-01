@@ -265,6 +265,16 @@ updateProfilePic(photo){
     })
   }
  
+reauthenticateUser(oldPass,newPass){
+  const credential = this.db.EmailAuth().credential(
+    this.userEmail, 
+    oldPass
+);
+  return this.currentUser.reauthenticateAndRetrieveDataWithCredential(credential).then(()=>{
+    this.currentUser.updatePassword(newPass)
+  })
+}
+
   signOut(){
     return this.updateUserActivity('offline').then(()=>{
       this.fireAuth.auth.signOut();
@@ -321,16 +331,25 @@ updateProfilePic(photo){
   }
 
   getFeed(){
+
     return this.db.colWithIds$('feeds', ref => ref.orderBy('createdAt','desc'))
+
   }
 
   getBooks(){
     return this.db.colWithIds$('users/'+this.uid+'/books', ref => ref.orderBy('createdAt','desc'))
   }
+
+  getReports(){
+    return this.db.colWithIds$('reports', ref => ref.orderBy('createdAt','desc'))
+  }
    
   getMyFeed(){
-    return this.db.colWithIds$('feeds', ref => ref.where('postedByUid', '==',this.uid ))
+
+      return this.db.colWithIds$('feeds', ref => ref.where('postedByUid', '==',this.uid ))
+  
   }
+   
 
   getFaculty(){
     return this.db.col$('users', ref => ref.where('staff', '==', true))
@@ -491,6 +510,26 @@ updateProfilePic(photo){
     return this.db.upsert('users/'+clubId+'/members/'+this.uid , member);
   }
 
+  getBlockedUser(){
+    return this.db.colWithIds$("blocked", ref => ref.where('blockedBy', '==',this.uid));
+  }
+
+  getOtherBlockedUser(){
+    return this.db.colWithIds$("blocked", ref => ref.where('blocked', '==',this.uid));
+  }
+
+  blockUser(block){
+    let blocked ={
+      blockedBy: this.uid,
+      blocked: block
+    }
+    return this.db.upsert("blocked/"+block+this.uid,blocked)
+  }
+
+  unBlockUser(block){
+    return this.db.delete("blocked/"+block+this.uid)
+  }
+
   addBuses (type,data){
     return this.db.add('buses/'+type+'/' +type, data);
   }
@@ -499,13 +538,10 @@ updateProfilePic(photo){
     return this.db.upsert('buses/'+type, data);
   }
 
-  addJob(job){
-    return  this.db.add("jobs",job)
-  }
-
   addFeed(feed){
     return  this.db.add("feeds",feed)
   }
+  
   addBooks(book){
     return  this.db.add('users/'+this.uid+'/books',book)
   }
@@ -557,6 +593,14 @@ updateProfilePic(photo){
       })
     
     })
+  }
+
+  addJob(job){
+    return  this.db.add("jobs",job)
+  }
+
+  addReport(report){
+    return  this.db.add("reports",report)
   }
 
   getRef(value:any) {

@@ -7,9 +7,17 @@
 <ion-header>
 
   <ion-navbar color="rit">
-      <img class="roundImg resize" *ngIf="receiver" src="{{receiver.photoUrl}}" width="40px" style="display:inline-block" height="40px"/>
-      <ion-title class="titleicon" *ngIf="receiver" style="display:inline-block" >{{receiver.fullName | titlecase}}<span><ion-card class="myHeight" *ngIf="receiver?.activity=='online'" color="secondary"></ion-card></span></ion-title>
-
+      <ion-toolbar>
+      <img [hidden]='youblocked' class="roundImg resize" *ngIf="receiver" src="{{receiver.photoUrl}}" width="40px" style="display:inline-block" height="40px"/>
+      <ion-title class="titleicon" *ngIf="receiver" style="display:inline-block" >{{receiver.fullName | titlecase}}<span><ion-card [hidden]='youblocked' class="myHeight" *ngIf="receiver?.activity=='online'" color="secondary"></ion-card></span></ion-title>
+      <ion-buttons end *ngIf='!youblocked'>
+        <button *ngIf="receiver" ion-button icon-only color='light' (click)="showMore(receiver.uid,receiver.fullName,receiver.email)" clear small>
+            <ion-icon name="more"></ion-icon>
+          </button>
+      </ion-buttons>
+        
+      </ion-toolbar>
+      
   </ion-navbar>
   
  
@@ -18,7 +26,7 @@
 
 <ion-content class="body">
   <div >
-        <p text-center *ngIf="!(chats |async)">
+        <p [hidden] ='chats ===" "' text-center *ngIf="!(chats |async)">
           <ion-spinner color="rit" name="crescent"></ion-spinner>
         </p>
           <ion-list>
@@ -66,7 +74,7 @@
             <ion-icon name="paper-plane"></ion-icon>
           </button>
         </ion-buttons>
-        <ion-textarea autocomplete="on" autocorrect="on" type="text" placeholder="Add a message" name="message" [(ngModel)]="message"></ion-textarea>
+        <ion-textarea [disabled] ='blocked' autocomplete="on" autocorrect="on" type="text" placeholder="Add a message" name="message" [(ngModel)]="message"></ion-textarea>
         
   </ion-toolbar>
   </ion-footer>

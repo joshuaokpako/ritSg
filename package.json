@@ -74,7 +74,6 @@
     "cordova-plugin-file-transfer": "^1.7.1",
     "cordova-plugin-filechooser": "^1.0.1",
     "cordova-plugin-filepath": "^1.4.2",
-    "cordova-plugin-geolocation": "^4.0.1",
     "cordova-plugin-googlemaps": "^2.5.3",
     "cordova-plugin-inappbrowser": "^3.0.0",
     "cordova-plugin-ionic": "^5.1.5",
@@ -84,7 +83,6 @@
     "cordova-plugin-screen-orientation": "^3.0.1",
     "cordova-plugin-splashscreen": "^5.0.2",
     "cordova-plugin-statusbar": "^2.4.2",
-    "cordova-plugin-telerik-imagepicker": "^2.2.2",
     "cordova-plugin-whitelist": "^1.3.3",
     "cordova-plugin-x-toast": "^2.7.2",
     "crypto-js": "^3.1.9-1",
@@ -123,12 +121,6 @@
       "cordova-plugin-splashscreen": {},
       "cordova-plugin-ionic-webview": {},
       "cordova-plugin-ionic-keyboard": {},
-      "cordova-plugin-telerik-imagepicker": {
-        "PHOTO_LIBRARY_USAGE_DESCRIPTION": "Gallery Permission"
-      },
-      "cordova-plugin-geolocation": {
-        "GEOLOCATION_USAGE_DESCRIPTION": "To locate you"
-      },
       "cordova-plugin-camera": {},
       "cordova-plugin-file": {},
       "cordova-plugin-statusbar": {},

@@ -26,6 +26,9 @@ firebase = firebase;
     return firebase.firestore.FieldValue.serverTimestamp()
   }
 
+  EmailAuth () {
+    return firebase.auth.EmailAuthProvider
+  }
   update<T>(ref: DocPredicate<T>, data: any) {
     return this.doc(ref).update({
       ...data,

@@ -110,6 +110,19 @@
       </ion-item>
     </div>
 
+    <div *ngIf="header == 'Reports'">
+      <p text-center *ngIf="!(reports|async)">
+        <ion-spinner color="rit" name="crescent"></ion-spinner>
+      </p>
+      <p text-center class="noEvents" [hidden]="(reports|async) != ''">
+        There are no reports at the moment
+      </p>
+  <ion-item *ngFor="let re of reports | async; let i = index">
+    <h2>{{re.reportedByName | titlecase}} reported {{re.reportedName | titlecase}}</h2> 
+    <p>{{re.description}}</p>
+  </ion-item>
+</div>
+
     <div *ngIf="header == 'Members'">
     <p text-center *ngIf="!(members |async)">
       <ion-spinner color="rit" name="crescent"></ion-spinner>
