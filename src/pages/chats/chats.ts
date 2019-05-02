@@ -3,7 +3,7 @@ import { IonicPage, NavController, ModalController, Events, AlertController} fro
 import { ChatServiceProvider} from '../../providers/chat-service/chat-service';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { Observable, Subject } from 'rxjs';
-import { map, share,takeUntil } from 'rxjs/operators';
+import { map, share,takeUntil, take } from 'rxjs/operators';
 
 @IonicPage()
 @Component({
@@ -16,25 +16,51 @@ export class ChatsPage implements OnInit{
   public chats:Observable<any>;
   observer:Subject<any> 
   test:number;
+  blockedUsers;
+  blockedBy;
   constructor(public events: Events,public uS:UserserviceProvider, public chServ:ChatServiceProvider,public navCtrl: NavController,public modalCtrl: ModalController, public alertCtrl:AlertController) {
   }
 
-ionViewWillEnter(){
+async ionViewWillEnter(){
   this.test= 0
   this.observer = new Subject();
   this.events.publish('chat entered', false,'noId');
+  await this.getBlocked()
   this.chats =this.chServ.getChats().pipe(map((ch:any)=>{
    //Only get the users info on page entry and keep it until page leave
     ch.forEach(myelement => {
           this.uS.getRef(myelement.userRef).subscribe(x=>{
             myelement.userRef =x;
+            this.blockedUsers.forEach(element => {
+              if(myelement.uid === element.blocked){
+                myelement.blocked = true;
+              }
+            });
+          this.blockedBy.forEach(element => {
+            if(myelement.uid === element.blockedBy){
+              myelement.blocked = true;
+            }
+          });
         })
       })
     return ch
     }),share()
   )
+  
 }
 
+getBlocked(){
+  return new Promise(resolve => {
+    this.uS.getBlockedUser().subscribe((x)=> {
+      this.blockedUsers = x
+      resolve(this.blockedUsers)
+    })
+    this.uS.getOtherBlockedUser().pipe(take(1)).subscribe(x=>{
+      this.blockedBy = x;
+    })
+    
+  })
+}
 
   ngOnInit(){
     

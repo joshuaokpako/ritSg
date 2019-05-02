@@ -32,12 +32,12 @@
                 <img *ngIf="!((chat.userRef)?.photoUrl)" src="assets/imgs/blank-profile-picture.png">
             </ion-col>
             <ion-col col-1>
-                <span><ion-card class="myHeight" *ngIf="(chat.userRef)?.activity=='online'" color="secondary"></ion-card></span>
+                <span><ion-card [hidden] = "chat?.blocked==true" class="myHeight" *ngIf="(chat.userRef)?.activity=='online'" color="secondary"></ion-card></span>
             </ion-col>
           </ion-row>
         </ion-avatar>
         <h2>{{chat.userRef.fullName | titlecase}}</h2>
-        <p><span *ngIf="chat.unreadMessages?.length != 0; else notBold"><b>{{chat.lastMessage}}</b></span><ng-template #notBold><span>{{chat.lastMessage}}</span></ng-template></p>
+        <p *ngIf = "chat?.blocked!==true"><span *ngIf="chat.unreadMessages?.length != 0; else notBold"><b>{{chat.lastMessage}}</b></span><ng-template #notBold><span>{{chat.lastMessage}}</span></ng-template></p>
         <button *ngIf= '((chat.userRef)?.admin) =="clubs"' ion-button clear item-end>Club</button>
         <button *ngIf= '((chat.userRef)?.admin) =="athletics"' ion-button clear item-end>Athletics</button>
         <ion-badge *ngIf="chat.unreadMessages?.length != 0" color="secondary" item-end>{{chat.unreadMessages?.length}}</ion-badge>

@@ -128,6 +128,11 @@ updateDesc(desc){
   return this.db.update('users/'+this.uid, desc)
 }
 
+updateOffice(office){
+
+  return this.db.update('users/'+this.uid, office)
+}
+
 updateProfilePic(photo){
   return this.currentUser.updateProfile({
     photoURL: photo.photoUrl
@@ -330,9 +335,13 @@ reauthenticateUser(oldPass,newPass){
     return this.db.col$('jobs', ref => ref.orderBy('createdAt','desc'))
   }
 
-  getFeed(){
-
-    return this.db.colWithIds$('feeds', ref => ref.orderBy('createdAt','desc'))
+  getFeed(y,doc){
+    if (y = 0){
+    return this.db.colWithIds$('feeds', ref => ref.orderBy('createdAt','desc').limit(2))
+    }
+    else{
+      return this.db.colWithIds$('feeds', ref => ref.orderBy('createdAt','desc').startAfter(doc).limit(2))
+    }
 
   }
 

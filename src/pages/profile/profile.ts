@@ -30,7 +30,7 @@ export class ProfilePage implements OnInit {
   observer:Subject<any> = new Subject();
   public userSpirit;
   subscription
-
+  staff
   constructor(private barcodeScanner: BarcodeScanner,private spinnerDialog: SpinnerDialog,private iab: InAppBrowser,public loadingCtrl: LoadingController, public actionSheetCtrl: ActionSheetController, public events:Events, public usersService : UserserviceProvider, public navCtrl: NavController, public navParams: NavParams, public alertCtrl:AlertController,public toastCtrl:ToastController,public app:App, public camera: Camera) {
   }
 
@@ -53,6 +53,9 @@ export class ProfilePage implements OnInit {
              }
          });
          
+       }
+       if(user.office){
+         this.staff = true
        }
        return user    
      })).subscribe(x=>this.user=x )
@@ -93,6 +96,21 @@ export class ProfilePage implements OnInit {
   }
 
   showMore() {
+    let  office = {
+      text: 'Change Profile Picture',
+      handler: () => {
+        this.presentConfirm()
+      }
+    }
+    if(this.staff){
+      office = {
+        text: 'Change Office Room Number',
+        handler: () => {
+          this.changeOffice()
+        }
+      }
+    }
+    
     const actionSheet = this.actionSheetCtrl.create({
       buttons: [
         {
@@ -100,7 +118,9 @@ export class ProfilePage implements OnInit {
           handler: () => {
             this.presentAlertPassword()
           }
-        },{
+        },
+        office,
+        {
           text: 'Contact Developer',
           role: 'destructive',
           handler: () => {
@@ -153,6 +173,33 @@ export class ProfilePage implements OnInit {
           text: 'Change',
           handler: data => {
             this.usersService.updateProfileName(data)
+          }
+        }
+      ]
+    });
+    prompt.present();
+  }
+
+  changeOffice(){
+    const prompt = this.alertCtrl.create({
+      title: 'Edit Office Room Number',
+      message: "Enter your new office number",
+      inputs: [
+        {
+          name: 'office',
+          placeholder: 'Room Number'
+        },
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          handler: data => {
+          }
+        },
+        {
+          text: 'Change',
+          handler: data => {
+            this.usersService.updateOffice(data)
           }
         }
       ]

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController,ModalController, IonicPage, AlertController, ActionSheetController } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
-import { map, share, take} from 'rxjs/operators';
+import { map, share, take, concat} from 'rxjs/operators';
 
 @IonicPage()
 @Component({
@@ -30,16 +30,27 @@ export class FeedsPage implements OnInit {
     this.test = false
   }
 
-  ngOnInit(){
+  async ngOnInit(){
     this.user =this.uS.db.doc$('users/'+this.uS.uid)
     this.user.subscribe(x => this.theUser = x)
-    this.uS.getBlockedUser().subscribe(x=> this.blockedUsers = x)
+    
+    this.test = false;
+    await this.getBlocked()
+    this.getFeeds()
+  
+    
+    
+  }
+  getBlocked(){
+    return new Promise(resolve => {
+      this.uS.getBlockedUser().subscribe((x)=> {
+        this.blockedUsers = x
+        resolve(this.blockedUsers)
+      })
     this.uS.getOtherBlockedUser().pipe(take(1)).subscribe(x=>{
       this.blockedBy = x;
     })
-    this.test = false;
-    this.getFeeds()
-    
+  })
   }
 
   doRefresh(refresher){
@@ -195,7 +206,7 @@ export class FeedsPage implements OnInit {
   }
   getFeeds(){
     let output:any =""
-    this.feeds = this.uS.getFeed().pipe(map((feed:any)=>{
+    this.feeds = concat(this.uS.getFeed(1,'').pipe(map((feed:any)=>{
     if(this.test == false){ // to make sure the postedBy only loads on page enter
       feed.forEach(myelement => {
           this.uS.getRef(myelement.postedBy).subscribe(x=>{
@@ -257,7 +268,8 @@ export class FeedsPage implements OnInit {
     output = feed;
     return feed
   }),share()
-) 
+),
+)
   
    
   

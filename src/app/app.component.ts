@@ -62,12 +62,12 @@ export class MyApp {
               splash.dismiss();
             }
           }
-          else if(!user.emailVerified){
+         /* else if(!user.emailVerified){
             let myuser = this.uS.user
             events.publish('get User',myuser)
             myuser.subscribe(theuser => {
               if (theuser) {
-                if (theuser.type == 'club') {
+                if (theuser.type == 'club' ) {
                   if(theuser.emailVerified){
                     p += 1;
                     this.rootPage = 'TabsPage';
@@ -116,7 +116,7 @@ export class MyApp {
               }
             });
             
-          }
+          }*/
           else{
             w += 1;
             this.log = true;
