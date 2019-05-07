@@ -73,15 +73,26 @@ export class ChatServiceProvider {
     )
   }
 
-  getMessages(key){
+  getMessages(key,doc,y){
     if(key){
-      return this.db.col$('messages/'+key +'/chats', ref => ref.orderBy('createdAt','asc')).pipe(map((x:any)=>{
+      if (y===0){
+        return this.db.col$('messages/'+key +'/chats', ref => ref.orderBy('createdAt','desc').limit(5)).pipe(map((x:any)=>{
+          x.forEach(element => {
+            element.message = this.decryptMessages(element.message,key) 
+          });
+          return x.reverse()
+        })
+        )
+      }
+      else{
+        return this.db.col$('messages/'+key +'/chats', ref => ref.orderBy('createdAt','desc').startAfter(doc).limit(5)).pipe(map((x:any)=>{
           x.forEach(element => {
             element.message = this.decryptMessages(element.message,key) 
           });
           return x
         })
-      )
+        )
+      }
     }
   }
 

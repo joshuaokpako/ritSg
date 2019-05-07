@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { NavController,ModalController, IonicPage, AlertController, ActionSheetController } from 'ionic-angular';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { NavController,ModalController, IonicPage, AlertController, ActionSheetController, Content, BlockerDelegate } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { map, share, take, concat} from 'rxjs/operators';
+import { Observable, merge } from 'rxjs';
 
 @IonicPage()
 @Component({
@@ -17,9 +18,12 @@ export class FeedsPage implements OnInit {
   blockedUsers;
   blockedBy;
   lastFeed;
-
-  new;
+  moreFeed;
+  old = [];
   complete = false;
+  doc;
+  n = 2;
+  @ViewChild(Content) content: Content;
   
 
   constructor(private alertCtrl: AlertController,public uS:UserserviceProvider, public navCtrl: NavController,public modalCtrl: ModalController, public actionSheetCtrl: ActionSheetController) {
@@ -28,15 +32,27 @@ export class FeedsPage implements OnInit {
 
   ionViewWillEnter(){
     this.test = false
-  }
-
-  async ngOnInit(){
+    this.old = []
+    this.moreFeed = undefined
     this.user =this.uS.db.doc$('users/'+this.uS.uid)
     this.user.subscribe(x => this.theUser = x)
     
     this.test = false;
-    await this.getBlocked()
-    this.getFeeds()
+    this.getBlocked().then(()=>{
+      this.getFeeds()
+    })
+  }
+
+  async ngOnInit(){
+    this.old = []
+    this.moreFeed = undefined
+    this.user =this.uS.db.doc$('users/'+this.uS.uid)
+    this.user.subscribe(x => this.theUser = x)
+    
+    this.test = false;
+    this.getBlocked().then(()=>{
+      this.getFeeds()
+    })
   
     
     
@@ -45,6 +61,10 @@ export class FeedsPage implements OnInit {
     return new Promise(resolve => {
       this.uS.getBlockedUser().subscribe((x)=> {
         this.blockedUsers = x
+        if(this.blockedUsers.length>0){
+          this.n =this.n*(this.blockedUsers.length+10)
+          console.log(this.n)
+        }
         resolve(this.blockedUsers)
       })
     this.uS.getOtherBlockedUser().pipe(take(1)).subscribe(x=>{
@@ -54,6 +74,7 @@ export class FeedsPage implements OnInit {
   }
 
   doRefresh(refresher){
+    this.old = []
     this.ngOnInit()
     if(this.feeds){
       refresher.complete();
@@ -113,7 +134,9 @@ export class FeedsPage implements OnInit {
   like(feed){
       if(feed.youLike==true){
         feed.likes = feed.likes.filter((likes)=> {return likes.path!=this.uS.userRef.path})
-      this.uS.updateFeedLike(feed)
+      this.uS.updateFeedLike(feed).then(()=>{
+        feed.youLike = false;
+      })
       }
       else{
         feed.likes.push(this.uS.userRef)
@@ -204,16 +227,161 @@ export class FeedsPage implements OnInit {
       })
     }
   }
-  getFeeds(){
+
+  getLast(doc){
+    this.doc = doc
+  }
+
+ async doInfinite(infiniteScroll){
+  let load =0 // to check if command started here or at observable
+    console.log(this.doc)
     let output:any =""
-    this.feeds = concat(this.uS.getFeed(1,'').pipe(map((feed:any)=>{
-    if(this.test == false){ // to make sure the postedBy only loads on page enter
+    this.moreFeed = await this.uS.getFeed(1,this.doc,this.n).pipe(map((feed:any)=>{
+        feed.forEach(myelement => {
+          if(myelement.postedBy.path){
+            this.uS.getRef(myelement.postedBy).subscribe(x=>{
+              myelement.postedBy =x;
+              this.test =true;
+              output = feed;
+            })
+          }
+          if(myelement.likes){
+            myelement.likes.forEach(element => { 
+            if(element.path==this.uS.userRef.path){
+              myelement.youLike = true;
+            } 
+            });
+          }
+          this.blockedUsers.forEach(element => {
+            if(myelement.postedBy.id === element.blocked){
+              myelement.blocked = true;
+            }
+          });
+  
+          this.blockedBy.forEach(element => {
+            if(myelement.postedBy.id === element.blockedBy){
+              myelement.blocked = true;
+            }
+          });
+        });
+
+      /*else {
+        for (let i = 0; i < feed.length; i++) {
+          let newFeedLength =feed.length - output.length
+          if(i < newFeedLength){ // only get the postedBy for new posts
+            this.uS.getRef(feed[i].postedBy)
+            .subscribe(x=>{
+              feed[i].postedBy =x;
+            })
+          }
+          else if (newFeedLength < 0){
+            this.ngOnInit();
+          }
+          else{
+            feed[i].postedBy = output[i-newFeedLength].postedBy // use old postedBy for old posts until page reenter
+          }    
+        }
+        feed.forEach(myelement => {
+          if(myelement.likes){
+            myelement.likes.forEach(element => { 
+            if(element.path==this.uS.userRef.path){
+              myelement.youLike = true;
+            }
+            });
+          }
+          this.blockedUsers.forEach(element => {
+            if(myelement.postedBy.id === element.blocked){
+              myelement.blocked = true;
+            }
+          });
+        });
+      }*/
+      output = feed;
+      feed.forEach(element => {
+        this.old.forEach(myelement => {
+          if(myelement.id ==element.id){
+            load = 1;
+          }
+        })
+        if(load ===0){
+          this.old.push(element);
+        }
+        
+      });
+      this.old.forEach(myelement => {
+      if(myelement.likes){
+        myelement.likes.forEach(element => { 
+        if(element.path==this.uS.userRef.path){
+          myelement.youLike = true;
+        } 
+        });
+      }
+      
+
+      this.blockedBy.forEach(element => {
+        if(myelement.postedBy.id === element.blockedBy){
+          myelement.blocked = true;
+        }
+      });
+    });
+      return this.old
+    }),share()
+  )
+  await this.moreFeed.subscribe(x => {
+    console.log(x)
+    
+
+    infiniteScroll.complete();
+  }
+    )
+    
+
+  }
+  getFirst(){
+   
+  }
+
+  getIndex(i){
+    console.log('hey')
+    console.log(i)
+  }
+
+  async getFeeds(){
+    let load =0 // to check if command started here or at observable
+    let output:any =""
+    this.feeds = this.uS.getFeed(0,'',this.n).pipe(take(1),map(async (feed:any)=>{
       feed.forEach(myelement => {
+        console.log(feed)
+        if(myelement.postedBy.path){
           this.uS.getRef(myelement.postedBy).subscribe(x=>{
             myelement.postedBy =x;
             this.test =true;
             output = feed;
           })
+          this.old.forEach(thelement => {
+            if(thelement.id ==myelement.id){
+              load = 1;
+            }
+          })
+          if( this.old[0] !==feed[0] && load!== 0){
+            load = 2;
+            this.old.forEach(thelement => {
+              if(thelement.id ===feed[0].id){
+                console.log('i am here')
+                load = 4;
+              }
+            })
+            if (load ===2){
+              console.log(this.old)
+              this.old.unshift(feed[0]);
+            }
+          }
+          else if(load ===0){
+            console.log('yo')
+            //this.old.push(myelement);
+          }
+         
+        }
         if(myelement.likes){
           myelement.likes.forEach(element => { 
           if(element.path==this.uS.userRef.path){
@@ -221,19 +389,62 @@ export class FeedsPage implements OnInit {
           } 
           });
         }
-        this.blockedUsers.forEach(element => {
-          if(myelement.postedBy.id === element.blocked){
-            myelement.blocked = true;
-          }
-        });
-
+      this.blockedUsers.forEach(element => {
+        if(myelement.postedBy.id === element.blocked){
+          myelement.blocked = true;
+          
+        }
+        
+        
+      });
         this.blockedBy.forEach(element => {
           if(myelement.postedBy.id === element.blockedBy){
             myelement.blocked = true;
           }
         });
       });
-    }
+      let blocked = []
+      feed.forEach(element => {
+        if(element.blocked){
+          blocked.push(element)
+          console.log(blocked)
+          if(blocked.length > this.n){
+            this.n += blocked.length
+            console.log(this.n)
+            this.ngOnInit()
+          }
+        }
+        
+      });
+      this.old.forEach(myelement => {
+        if(myelement.likes){
+          myelement.likes.forEach(element => { 
+          if(element.path==this.uS.userRef.path){
+            myelement.youLike = true;
+          } 
+          });
+        }
+        let blocked = []
+     this.blockedUsers.forEach(element => {
+        if(myelement.postedBy.id === element.blocked){
+          myelement.blocked = true;
+          blocked.push(myelement)
+          this.n += blocked.length
+          if(this.n-blocked.length<=3){
+            console.log(this.n)
+            this.ngOnInit()
+          }
+        }
+      });
+  
+        this.blockedBy.forEach(element => {
+          if(myelement.postedBy.id === element.blockedBy){
+            myelement.blocked = true;
+          }
+        });
+      });
+      
+   /* }
     else {
       for (let i = 0; i < feed.length; i++) {
         let newFeedLength =feed.length - output.length
@@ -264,12 +475,12 @@ export class FeedsPage implements OnInit {
           }
         });
       });
-    }
+    }*/
     output = feed;
     return feed
   }),share()
-),
 )
+
   
    
   

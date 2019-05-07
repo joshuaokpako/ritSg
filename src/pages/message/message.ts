@@ -21,19 +21,24 @@ export class MessagePage implements OnInit{
 data = { name:'', chatUid:'', message:'',photoUrl:'' };
 message ='';
 receiver:any;
-chats;
+chats:any = [];
 key:string;
 subscription;
 receiverUnreadMessages:any;
 myUnreadMessages:any;
 getUnreadSub;
 sub;
+doc;
 now;
 hasRead= false;
 tabBarElement:any;
 blockedUsers;
 blocked = false;
 youblocked = false;
+lastMess
+scroll = true; // to scroll to bottom when neccessary
+scrollTop =0
+
 @ViewChild(Navbar) navBar: Navbar;
 @ViewChild(Content) content: Content;
 public user;
@@ -42,6 +47,7 @@ public name:string;
     this.data.chatUid= this.navParams.get('uid');
     this.key= this.navParams.get('key');
     this.name= this.navParams.get('name');
+    this.lastMess = this.navParams.get('lastMess');
     this.now = new Date().getTime()
     this.user= "";
     this.tabBarElement = document.querySelector('.tabbar.show-tabbar');
@@ -62,10 +68,28 @@ public name:string;
   }
 
   toBottom(){
-    this.content.scrollToBottom(0)
+    if(this.scroll===true){
+      this.content.scrollToBottom(0).then(()=>{
+        this.scrollTop = this.content.scrollTop
+      })
+    }
+  }
+
+  checkscroll(){
+    console.log(this.content.scrollTop)
+    if(this.content.scrollTop <5){
+
+    }
   }
 
   ngOnInit(){
+    this.content.ionScroll.subscribe((x)=>{
+      if (Math.abs(x.scrollTop -this.scrollTop) <30){
+        console.log('he')
+        this.scroll = true
+      }
+    });
+    let test = 0; // check if message was added or page was just refreshed
     let n= 0;
     let p = 0;
     this.user = this.uS.uid
@@ -123,7 +147,13 @@ public name:string;
         }
       });
     })
-     this.chats = this.chatServ.getMessages(this.key)
+     this.chatServ.getMessages(this.key,'',0).subscribe((x)=>{
+      x.forEach(element => {
+          this.chats.push(element)
+   
+      });
+      test = 1;
+     })
       this.chatServ.getReceiverUnreadMessages(this.data.chatUid).subscribe((x:any)=>{
         if(x){
           if(x.unreadMessages.length ==0){
@@ -160,6 +190,26 @@ public name:string;
      
   }
 
+  getFirst(doc){
+    this.doc = doc
+  }
+
+  doInfinite(infiniteScroll){
+    this.scroll = false;
+    let load =0 // to check if command started here or at observable
+    this.chatServ.getMessages(this.key,this.doc,1).pipe(take(1)).subscribe((x)=>{
+      if(load===0){
+        x.forEach(element => {
+          this.chats.unshift(element)
+
+          load =1;
+          infiniteScroll.complete();
+        });
+        console.log(this.chats)
+      }
+     })
+  }
+
   ngOnDestroy() { 
     if (this.subscription) {
        this.subscription.unsubscribe();
@@ -183,7 +233,7 @@ public name:string;
       if (this.data.message!="") {
         this.chatServ.saveMessage(this.data,this.key).then((x)=>{
           this.chatServ.addChat(this.data,this.key,this.receiverUnreadMessages)
-          this.chats = this.chatServ.getMessages(this.key)
+         // this.chats = this.chatServ.getMessages(this.key)
         })
       }
     }

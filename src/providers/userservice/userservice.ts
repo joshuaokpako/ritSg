@@ -335,12 +335,13 @@ reauthenticateUser(oldPass,newPass){
     return this.db.col$('jobs', ref => ref.orderBy('createdAt','desc'))
   }
 
-  getFeed(y,doc){
-    if (y = 0){
-    return this.db.colWithIds$('feeds', ref => ref.orderBy('createdAt','desc').limit(2))
+  getFeed(y,doc,n){
+    console.log(doc)
+    if (y === 0){
+    return this.db.colWithIds$('feeds', ref => ref.orderBy('createdAt','desc').limit(n))
     }
     else{
-      return this.db.colWithIds$('feeds', ref => ref.orderBy('createdAt','desc').startAfter(doc).limit(2))
+      return this.db.colWithIds$('feeds', ref => ref.orderBy('createdAt','desc').startAfter(doc).limit(n))
     }
 
   }

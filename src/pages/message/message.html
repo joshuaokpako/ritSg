@@ -25,12 +25,17 @@
 
 
 <ion-content class="body">
+    <ion-infinite-scroll position='top' (ionInfinite)="doInfinite($event)">
+        <ion-infinite-scroll-content>
+        </ion-infinite-scroll-content>
+        
+    </ion-infinite-scroll>
   <div >
-        <p [hidden] ='chats ===" "' text-center *ngIf="!(chats |async)">
+        <p [hidden] ='chats ===" "' text-center *ngIf="!chats">
           <ion-spinner color="rit" name="crescent"></ion-spinner>
         </p>
           <ion-list>
-            <ion-item no-lines  *ngFor="let chat of chats | async as chatArray; let last = last; let i =index; let first = first">
+            <ion-item  no-lines  *ngFor="let chat of chats as chatArray; let last = last; let i =index; let first = first">
                 <!-- Show the first chat date-->
                 <div class="chat-status" text-center *ngIf="first">
                   <span class="chat-content-center" *ngIf="((chat.createdAt)?.seconds * 1000 | date:'mediumDate')!= (now | date:'mediumDate'); else today">{{(chat.createdAt)?.seconds * 1000 | date:'mediumDate'}}</span>
@@ -45,6 +50,7 @@
                     </ng-template>
                   </div>
                 </div>
+                {{first ? getFirst(chat.createdAt) : ''}} 
               <div class="innermsg right" text-right *ngIf="chat.uid == user">
                   <span class="msg-name">Me</span>
                   <span *ngIf="(chat.createdAt)?.seconds" class="msg-date"> {{(chat.createdAt)?.seconds * 1000 | date:'shortTime'}}</span>
