@@ -401,26 +401,13 @@ export class ProfilePage implements OnInit {
 
   }
 
-  blockBack(){
 
-    // stop back button (for 1 s)
-    // used by barcode camera (when canceling and returnin back)
-    // was sending the back event to the router, and left the screen
-    
-    document.addEventListener("backbutton", onBackKeyDown, false);
-    
-    setTimeout(function(){
-    document.removeEventListener("backbutton", onBackKeyDown, false)
-    }, 1000)
-    
-    function onBackKeyDown() {
-    // swallow the back button - do nothing
-    return false;
-    }
-    }
+  onBackKeyDown(){
+    return false
+  }
 
   scanBarcode(header){
-    this.canLeave = false;
+    this.events.publish('barcode', 'scanning')
     let message;
     let observer = new Subject()
     let test = false
@@ -530,11 +517,14 @@ export class ProfilePage implements OnInit {
 
        })
       }
-    }).then(()=>{
-      this.canLeave = true;
+      else if (barcodeData.cancelled){
+        setTimeout(()=>{
+          this.events.publish('barcode', 'notScanning')
+        }, 1000)
+      }
     })
     .catch(err => {
-      this.canLeave = true;
+      this.events.publish('barcode', 'notScanning')
     })
       
   }

@@ -24,8 +24,10 @@ export class MyApp {
   timer = 0; // timer for splash screen
   currentUser;
   notif = undefined;
+  scan;
   log = false; // check if user is logged in
-  constructor(private screenOrientation: ScreenOrientation,public app: App,private badge: Badge,public events: Events, public uS : UserserviceProvider,
+  constructor(private screenOrientation: ScreenOrientation,public app: App,private badge: Badge,
+    public events: Events, public uS : UserserviceProvider,
     modalCtrl: ModalController, platform: Platform, statusBar: StatusBar,  
     fcm: FcmProvider, toastCtrl: ToastController, private appMinimize: AppMinimize) {
     platform.ready().then(() => {
@@ -175,6 +177,10 @@ export class MyApp {
     platform.resume.subscribe((res) => {
       uS.updateUserActivity('online')
   });
+
+    this.events.subscribe('barcode',(entered) => {
+      this.scan =entered
+    })
     
     platform.registerBackButtonAction(() => {
       let nav = this.app.getActiveNavs()[0];
@@ -182,7 +188,11 @@ export class MyApp {
         nav.pop(); // If called very fast in a row, pop will reject because no pages
       }
       else{
-        this.appMinimize.minimize();
+        if (this.scan === 'scanning'){
+        }
+        else{
+          this.appMinimize.minimize();
+        }
       }
     }, 500);
   }

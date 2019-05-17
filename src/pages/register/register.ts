@@ -196,7 +196,6 @@ toPrivacyPolicy(link){
   }
 
   scan(){
-    this.canLeave = false;
     this.barcodeScanner.scan({resultDisplayDuration:0,showTorchButton:true}).then(barcodeData => {
       let data = this.usersService.encrypt(barcodeData.text)
       if(!barcodeData.cancelled){
@@ -214,8 +213,12 @@ toPrivacyPolicy(link){
           }
         })
       }
-    }).then(()=>{
-      this.canLeave = true;
+      else if (barcodeData.cancelled){
+        this.canLeave = false
+        setTimeout(()=>{
+          this.canLeave = true
+          }, 1000)
+      }
     })
     .catch(err => {
       this.canLeave = true;

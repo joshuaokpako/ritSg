@@ -4,6 +4,7 @@ import { map, share,takeUntil} from 'rxjs/operators';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { Observable, Subject } from 'rxjs';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
+import { O_TRUNC } from 'constants';
 
 /**
  * Generated class for the EventsPage page.
@@ -306,12 +307,12 @@ export class EventsPage implements OnInit {
   }
 
   scanBarcode(event){
-    this.canLeave = false;
     let observer = new Subject()
     let test = false
     this.barcodeScanner.scan({resultDisplayDuration:0,showTorchButton:true}).then(barcodeData => {
       let data = this.uS.encrypt(barcodeData.text)
       if(!barcodeData.cancelled){
+        this.canLeave = false
          this.uS.checkStudentId(data).pipe(takeUntil(observer)).subscribe((student:any)=>{
           if (test == false){
             if(student.length!=0){
@@ -389,8 +390,12 @@ export class EventsPage implements OnInit {
           }
         })
       }
-    }).then(()=>{
-      this.canLeave = true;
+      else if (barcodeData.cancelled){
+        this.canLeave = false
+        setTimeout(()=>{
+          this.canLeave = true
+          }, 1000)
+      }
     })
     .catch(err => {
       this.canLeave = true;
