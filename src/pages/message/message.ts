@@ -2,8 +2,7 @@ import { Component, OnInit, ViewChild} from '@angular/core';
 import { IonicPage, NavController, NavParams, Content, Navbar,Events, AlertController, ModalController, ActionSheetController } from 'ionic-angular';
 import { ChatServiceProvider} from '../../providers/chat-service/chat-service';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
-import { map, takeUntil, take } from 'rxjs/operators';
-import { Observable, Subject, pipe } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 /**
  * Generated class for the MessagePage page.
@@ -37,7 +36,8 @@ blocked = false;
 youblocked = false;
 lastMess
 scroll = true; // to scroll to bottom when neccessary
-scrollTop =0
+scrollTop =true // hide or show chip
+initScrollHeight;
 
 @ViewChild(Navbar) navBar: Navbar;
 @ViewChild(Content) content: Content;
@@ -57,9 +57,6 @@ public name:string;
     this.uS.updateChatActivity(this.data.chatUid);
     this.events.publish('chat entered', true, this.data.chatUid);
     this.tabBarElement.style.display = 'none';
-    let observer = new Subject()
-    
-      
   }
  
   ionViewWillLeave() {
@@ -67,28 +64,25 @@ public name:string;
     this.uS.updateChatActivity('');
   }
 
-  toBottom(){
+  toBottom(test){
+    if(test){
+      this.scroll= test;
+      this.scrollTop = true;
+    }
     if(this.scroll===true){
-      this.content.scrollToBottom(0).then(()=>{
-        this.scrollTop = this.content.scrollTop
-      })
-    }
+      this.content.scrollToBottom(0)
+   }
   }
 
-  checkscroll(){
-    console.log(this.content.scrollTop)
-    if(this.content.scrollTop <5){
-
+  scrolling(){
+    if ((this.content.getContentDimensions().scrollHeight -this.content.getContentDimensions().scrollTop) <this.initScrollHeight+50){
+      this.scrollTop = true;
     }
   }
+  
 
   ngOnInit(){
-    this.content.ionScroll.subscribe((x)=>{
-      if (Math.abs(x.scrollTop -this.scrollTop) <30){
-        console.log('he')
-        this.scroll = true
-      }
-    });
+    this.initScrollHeight = this.content.getContentDimensions().scrollHeight -this.content.getContentDimensions().scrollTop;
     let test = 0; // check if message was added or page was just refreshed
     let n= 0;
     let p = 0;
@@ -113,9 +107,8 @@ public name:string;
           });
           if(n ===1){
             n += 1;
-            console.log(n)
             alert.present();
-            this.chats = ' '
+            this.chats = []
           }
         }
       });
@@ -139,7 +132,6 @@ public name:string;
             ]
           });
           if(p ===1){
-            console.log('yh')
             alert.present()
             this.chats = ' '
             
@@ -148,10 +140,28 @@ public name:string;
       });
     })
      this.chatServ.getMessages(this.key,'',0).subscribe((x)=>{
-      x.forEach(element => {
+       if(test===0){
+        x.forEach(element => {
           this.chats.push(element)
-   
       });
+       }
+      else if(x[x.length-1].id!==this.chats[this.chats.length-1].id){
+        if(x[x.length-1].createdAt && x[x.length-1].updatedAt){
+          this.chats.push(x[x.length-1])
+          if ((this.content.getContentDimensions().scrollHeight -this.content.getContentDimensions().scrollTop) <this.initScrollHeight+50){
+            this.scroll = true
+            this.toBottom(false);
+            this.scrollTop = true;
+          }
+          else{
+            if(x[x.length-1].sentTo===this.uS.uid){
+              this.scrollTop = false;
+            }
+            this.scroll = false;
+          }
+        }
+        
+      }
       test = 1;
      })
       this.chatServ.getReceiverUnreadMessages(this.data.chatUid).subscribe((x:any)=>{
@@ -179,8 +189,8 @@ public name:string;
       
       this.sub = this.chatServ.getChatPerson(this.data.chatUid).subscribe((recOutput:any)=>{
         let recName:string = recOutput.fullName
-        if (recName.length>18){
-         recOutput.fullName = recName.slice(0,18) + '...'
+        if (recName.length>16){
+         recOutput.fullName = recName.slice(0,16) + '...'
         }
         this.receiver = recOutput 
       })
@@ -199,13 +209,15 @@ public name:string;
     let load =0 // to check if command started here or at observable
     this.chatServ.getMessages(this.key,this.doc,1).pipe(take(1)).subscribe((x)=>{
       if(load===0){
+        if (x.length ===0){
+          infiniteScroll.complete();
+        }
         x.forEach(element => {
           this.chats.unshift(element)
 
           load =1;
           infiniteScroll.complete();
         });
-        console.log(this.chats)
       }
      })
   }
@@ -306,7 +318,6 @@ public name:string;
           text: 'Cancel',
           role: 'cancel',
           handler: () => {
-            console.log('Cancel clicked');
           }
         }
       ]
@@ -324,7 +335,6 @@ public name:string;
           text: 'Cancel',
           role: 'cancel',
           handler: () => {
-            console.log('Cancel clicked');
           }
         },
         {

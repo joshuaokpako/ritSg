@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, LoadingController, Platform } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { map, takeUntil } from "rxjs/operators"
 import { FeedbackPage } from '../feedback/feedback';
@@ -24,12 +24,16 @@ export class ProfileDetailsPage implements OnInit {
   public userSpirit;
   public members;
   public reports;
+  resHeight;
 
-  constructor(public loadingCtrl:LoadingController, public uS:UserserviceProvider, public alertCtrl:AlertController, public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public loadingCtrl:LoadingController, public uS:UserserviceProvider,
+     public alertCtrl:AlertController, public navCtrl: NavController, 
+     public navParams: NavParams, public platform: Platform) {
     this.header = this.navParams.get('header')
   }
 
   ngOnInit(){
+    this.resHeight = this.platform.height() *0.7
     if (this.header =="My Feeds"){
       this.myFeeds = this.uS.getMyFeed().pipe(map((event:any)=>{
         event.forEach(myelement => {

@@ -50,7 +50,7 @@ export class DetailsPage implements AfterViewInit {
   ngOnInit(){}
 
   loadMap() {
-    if(!this.platform.is('ios')){
+    if(this.platform.is('android')){
       let mapOptions: GoogleMapOptions = {
         camera: {
           target: {

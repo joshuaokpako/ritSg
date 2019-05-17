@@ -35,17 +35,17 @@
   </ion-fab>
 
   <!--SG events-->
-  <div *ngIf="eventHeaderName =='SG Events'">
-    <p text-center *ngIf="!(sgEvents |async)">
+  <div>
+    <p text-center *ngIf="eventLoaded === false">
       <ion-spinner color="rit" name="crescent"></ion-spinner>
     </p>
     <!--Show when there are no events-->
-    <p class="noEvents" [hidden]="(sgEvents | async) != ''">
+    <p class="noEvents" [hidden]="events.length!==0 || eventLoaded ===false">
       Sorry there are no events right now 
     </p>
     <!--Show when there are SG events-->
-    <div [hidden]="(sgEvents | async) == ''">
-      <ion-card [ngStyle]='{"background-color":((sgEv.eventDate) |timeFilter:"eventFinished") ? "#f0f0f0": "white"}' *ngFor="let sgEv of sgEvents | async">
+    <div [hidden]="events == ''">
+      <ion-card [ngStyle]='{"background-color":((sgEv.eventDate) |timeFilter:"eventFinished") ? "#f0f0f0": "white"}' *ngFor="let sgEv of events; let last = last;let first = first; let index = index">
         <ion-item [ngStyle]='{"background-color":((sgEv.eventDate) |timeFilter:"eventFinished") ? "#f0f0f0": "white"}'>
           <ion-avatar item-start >
             <img class ="resize" *ngIf="sgEv.postedBy.photoUrl" src="{{sgEv.postedBy.photoUrl}}">
@@ -62,7 +62,7 @@
             <p>Upcoming Event</p>
           </ng-template>
         </ion-item>
-        <img *ngIf="sgEv.postImg" class="resizeImg max" src="{{sgEv.postImg}}">
+        <img *ngIf="sgEv.postImg" [ngStyle]='{"max-height.px": resHeight}' class="resizeImg max" src="{{sgEv.postImg}}">
         <ion-card-content>
           <h2><b>{{sgEv.title |titlecase}} - {{sgEv.eventDate}}</b></h2>
           <h3 *ngIf="sgEv.price !=''">Entry Fee: {{sgEv.price | currency:'AED' :'code'}}</h3>
@@ -90,233 +90,17 @@
             </ion-note>
           </ion-col>
         </ion-row>
+        {{last ? getLast(sgEv.createdAt) : ''}} 
       </ion-card>
     </div>
   </div>
-  <!--RIT Events-->
-  <div *ngIf="eventHeaderName =='RIT Events'">
-    <p text-center *ngIf="!(ritEvents |async)">
-      <ion-spinner color="rit" name="crescent"></ion-spinner>
-    </p>
-    <p class="noEvents" [hidden]="(ritEvents | async) != ''">
-      Sorry there are no events right now 
-    </p>
-    <div [hidden]="(ritEvents | async) == ''">
-      <ion-card [ngStyle]='{"background-color":((ritEv.eventDate) |timeFilter:"eventFinished") ? "#f0f0f0": "white"}' *ngFor="let ritEv of ritEvents | async">
-          <ion-item [ngStyle]='{"background-color":((ritEv.eventDate) |timeFilter:"eventFinished") ? "#f0f0f0": "white"}'>
-            <ion-avatar  item-start >
-              <img class ="resize" *ngIf="ritEv.postedBy.photoUrl" src="{{ritEv.postedBy.photoUrl}}">
-            </ion-avatar>
-            <h2 >{{ritEv.postedBy.fullName | titlecase}}</h2>
-            <button ion-button icon-only item-end *ngIf='(user.admin=="main" || user.SG==true) && ritEv.price !==""' color='secondary' (click)="goingPaid(ritEv)" clear small>
-              <ion-icon name="add"></ion-icon>
-            </button>
-            <button ion-button icon-only item-end *ngIf='user.admin=="main" || user.SG==true' color='rit' (click)="scanBarcode(ritEv)" clear small>
-              <ion-icon name="barcode"></ion-icon>
-            </button>
-            <p *ngIf='((ritEv.eventDate) |timeFilter:"eventFinished"); else upcoming'>Event Finished</p>
-          <ng-template #upcoming>
-            <p>Upcoming Event</p>
-          </ng-template>
-          </ion-item>
-          <img *ngIf="ritEv.postImg" class="resizeImg max" src="{{ritEv.postImg}}">
-          <ion-card-content>
-            <h2><b>{{ritEv.title |titlecase}} - {{ritEv.eventDate}}</b></h2>
-            <h3 *ngIf="ritEv.price !=''">Entry Fee: {{ritEv.price | currency:'AED' :'code'}}</h3>
-            <h3>{{ritEv.startTime}} to {{ritEv.endTime}}</h3>
-            <p>{{ritEv.description}} </p>
-          </ion-card-content>
-          <ion-row>
-            <ion-col>
-              <button ion-button icon-left [color]="ritEv.youGoing==true ? 'danger': 'inactive'" (click)="going(ritEv)" clear small>
-                <ion-icon name="walk"></ion-icon>
-                <div >{{ritEv.going.length}} going</div>
-                
-              </button>
-            </ion-col>
-            <ion-col>
-              <button ion-button icon-left clear color="inactive" small (click)="toFeedback('Feedbacks',ritEv.id,ritEv.going)">
-                <ion-icon name="text"></ion-icon>
-                <div *ngIf="ritEv.feedback;else noFeedbacks"><span *ngIf="ritEv.feedback!=1;else oneFeedback">{{ritEv.feedback}} Feedbacks</span><ng-template #oneFeedback>{{ritEv.feedback}} Feedback</ng-template></div>
-                <ng-template #noFeedbacks>0 Feedbacks</ng-template>
-              </button>
-            </ion-col>
-            <ion-col center text-center>
-              <ion-note>
-                
-              </ion-note>
-            </ion-col>
-          </ion-row>
-        </ion-card>
-    </div>
-  </div>
+  
         
-    <!--Common Hour Events-->
-    <div *ngIf="eventHeaderName =='Common Hour Events'">
-        <p text-center *ngIf="!(comHEvents |async)">
-          <ion-spinner color="rit" name="crescent"></ion-spinner>
-        </p>
-        <p class="noEvents" [hidden]="(comHEvents | async) != ''">
-          Sorry there are no events right now
-        </p>
-        <div [hidden]="(comHEvents | async) == ''">
-          <ion-card [ngStyle]='{"background-color":((ch.eventDate) |timeFilter:"eventFinished") ? "#f0f0f0": "white"}' *ngFor="let ch of comHEvents | async">
-              <ion-item [ngStyle]='{"background-color":((ch.eventDate) |timeFilter:"eventFinished") ? "#f0f0f0": "white"}'>
-                <ion-avatar item-start >
-                  <img class ="resize" *ngIf="ch.postedBy.photoUrl" src="{{ch.postedBy.photoUrl}}">
-                </ion-avatar>
-                <h2 >{{ch.postedBy.fullName | titlecase}}</h2>
-                <button ion-button icon-only item-end *ngIf='(user.admin=="main" || user.SG==true) && ch.price !==""' color='secondary' (click)="goingPaid(ch)" clear small>
-                  <ion-icon name="add"></ion-icon>
-                </button>
-                <button ion-button icon-only item-end *ngIf='user.admin=="main" || user.SG==true' color='rit' (click)="scanBarcode(ch)" clear small>
-                  <ion-icon name="barcode"></ion-icon>
-                </button>
-                <p *ngIf='((ch.eventDate) |timeFilter:"eventFinished"); else upcoming'>Event Finished</p>
-                <ng-template #upcoming>
-                  <p>Upcoming Event</p>
-                </ng-template> 
-              </ion-item>
-              <img *ngIf="ch.postImg" class ="resizeImg max" src="{{ch.postImg}}">
-              <ion-card-content>
-                <h2><b>{{ch.title |titlecase}} - {{ch.eventDate}}</b></h2>
-                <h3 *ngIf="ch.price !=''">Entry Fee: {{ch.price | currency:'AED' :'code'}}</h3>
-                <h3>{{ch.startTime}} to {{ch.endTime}}</h3>
-                <p>{{ch.description}} </p>
-              </ion-card-content>
-              <ion-row>
-                <ion-col>
-                  <button ion-button icon-left [color]="ch.youGoing==true ? 'danger': 'inactive'" (click)="going(ch)" clear small>
-                    <ion-icon name="walk"></ion-icon>
-                    <div >{{ch.going.length}} going</div>
-                    
-                  </button>
-                </ion-col>
-                <ion-col>
-                  <button ion-button icon-left clear color="inactive" small (click)="toFeedback('Feedbacks',ch.id,ch.going)">
-                    <ion-icon name="text"></ion-icon>
-                    <div *ngIf="ch.feedback;else noFeedbacks"><span *ngIf="ch.feedback!=1;else oneFeedback">{{ch.feedback}} Feedbacks</span><ng-template #oneFeedback>{{ch.feedback}} Feedback</ng-template></div>
-                    <ng-template #noFeedbacks>0 Feedbacks</ng-template>
-                  </button>
-                </ion-col>
-                <ion-col center text-center>
-                  <ion-note>
-                    
-                  </ion-note>
-                </ion-col>
-              </ion-row>
-            </ion-card>
-          </div>
-        </div>
-    <!--Other Events-->
-  <div *ngIf="eventHeaderName =='Other Events' ">
-      <p text-center *ngIf="!(otherEvents |async)">
-        <ion-spinner color="rit" name="crescent"></ion-spinner>
-      </p>
-      <p class="noEvents" [hidden]="(otherEvents | async) != ''">
-        Sorry there are no events right now
-      </p>
-        <div [hidden]="(otherEvents | async) == ''">
-          <ion-card [ngStyle]='{"background-color":((ot.eventDate) |timeFilter:"eventFinished") ? "#f0f0f0": "white"}' *ngFor="let ot of otherEvents | async">
-              <ion-item [ngStyle]='{"background-color":((ot.eventDate) |timeFilter:"eventFinished") ? "#f0f0f0": "white"}'>
-                  <ion-avatar item-start >
-                    <img class ="resize" *ngIf="ot.postedBy.photoUrl" src="{{ot.postedBy.photoUrl}}">
-                  </ion-avatar>
-                  <h2 >{{ot.postedBy.fullName | titlecase}}</h2> 
-                  <button ion-button icon-only item-end *ngIf='(user.admin=="main" || user.SG==true) && ot.price !==""' color='secondary' (click)="goingPaid(ot)" clear small>
-                    <ion-icon name="add"></ion-icon>
-                  </button>
-                  <button ion-button icon-only item-end *ngIf='user.admin=="main" || user.SG==true' color='rit' (click)="scanBarcode(ot)" clear small>
-                    <ion-icon name="barcode"></ion-icon>
-                  </button>
-                  <p *ngIf='((ot.eventDate) |timeFilter:"eventFinished"); else upcoming'>Event Finished</p>
-                  <ng-template #upcoming>
-                    <p>Upcoming Event</p>
-                  </ng-template>
-                </ion-item>
-                <img *ngIf="ot.postImg" class ="resizeImg max" src="{{ot.postImg}}">
-                <ion-card-content>
-                  <h2><b>{{ot.title |titlecase}} - {{ot.eventDate}}</b></h2>
-                  <h3 *ngIf="ot.price !=''">Entry Fee: {{ot.price | currency:'AED' :'code'}}</h3>
-                  <h3>{{ot.startTime}} to {{ot.endTime}}</h3>
-                  <p>{{ot.description}} </p>
-                </ion-card-content>
-                <ion-row>
-                  <ion-col>
-                    <button ion-button icon-left [color]="ot.youGoing==true ? 'danger': 'inactive'" (click)="going(ot)" clear small>
-                      <ion-icon name="walk"></ion-icon>
-                      <div >{{ot.going.length}} going</div>
-                      
-                    </button>
-                  </ion-col>
-                  <ion-col>
-                    <button ion-button icon-left clear color="inactive" small (click)="toFeedback('Feedbacks',ot.id,ot.going)">
-                      <ion-icon name="text"></ion-icon>
-                      <div *ngIf="ot.feedback;else noFeedbacks"><span *ngIf="ot.feedback!=1;else oneFeedback">{{ot.feedback}} Feedbacks</span><ng-template #oneFeedback>{{ot.feedback}} Feedback</ng-template></div>
-                      <ng-template #noFeedbacks>0 Feedbacks</ng-template>
-                    </button>
-                  </ion-col>
-                  <ion-col center text-center>
-                    <ion-note>
-                      
-                    </ion-note>
-                  </ion-col>
-                </ion-row>
-              </ion-card>
-          </div>
-        </div>
-    <!--Suggested Events-->
-    <div *ngIf="eventHeaderName =='Suggested Events'">
-      <p text-center *ngIf="!(sugEvents |async)">
-        <ion-spinner color="rit" name="crescent"></ion-spinner>
-      </p>
-        <p class="noEvents" [hidden]="(sugEvents | async) != ''">
-          Sorry there are no events right now
-        </p>
-        <div [hidden]="(sugEvents | async) == ''">
-            <ion-card [ngStyle]='{"background-color":((sug.eventDate) |timeFilter:"eventFinished") ? "#f0f0f0": "white"}' *ngFor="let sug of sugEvents | async">
-                <ion-item [ngStyle]='{"background-color":((sug.eventDate) |timeFilter:"eventFinished") ? "#f0f0f0": "white"}'>
-                    <ion-avatar item-start >
-                      <img class ="resize" *ngIf="sug.postedBy.photoUrl" src="{{sug.postedBy.photoUrl}}">
-                    </ion-avatar>
-                    <h2 >{{sug.postedBy.fullName | titlecase}}</h2>
-                    <p *ngIf='((sug.eventDate) |timeFilter:"eventFinished"); else upcoming'>Event Finished</p>
-                    <ng-template #upcoming>
-                      <p>Upcoming Event</p>
-                    </ng-template>
-                  </ion-item>
-                  <img *ngIf="sug.postImg" class ="resizeImg max" src="{{sug.postImg}}">
-                  <ion-card-content>
-                    <h2><b>{{sug.title |titlecase}} - {{sug.eventDate}}</b></h2>
-                    <h3 *ngIf="sug.price !=''">Entry Fee: {{sug.price | currency:'AED' :'code'}}</h3>
-                    <h3>{{sug.startTime}} to {{sug.endTime}}</h3>
-                    <p>{{sug.description}} </p>
-                  </ion-card-content>
-                  <ion-row>
-                    <ion-col>
-                      <button ion-button icon-left [color]="sug.youGoing==true ? 'danger': 'inactive'" (click)="going(sug)" clear small>
-                        <ion-icon name="walk"></ion-icon>
-                        <div ><span *ngIf="sug.going.length!=1; else oneLike">{{sug.going.length}} likes </span> <ng-template #oneLike>{{sug.going.length}} like<span></span></ng-template></div>
-                        
-                      </button>
-                    </ion-col>
-                    <ion-col>
-                      <button ion-button icon-left clear color="inactive" small (click)="toFeedback('Comments',sug.id,sug.going)">
-                        <ion-icon name="text"></ion-icon>
-                        <div *ngIf="sug.feedback;else noFeedbacks"><span *ngIf="sug.feedback!=1;else oneFeedback">{{sug.feedback}} Comments</span><ng-template #oneFeedback>{{sug.feedback}} Comment</ng-template></div>
-                        <ng-template #noFeedbacks>0 Comments</ng-template>
-                      </button>
-                    </ion-col>
-                    <ion-col center text-center>
-                      <ion-note>
-                        
-                      </ion-note>
-                    </ion-col>
-                  </ion-row>
-                </ion-card>
-        </div>
-         
-          </div>
+        <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
+            <ion-infinite-scroll-content>
+            </ion-infinite-scroll-content>
+            
+        </ion-infinite-scroll>
 </ion-content>
 
 <ion-footer>

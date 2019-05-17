@@ -66,6 +66,7 @@
     <!--Staff Button-->
   <button  ion-button [hidden]="type == 'student'" [disabled]="!email || !password || !name || !faculty || !office" color="rit" block (click)="submitLogin()">
       Sign up</button>
+      <button ion-button color="primary" small block clear (click)="toPrivacyPolicy('https://ritdsgwordpresscom.wordpress.com/privacy%20policy/')">Privacy Policy</button>
 </ion-list>
 
 </ion-content>

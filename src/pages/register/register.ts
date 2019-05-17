@@ -1,10 +1,12 @@
 import { Component} from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, AlertController, App, Events } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, AlertController, App, Events, Platform } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { FcmProvider } from '../../providers/fcm/fcm';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
+import { SpinnerDialog } from '@ionic-native/spinner-dialog';
+import { InAppBrowser } from '@ionic-native/in-app-browser';
 
 
 /**
@@ -32,14 +34,23 @@ export class RegisterPage {
   public office:string;
   public departments:any;
   public faculty:any = "";
+  public preventBack;
   public position:any = "";
   test:boolean = false; // if student ID has not been used return true else false
   observer:Subject<any> = new Subject();
+  canLeave = true;
 
 
-  constructor(private barcodeScanner: BarcodeScanner,public fcm:FcmProvider,public events:Events, public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
-    public alertCtrl: AlertController,  public navCtrl: NavController, public navParams: NavParams, public app : App) {
+  constructor(private barcodeScanner: BarcodeScanner,public fcm:FcmProvider,public events:Events, 
+    public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
+    public alertCtrl: AlertController,  public navCtrl: NavController, 
+    public navParams: NavParams, public app : App, 
+    private spinnerDialog: SpinnerDialog,private iab: InAppBrowser,public platform: Platform) {
       this.type ="student"
+  }
+
+  ionViewCanLeave(){
+    return this.canLeave
   }
 
   ionViewDidLoad() {
@@ -48,6 +59,21 @@ export class RegisterPage {
   ionViewWillLeave(){
     this.observer.next()
     this.observer.complete()
+  }
+
+toPrivacyPolicy(link){
+    const browser = this.iab.create(link,'_blank', 'location=yes,hideurlbar=yes,hidespinner=yes,toolbarcolor=#F36E21');
+    browser.on('loadstart').subscribe(event => {
+      this.spinnerDialog.show();
+   });
+    browser.on('loadstop').subscribe(event => {
+    this.spinnerDialog.hide();
+    });
+    browser.on('loaderror').subscribe(event => {
+      this.spinnerDialog.hide();
+    });
+    
+    browser.show()
   }
 
   getDepartment(){
@@ -168,7 +194,9 @@ export class RegisterPage {
     
     
   }
+
   scan(){
+    this.canLeave = false;
     this.barcodeScanner.scan({resultDisplayDuration:0,showTorchButton:true}).then(barcodeData => {
       let data = this.usersService.encrypt(barcodeData.text)
       if(!barcodeData.cancelled){
@@ -186,6 +214,11 @@ export class RegisterPage {
           }
         })
       }
+    }).then(()=>{
+      this.canLeave = true;
+    })
+    .catch(err => {
+      this.canLeave = true;
     })
   }
 }

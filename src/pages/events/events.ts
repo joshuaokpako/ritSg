@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicPage, NavController, NavParams,LoadingController,ModalController, AlertController, ToastController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams,LoadingController,ModalController, AlertController, ToastController, Platform } from 'ionic-angular';
 import { map, share,takeUntil} from 'rxjs/operators';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { Observable, Subject } from 'rxjs';
@@ -22,27 +22,36 @@ export class EventsPage implements OnInit {
   public eventHeaderName:string;
   tabBarElement:any;
   observer:Subject<any> = new Subject();
-  public sgEvents:Observable<any>;
-  public ritEvents;
-  public comHEvents;
-  public otherEvents;
-  public sugEvents;
+  public events;
   public loading:any;
   public user:any;
   public youGoing;
   subscription;
+  doc;
   now;
+  n =3;
+  eventLoaded = false;
+  moreEvents;
+  canLeave=true;
+  resHeight;
 
-  constructor(public toastCtrl:ToastController, private barcodeScanner: BarcodeScanner, public modalCtrl: ModalController,public loadingCtrl: LoadingController,public navCtrl: NavController, 
-    public navParams: NavParams,public uS: UserserviceProvider,private alertCtrl: AlertController) {
+  constructor(public toastCtrl:ToastController, private barcodeScanner: BarcodeScanner, 
+    public modalCtrl: ModalController,public loadingCtrl: LoadingController,public navCtrl: NavController, 
+    public navParams: NavParams,public uS: UserserviceProvider,
+    private alertCtrl: AlertController, public platform: Platform) {
     this.tabBarElement = document.querySelector('.tabbar.show-tabbar');
     this.eventHeaderName = "SG Events";
     this.user= ""
     this.youGoing =false;
       
   }
+
+  ionViewCanLeave(){
+    return this.canLeave
+  }
   
   ngOnInit(){
+    this.resHeight = this.platform.height() *0.7
     this.subscription = this.uS.user.pipe(map((user:any)=>{
      if (user.groupAdmin){
         user.groupAdmin.forEach(element => {
@@ -60,7 +69,7 @@ export class EventsPage implements OnInit {
       return user    
     })).subscribe(x=>this.user=x )
 
-  this.showEvents("SG Events");
+  this.showEvents(this.eventHeaderName);
   
       
   }
@@ -106,6 +115,7 @@ export class EventsPage implements OnInit {
         if(event.going.length ==0){
           event.going.push(userRef)
           this.uS.updateEventGoing(event,this.eventHeaderName,user[0].uid,true).then(x=>{ // adding to going
+            event.youGoing= true;
             observer.next()
             observer.complete()
           }).catch((error)=>{
@@ -137,6 +147,7 @@ export class EventsPage implements OnInit {
                   handler: () => {
                     event.going = event.going.filter((going)=> {return going.path!= userRef.path})
                     this.uS.updateEventGoing(event,this.eventHeaderName,user[0].uid,false) // remove from going
+                    event.youGoing= false;
                   }
                 },
                 {
@@ -155,6 +166,7 @@ export class EventsPage implements OnInit {
         if (userGoing ===false){
           event.going.push(userRef)
           this.uS.updateEventGoing(event,this.eventHeaderName,user[0].uid,true).then(x=>{ //add to going
+            event.youGoing= true;
             observer.next()
             observer.complete()
           }).catch(()=>{
@@ -188,11 +200,56 @@ export class EventsPage implements OnInit {
     if(event.price==''){
       if(event.youGoing==true){
         event.going = event.going.filter((going)=> {return going.path!=this.uS.userRef.path})
-        this.uS.updateEventGoing(event,this.eventHeaderName,this.uS.uid,false) // remove from going 
+        this.uS.checkDocExists('events/'+this.eventHeaderName+'/'+this.eventHeaderName+'/',event.id).then(val=>{
+          if(val ===true){
+            this.uS.updateEventGoing(event,this.eventHeaderName,this.uS.uid,true).then((ev)=>{// add to going
+              event.youGoing= false;
+            })
+          }
+          else{
+            let alert = this.alertCtrl.create({
+              title: 'Event Deleted',
+              message: "Sorry this event has been deleted by the user",
+              buttons: [
+                {
+                  text: 'Ok',
+                  role: 'cancel',
+                  handler: () => {
+                    this.ngOnInit()
+                  }
+                }
+              ]
+            });
+            alert.present();
+          }
+        })
       }
       else{
         event.going.push(this.uS.userRef)
-        this.uS.updateEventGoing(event,this.eventHeaderName,this.uS.uid,true) // add to going
+        this.uS.checkDocExists('events/'+this.eventHeaderName+'/'+this.eventHeaderName+'/',event.id).then(val=>{
+          if(val ===true){
+            this.uS.updateEventGoing(event,this.eventHeaderName,this.uS.uid,true).then((ev)=>{// add to going
+              event.youGoing= true;
+            })
+          }
+          else{
+            let alert = this.alertCtrl.create({
+              title: 'Event Deleted',
+              message: "Sorry this event has been deleted by the user",
+              buttons: [
+                {
+                  text: 'Ok',
+                  role: 'cancel',
+                  handler: () => {
+                    this.ngOnInit()
+                  }
+                }
+              ]
+            });
+            alert.present();
+          }
+        })
+        
       }
     }
     else{
@@ -225,10 +282,31 @@ export class EventsPage implements OnInit {
       type:this.eventHeaderName,
       likes: going
     }
-    this.navCtrl.push('FeedbackPage',obj)
+    this.uS.checkDocExists('events/'+this.eventHeaderName+'/'+this.eventHeaderName+'/',id).then(val=>{
+      if(val ===true){
+        this.navCtrl.push('FeedbackPage',obj)
+      }
+      else{
+        let alert = this.alertCtrl.create({
+          title: 'Feed Deleted',
+          message: "Sorry this feed has been deleted by the user",
+          buttons: [
+            {
+              text: 'Ok',
+              role: 'cancel',
+              handler: () => {
+                this.ngOnInit()
+              }
+            }
+          ]
+        });
+        alert.present();
+      }
+    })
   }
 
   scanBarcode(event){
+    this.canLeave = false;
     let observer = new Subject()
     let test = false
     this.barcodeScanner.scan({resultDisplayDuration:0,showTorchButton:true}).then(barcodeData => {
@@ -311,8 +389,11 @@ export class EventsPage implements OnInit {
           }
         })
       }
+    }).then(()=>{
+      this.canLeave = true;
     })
     .catch(err => {
+      this.canLeave = true;
       let alert = this.alertCtrl.create({
         title: 'Error',
         subTitle: err,
@@ -337,160 +418,64 @@ export class EventsPage implements OnInit {
   ionViewWillLeave() {
     this.tabBarElement.style.display = 'flex';
   }
+  getLast(doc){
+    this.doc = doc
+  }
+
+  
+ async doInfinite(infiniteScroll){
+  let load =0 // to check if command started here or at observable
+    this.moreEvents = this.uS.getEvents( this.eventHeaderName,1,this.doc,this.n).pipe(map((event:any)=>{
+        event.forEach(myelement => {
+          if(myelement.postedBy.path){
+            this.uS.getRef(myelement.postedBy).subscribe(x=>{
+              myelement.postedBy =x;
+            })
+          }
+        });
+      event.forEach(myelement => {
+          this.events.push(myelement);
+        })
+      load =1;
+      this.events.forEach(myelement => {
+        if(myelement.going){ //show if you subscribed to go
+          myelement.going.forEach(element => { 
+          if(element.path==this.uS.userRef.path){
+            myelement.youGoing = true;
+          } 
+          });
+        } 
+      })
+    
+      return this.events
+    }),share()
+    )
+    this.moreEvents.subscribe(x => {
+        infiniteScroll.complete();
+    })
+  }
 
   showEvents(name){
     let output:any =""
     let test = false;
     this.eventHeaderName = name;
     // the tabs
-  switch (name) {
-    case 'SG Events':
-      this.sgEvents = this.uS.sgEvents.pipe(map((event:any)=>{
-        if(test == false){ // to make sure the postedBy only loads on page enter
+    this.eventLoaded = false
+    this.events = []
+    let load =0 // to check if command started here or at observable
+       this.uS.getEvents(name,0,'',this.n).pipe(map((event:any)=>{
           event.forEach(myelement => {
             this.uS.getRef(myelement.postedBy).subscribe(x=>{
               myelement.postedBy =x; 
               test =true;
               output = event;
             })
-          if(myelement.going){ //show if you subscribed to go
-            myelement.going.forEach(element => { 
-            if(element.path==this.uS.userRef.path){
-              myelement.youGoing = true;
-            } 
-            });
-          } 
-        }); 
-        }
-        else {
-          for (let i = 0; i < event.length; i++) {
-            let newEventLength =event.length - output.length
-            if(i < newEventLength){ // only get the postedBy for new posts
-              this.uS.getRef(event[i].postedBy)
-              .subscribe(x=>{
-                event[i].postedBy =x;
-              })
+            if(load ===0){
+              this.events.push(myelement)
             }
-            else{
-              event[i].postedBy = output[i-newEventLength].postedBy // use old postedBy for old posts until page reenter
-            }    
-          }
-          event.forEach(myelement => {  //show if you subscribed to go
-            if(myelement.going){
-              myelement.going.forEach(element => { 
-              if(element.path==this.uS.userRef.path){
-                myelement.youGoing = true;
-              }
-              });
-            }
-          });
-        }
-        return event
-    }),share()
-    )
-      break;
-    
-    case 'RIT Events':
-      this.ritEvents = this.uS.ritEvents.pipe(map((event:any)=>{
-        if(test == false){ // to make sure the postedBy only loads on page enter
-          event.forEach(myelement => {
-            this.uS.getRef(myelement.postedBy).subscribe(x=>{
-              myelement.postedBy =x; 
-              test =true;
-              output = event;
-            })
-          if(myelement.going){ //show if you subscribed to go
-            myelement.going.forEach(element => { 
-            if(element.path==this.uS.userRef.path){
-              myelement.youGoing = true;
-            } 
-            });
-          } 
-        }); 
-        }
-        else {
-          for (let i = 0; i < event.length; i++) {
-            let newEventLength =event.length - output.length
-            if(i < newEventLength){ // only get the postedBy for new posts
-              this.uS.getRef(event[i].postedBy)
-              .subscribe(x=>{
-                event[i].postedBy =x;
-              })
-            }
-            else{
-              event[i].postedBy = output[i-newEventLength].postedBy // use old postedBy for old posts until page reenter
-            }    
-          }
-          event.forEach(myelement => {  //show if you subscribed to go
-            if(myelement.going){
-              myelement.going.forEach(element => { 
-              if(element.path==this.uS.userRef.path){
-                myelement.youGoing = true;
-              }
-              });
-            }
-          });
-        }
-        return event
-      }),share()
-      )
-      break;
-    
-    case "Common Hour Events":
-      this.comHEvents = this.uS.comHEvents.pipe(map((event:any)=>{
-        if(test == false){ // to make sure the postedBy only loads on page enter
-          event.forEach(myelement => {
-            this.uS.getRef(myelement.postedBy).subscribe(x=>{
-              myelement.postedBy =x; 
-              test =true;
-              output = event;
-            })
-          if(myelement.going){ //show if you subscribed to go
-            myelement.going.forEach(element => { 
-            if(element.path==this.uS.userRef.path){
-              myelement.youGoing = true;
-            } 
-            });
-          } 
-        }); 
-        }
-        else {
-          for (let i = 0; i < event.length; i++) {
-            let newEventLength =event.length - output.length
-            if(i < newEventLength){ // only get the postedBy for new posts
-              this.uS.getRef(event[i].postedBy)
-              .subscribe(x=>{
-                event[i].postedBy =x;
-              })
-            }
-            else{
-              event[i].postedBy = output[i-newEventLength].postedBy // use old postedBy for old posts until page reenter
-            }    
-          }
-          event.forEach(myelement => {  //show if you subscribed to go
-            if(myelement.going){
-              myelement.going.forEach(element => { 
-              if(element.path==this.uS.userRef.path){
-                myelement.youGoing = true;
-              }
-              });
-            }
-          });
-        }
-        return event
-      }),share()
-      )
-      break;
-
-    case "Other Events":
-      this.otherEvents = this.uS.otherEvents.pipe(map((event:any)=>{
-        if(test == false){ // to make sure the postedBy only loads on page enter
-          event.forEach(myelement => {
-            this.uS.getRef(myelement.postedBy).subscribe(x=>{
-              myelement.postedBy =x; 
-              test =true;
-              output = event;
-            })
+          }); 
+          load = 1;
+          this.events.forEach(myelement => {
             if(myelement.going){ //show if you subscribed to go
               myelement.going.forEach(element => { 
               if(element.path==this.uS.userRef.path){
@@ -498,89 +483,13 @@ export class EventsPage implements OnInit {
               } 
               });
             } 
-        }); 
-        }
-        else {
-          for (let i = 0; i < event.length; i++) {
-            let newEventLength =event.length - output.length
-            if(i < newEventLength){ // only get the postedBy for new posts
-              this.uS.getRef(event[i].postedBy)
-              .subscribe(x=>{
-                event[i].postedBy =x;
-              })
-            }
-            else{
-              event[i].postedBy = output[i-newEventLength].postedBy // use old postedBy for old posts until page reenter
-            }    
-          }
-          event.forEach(myelement => {  //show if you subscribed to go
-            if(myelement.going){
-              myelement.going.forEach(element => { 
-              if(element.path==this.uS.userRef.path){
-                myelement.youGoing = true;
-              }
-              });
-            }
-          });
-        }
+          })
+        
         return event
-      }),share()
-      )
-      break;
-    case "Suggested Events":
-      this.sugEvents = this.uS.sugEvents.pipe(map((event:any)=>{
-        if(test == false){ // to make sure the postedBy only loads on page enter
-          event.forEach(myelement => {
-              this.uS.getRef(myelement.postedBy).subscribe(x=>{
-                myelement.postedBy =x; 
-                test =true;
-                output = event;
-            })
-          if(myelement.going){ //show if you subscribed to go
-            myelement.going.forEach(element => { 
-            if(element.path==this.uS.userRef.path){
-              myelement.youGoing = true;
-            } 
-            });
-          } 
-        }); 
-        }
-        else {
-          for (let i = 0; i < event.length; i++) {
-            let newEventLength =event.length - output.length
-            if(i < newEventLength){ // only get the postedBy for new posts
-              this.uS.getRef(event[i].postedBy)
-              .subscribe(x=>{
-                event[i].postedBy =x;
-              })
-            }
-            else{
-              event[i].postedBy = output[i-newEventLength].postedBy // use old postedBy for old posts until page reenter
-            }    
-          }
-          event.forEach(myelement => {  //show if you subscribed to go
-            if(myelement.going){
-              myelement.going.forEach(element => { 
-              if(element.path==this.uS.userRef.path){
-                myelement.youGoing = true;
-              }
-              });
-            }
-          });
-        }
-        return event
-      }),share()
-      )
-      break;
-  
-    default:
-      break;
-  }
-  
-    
-    
-    
-    
+    }),share()
+    ).subscribe(()=>{
+      this.eventLoaded = true;
+    })
     
   }
   addEventModal(header){

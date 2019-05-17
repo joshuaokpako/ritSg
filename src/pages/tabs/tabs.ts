@@ -62,7 +62,6 @@ export class TabsPage implements OnInit {
       return (notif == 0)? undefined : notif
       }),share()
      )
-     this.chatNotification.subscribe()
       
     
      
@@ -130,8 +129,5 @@ export class TabsPage implements OnInit {
     });
   }
   ionViewWillLeave(){
-    if(this.chatNotification){
-      this.chatNotification.unsubscribe()
-    }
   }
 }

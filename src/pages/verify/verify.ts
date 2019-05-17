@@ -32,8 +32,7 @@ userSubs;
   }
 
   ionViewWillLoad() {
-    this.userSubs=this.uS.fireAuth.authState
-    this.userSubs.subscribe(user => {
+    this.userSubs=this.uS.fireAuth.authState.subscribe(user => {
       if (user) {
         this.user = this.uS.db.doc$('users/'+user.uid);
       }

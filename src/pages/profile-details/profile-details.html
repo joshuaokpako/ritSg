@@ -20,7 +20,7 @@
         <ion-spinner color="rit" name="crescent"></ion-spinner>
       </p>
       <p text-center class="noEvents" [hidden]="(myFeeds |async) != ''">
-          Sorry there are no feeds right now 
+          Sorry you have no feeds right now 
         </p>
       <ion-card *ngFor="let feed  of myFeeds |async">
 
@@ -33,7 +33,7 @@
             <p>{{(feed.createdAt)?.seconds * 1000 | date :'mediumDate'}}</p>
           </ion-item>
         
-          <img *ngIf="(feed)?.postImg" class="max resizeImg" src="{{feed?.postImg}}">
+          <img *ngIf="(feed)?.postImg" class="resizeImg" [ngStyle]='{"max-height.px": resHeight}' src="{{feed?.postImg}}">
         
           <ion-card-content>
             <p>{{feed.description}}</p>
@@ -62,6 +62,12 @@
     </div>
 
     <div *ngIf="header == 'My Events'">
+        <p text-center *ngIf="!(myEvents |async)">
+            <ion-spinner color="rit" name="crescent"></ion-spinner>
+          </p>
+          <p text-center class="noEvents" [hidden]="(myEvents |async) != ''">
+              Sorry you have no events right now 
+            </p>
         <ion-card *ngFor="let user of myEvents | async">
             <ion-item>
               <ion-avatar item-start >
@@ -69,7 +75,7 @@
               </ion-avatar>
               <h2>{{(user.eventRef.postedBy)?.fullName | titlecase}}</h2> 
             </ion-item>
-            <img *ngIf="(user.eventRef)?.postImg" class="max resizeImg" src="{{(user.eventRef)?.postImg}}">
+            <img *ngIf="(user.eventRef)?.postImg" [ngStyle]='{"max-height.px": resHeight}' class="resizeImg" src="{{(user.eventRef)?.postImg}}">
             <ion-card-content>
               <h2><b>{{user.title |titlecase}} - {{user.eventRef.eventDate}}</b></h2>
               <h3 *ngIf="user.eventRef.price !=''">Entry Fee: {{user.eventRef.price | currency:'AED' :'code'}}</h3>

@@ -24,14 +24,23 @@
 </ion-header>
 
 
-<ion-content class="body">
-    <ion-infinite-scroll position='top' (ionInfinite)="doInfinite($event)">
+<ion-content (ionScroll)="scrolling()"  class="body">
+    <ion-infinite-scroll position='top' threshold="25%" (ionInfinite)="doInfinite($event)">
         <ion-infinite-scroll-content>
         </ion-infinite-scroll-content>
         
     </ion-infinite-scroll>
-  <div >
-        <p [hidden] ='chats ===" "' text-center *ngIf="!chats">
+    <ion-fab (click)='toBottom(true)'[hidden]='scrollTop' bottom center>
+        <ion-chip  class='bounceChip'  color="secondary" *ngIf='!youblocked && receiver'>
+            <ion-avatar>
+              <img class="resize" src="{{receiver.photoUrl}}">
+            </ion-avatar>
+            <ion-label>New Messages</ion-label>
+          </ion-chip>
+          <button ion-fab [hidden]= true></button>
+      </ion-fab>
+  <div *ngIf="youblocked ===false && blocked === false">
+        <p [hidden] ='chats.length === 0' text-center *ngIf="!chats">
           <ion-spinner color="rit" name="crescent"></ion-spinner>
         </p>
           <ion-list>
@@ -64,11 +73,10 @@
               </div>
               <p text-right class="read right" *ngIf="chat.uid == user && last && hasRead" small >seen</p>
               
-              {{last ? toBottom() : ''}} 
+              {{last ? toBottom(false) : ''}} 
             </ion-item>
+            
           </ion-list>
-         
-
   </div>
   
 </ion-content>

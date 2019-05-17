@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController, NavParams, AlertController, App, LoadingController, ToastController, IonicPage, Events, ActionSheetController } from 'ionic-angular';
+import { NavController, NavParams, AlertController, App, LoadingController, ToastController, IonicPage, Events, ActionSheetController, Platform } from 'ionic-angular';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import { finalize, map, takeUntil } from 'rxjs/operators';
@@ -31,13 +31,19 @@ export class ProfilePage implements OnInit {
   public userSpirit;
   subscription
   staff
-  constructor(private barcodeScanner: BarcodeScanner,private spinnerDialog: SpinnerDialog,private iab: InAppBrowser,public loadingCtrl: LoadingController, public actionSheetCtrl: ActionSheetController, public events:Events, public usersService : UserserviceProvider, public navCtrl: NavController, public navParams: NavParams, public alertCtrl:AlertController,public toastCtrl:ToastController,public app:App, public camera: Camera) {
+  canLeave = true;
+  constructor(private barcodeScanner: BarcodeScanner,private spinnerDialog: SpinnerDialog,
+    private iab: InAppBrowser,public loadingCtrl: LoadingController, 
+    public actionSheetCtrl: ActionSheetController, public events:Events, 
+    public usersService : UserserviceProvider, public navCtrl: NavController, 
+    public navParams: NavParams, public alertCtrl:AlertController,
+    public toastCtrl:ToastController,public app:App, public camera: Camera,
+    public platform: Platform) {
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad ProfilePage');
+  ionViewCanLeave(){
+    return this.canLeave
   }
-
   ngOnInit(){
     this.usersService.getPersonalEvents()
     this.subscription = this.usersService.user.pipe(map((user:any)=>{
@@ -395,7 +401,26 @@ export class ProfilePage implements OnInit {
 
   }
 
+  blockBack(){
+
+    // stop back button (for 1 s)
+    // used by barcode camera (when canceling and returnin back)
+    // was sending the back event to the router, and left the screen
+    
+    document.addEventListener("backbutton", onBackKeyDown, false);
+    
+    setTimeout(function(){
+    document.removeEventListener("backbutton", onBackKeyDown, false)
+    }, 1000)
+    
+    function onBackKeyDown() {
+    // swallow the back button - do nothing
+    return false;
+    }
+    }
+
   scanBarcode(header){
+    this.canLeave = false;
     let message;
     let observer = new Subject()
     let test = false
@@ -505,10 +530,12 @@ export class ProfilePage implements OnInit {
 
        })
       }
-      })
-      .catch(err => {
-          console.log('Error', err);
-      });
+    }).then(()=>{
+      this.canLeave = true;
+    })
+    .catch(err => {
+      this.canLeave = true;
+    })
       
   }
   

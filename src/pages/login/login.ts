@@ -3,6 +3,8 @@ import { IonicPage, NavController, NavParams, LoadingController, AlertController
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { FirestoreProvider }   from '../../providers/firestore/firestore';
 import { FcmProvider } from '../../providers/fcm/fcm';
+import { SpinnerDialog } from '@ionic-native/spinner-dialog';
+import { InAppBrowser } from '@ionic-native/in-app-browser';
 
 /**
  * Generated class for the LoginPage page.
@@ -23,8 +25,11 @@ export class LoginPage implements OnInit {
   public checkUser: void;
 
 
-  constructor(public fs: FirestoreProvider,public fcm:FcmProvider, public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
-    public alertCtrl: AlertController,  public navCtrl: NavController, public events: Events, public navParams: NavParams, public app:App) {
+  constructor(public fs: FirestoreProvider,public fcm:FcmProvider, 
+    public usersService : UserserviceProvider,public loadingCtrl: LoadingController, 
+    public alertCtrl: AlertController,  public navCtrl: NavController,
+     public events: Events, public navParams: NavParams, public app:App,
+     private spinnerDialog: SpinnerDialog,private iab: InAppBrowser) {
       var that =this
     
   }
@@ -32,6 +37,20 @@ export class LoginPage implements OnInit {
     
   }
 
+  toPrivacyPolicy(link){
+    const browser = this.iab.create(link,'_blank', 'location=yes,hideurlbar=yes,hidespinner=yes,toolbarcolor=#F36E21');
+    browser.on('loadstart').subscribe(event => {
+      this.spinnerDialog.show();
+   });
+    browser.on('loadstop').subscribe(event => {
+    this.spinnerDialog.hide();
+    });
+    browser.on('loaderror').subscribe(event => {
+      this.spinnerDialog.hide();
+    });
+    
+    browser.show()
+  }
   
 
   submitLogin(){

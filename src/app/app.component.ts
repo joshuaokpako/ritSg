@@ -25,7 +25,9 @@ export class MyApp {
   currentUser;
   notif = undefined;
   log = false; // check if user is logged in
-  constructor(private screenOrientation: ScreenOrientation,public app: App,private badge: Badge,public events: Events, public uS : UserserviceProvider,modalCtrl: ModalController, platform: Platform, statusBar: StatusBar,  fcm: FcmProvider, toastCtrl: ToastController, private appMinimize: AppMinimize) {
+  constructor(private screenOrientation: ScreenOrientation,public app: App,private badge: Badge,public events: Events, public uS : UserserviceProvider,
+    modalCtrl: ModalController, platform: Platform, statusBar: StatusBar,  
+    fcm: FcmProvider, toastCtrl: ToastController, private appMinimize: AppMinimize) {
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
@@ -62,7 +64,7 @@ export class MyApp {
               splash.dismiss();
             }
           }
-         /* else if(!user.emailVerified){
+          else if(!user.emailVerified){
             let myuser = this.uS.user
             events.publish('get User',myuser)
             myuser.subscribe(theuser => {
@@ -116,7 +118,7 @@ export class MyApp {
               }
             });
             
-          }*/
+          }
           else{
             w += 1;
             this.log = true;

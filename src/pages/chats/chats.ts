@@ -30,17 +30,21 @@ async ionViewWillEnter(){
    //Only get the users info on page entry and keep it until page leave
     ch.forEach(myelement => {
           this.uS.getRef(myelement.userRef).subscribe(x=>{
+          if (x!= undefined){
             myelement.userRef =x;
             this.blockedUsers.forEach(element => {
               if(myelement.uid === element.blocked){
                 myelement.blocked = true;
               }
             });
+          }
+          if (x!= undefined){
           this.blockedBy.forEach(element => {
             if(myelement.uid === element.blockedBy){
               myelement.blocked = true;
             }
           });
+        }
         })
       })
     return ch
@@ -53,13 +57,13 @@ getBlocked(){
   return new Promise(resolve => {
     this.uS.getBlockedUser().subscribe((x)=> {
       this.blockedUsers = x
-      resolve(this.blockedUsers)
+      this.blockedUsers
     })
-    this.uS.getOtherBlockedUser().pipe(take(1)).subscribe(x=>{
-      this.blockedBy = x;
-    })
-    
+  this.uS.getOtherBlockedUser().pipe(take(1)).subscribe(x=>{
+    this.blockedBy = x;
+    resolve(this.blockedBy)
   })
+})
 }
 
   ngOnInit(){

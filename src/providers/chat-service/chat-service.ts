@@ -76,7 +76,7 @@ export class ChatServiceProvider {
   getMessages(key,doc,y){
     if(key){
       if (y===0){
-        return this.db.col$('messages/'+key +'/chats', ref => ref.orderBy('createdAt','desc').limit(5)).pipe(map((x:any)=>{
+        return this.db.colWithIds$('messages/'+key +'/chats', ref => ref.orderBy('createdAt','desc').limit(15)).pipe(map((x:any)=>{
           x.forEach(element => {
             element.message = this.decryptMessages(element.message,key) 
           });
@@ -85,7 +85,7 @@ export class ChatServiceProvider {
         )
       }
       else{
-        return this.db.col$('messages/'+key +'/chats', ref => ref.orderBy('createdAt','desc').startAfter(doc).limit(5)).pipe(map((x:any)=>{
+        return this.db.colWithIds$('messages/'+key +'/chats', ref => ref.orderBy('createdAt','desc').startAfter(doc).limit(15)).pipe(map((x:any)=>{
           x.forEach(element => {
             element.message = this.decryptMessages(element.message,key) 
           });

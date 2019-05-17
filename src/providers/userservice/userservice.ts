@@ -64,11 +64,7 @@ export class UserserviceProvider {
     this.athletics = this.db.colWithIds$("users", ref => ref.where('admin', '==','athletics'));
     //get events data
     
-    this.sgEvents= this.db.colWithIds$("events/SG Events/SG Events", ref => ref.orderBy('createdAt','desc'))
-    this.ritEvents= this.db.colWithIds$("events/RIT Events/RIT Events", ref => ref.orderBy('createdAt','desc'))
-    this.comHEvents= this.db.colWithIds$("events/Common Hour Events/Common Hour Events", ref => ref.orderBy('createdAt','desc'))
-    this.otherEvents= this.db.colWithIds$("events/Other Events/Other Events", ref => ref.orderBy('createdAt','desc'))
-    this.sugEvents= this.db.colWithIds$("events/Suggested Events/Suggested Events", ref => ref.orderBy('createdAt','desc'))
+    
     this.fireAuth.authState.subscribe(user => {
       if (user) {
         this.currentUser = user;
@@ -93,9 +89,31 @@ export class UserserviceProvider {
     })
     
 }
+getEvents(name,y,doc,n){
+  if (y === 0){
+  return this.db.colWithIds$("events/"+name+"/"+name, ref => ref.orderBy('createdAt','desc').limit(n))
+  }
+  else{
+    return this.db.colWithIds$("events/"+name+"/"+name, ref => ref.orderBy('createdAt','desc').startAfter(doc).limit(n))
+  }
+}
 
 getUserRef(user){
   return this.db.doc('users/'+user).ref
+}
+
+checkDocExists(docCol,docId){
+  console.log(docCol+docId)
+ let doc= this.db.doc(docCol+docId).ref.get().then((docData) => {
+    if (docData.exists) {
+      // document exists (online/offline)
+      return true
+    } else {
+      // document does not exist (only on online)
+      return false
+    }
+  })
+  return doc
 }
 
 updateClubEmailVerified(id) {
@@ -336,7 +354,6 @@ reauthenticateUser(oldPass,newPass){
   }
 
   getFeed(y,doc,n){
-    console.log(doc)
     if (y === 0){
     return this.db.colWithIds$('feeds', ref => ref.orderBy('createdAt','desc').limit(n))
     }

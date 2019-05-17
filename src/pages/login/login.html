@@ -43,6 +43,7 @@
       <button [disabled]="!email || !password" ion-button color="rit"  block (click)="submitLogin()">Login</button>
       <button  ion-button color="light"  block (click)="loginGuest()">Login as Guest</button>
       <button ion-button color="primary" block clear (click)="forgotPassword()">Forgot Password</button>
+      <button ion-button color="primary" small block clear (click)="toPrivacyPolicy('https://ritdsgwordpresscom.wordpress.com/privacy%20policy/')">Privacy Policy</button>
     </div>
   </div>
 </form>
