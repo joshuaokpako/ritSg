@@ -45,6 +45,9 @@
         <config-file parent="NSCameraUsageDescription" platform="ios" target="*-Info.plist">
             <string>Enable RITDSG to access your camera for uploading your photos, scanning barcodes for user identification, and for saving uploaded photos for you and other users of this app with the right permissions to see</string>
         </config-file>
+		<config-file parent="NSPhotoLibraryUsageDescription" platform="ios" target="*-Info.plist">
+            <string>Enable RITDSG to access your photo library, so you can upload photos for other users of this app with the right permissions to see</string>
+        </config-file>
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
         <icon height="57" src="resources/ios/icon/icon.png" width="57" />
