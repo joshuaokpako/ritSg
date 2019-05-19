@@ -3,7 +3,7 @@ import { IonicPage, NavController, ModalController, Events, AlertController} fro
 import { ChatServiceProvider} from '../../providers/chat-service/chat-service';
 import { UserserviceProvider } from '../../providers/userservice/userservice';
 import { Observable, Subject } from 'rxjs';
-import { map, share,takeUntil, take } from 'rxjs/operators';
+import { map, share,takeUntil, take} from 'rxjs/operators';
 
 @IonicPage()
 @Component({
@@ -18,11 +18,12 @@ export class ChatsPage implements OnInit{
   test:number;
   blockedUsers;
   blockedBy;
+  chatLength =0;
   constructor(public events: Events,public uS:UserserviceProvider, public chServ:ChatServiceProvider,public navCtrl: NavController,public modalCtrl: ModalController, public alertCtrl:AlertController) {
   }
 
  ionViewWillEnter(){
- 
+    this.ngOnInit()
   
 }
 
@@ -44,9 +45,12 @@ async ngOnInit(){
     this.observer = new Subject();
     this.events.publish('chat entered', false,'noId');
     await this.getBlocked()
-    this.chats =this.chServ.getChats().pipe(map((ch:any)=>{
+    this.chats =this.chServ.getChats().pipe(takeUntil(this.observer), map((ch:any)=>{
+      
+      this.chatLength = ch.length
      //Only get the users info on page entry and keep it until page leave
       ch.forEach(myelement => {
+
             this.uS.getRef(myelement.userRef).subscribe(x=>{
             if (x!= undefined){
               myelement.userRef =x;
@@ -68,10 +72,14 @@ async ngOnInit(){
       return ch
       }),share()
     )
+    this.chats.subscribe()
   }
 
   ionViewWillLeave(){
     this.events.publish('chat entered', true,'noId');
+  }
+
+  ngOnDestroy(){
     this.observer.next()
     this.observer.complete()
   }

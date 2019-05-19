@@ -36,7 +36,7 @@ export class ChatServiceProvider {
   }
 
   getChats(){
-   return this.db.col$('users/'+this.uS.uid +'/chats', ref => ref.orderBy('lastMessTime','desc'))
+   return this.db.colWithIds$('users/'+this.uS.uid +'/chats', ref => ref.orderBy('lastMessTime','desc'))
    .pipe(map((x:any)=>{
     if(x){
       x.forEach(element => {
@@ -163,7 +163,7 @@ export class ChatServiceProvider {
       lastMessTime: this.db.timestamp
 
     }
-    this.db.upsert('users/'+this.uS.uid+'/chats/'+data.chatUid,receiver).then(()=>{
+    return this.db.upsert('users/'+this.uS.uid+'/chats/'+data.chatUid,receiver).then(()=>{
       return  this.db.upsert('users/'+data.chatUid+'/chats/'+this.uS.uid,sender)
     })
   }
