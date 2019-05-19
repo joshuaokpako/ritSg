@@ -20,7 +20,7 @@
 
 
 <ion-content (ionScroll)="scrolling()"  class="body">
-    <ion-infinite-scroll position='top' threshold="25%" (ionInfinite)="doInfinite($event)">
+    <ion-infinite-scroll *ngIf="youblocked ===false && blocked === false" position='top' threshold="25%" (ionInfinite)="doInfinite($event)">
         <ion-infinite-scroll-content>
         </ion-infinite-scroll-content>
         
@@ -83,7 +83,7 @@
             <ion-icon name="paper-plane"></ion-icon>
           </button>
         </ion-buttons>
-        <ion-textarea [disabled] ='blocked' autocomplete="on" autocorrect="on" type="text" placeholder="Add a message" name="message" [(ngModel)]="message"></ion-textarea>
+        <ion-textarea [disabled] ='blocked || youblocked' autocomplete="on" autocorrect="on" type="text" placeholder="Add a message" name="message" [(ngModel)]="message"></ion-textarea>
         
   </ion-toolbar>
   </ion-footer>

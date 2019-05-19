@@ -245,7 +245,7 @@ public name:string;
       if (this.data.message!="") {
         this.chatServ.saveMessage(this.data,this.key).then((x)=>{
           this.chatServ.addChat(this.data,this.key,this.receiverUnreadMessages)
-         // this.chats = this.chatServ.getMessages(this.key)
+          this.ngOnInit()
         })
       }
     }

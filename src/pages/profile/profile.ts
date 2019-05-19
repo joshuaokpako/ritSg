@@ -128,7 +128,6 @@ export class ProfilePage implements OnInit {
         office,
         {
           text: 'Contact Developer',
-          role: 'destructive',
           handler: () => {
             this.openBrowser('https://ritdsgwordpresscom.wordpress.com/contact/')
           }
@@ -269,15 +268,18 @@ export class ProfilePage implements OnInit {
   }
 
   verifyPassword(old,newpass){
+    this.presentLoader(true)
     this.usersService.reauthenticateUser(old,newpass).then(()=>{
       let alert = this.alertCtrl.create({
         subTitle: 'Password Succesfully changed',
       })
+      this.presentLoader(false)
       alert.present()
     }).catch((error)=>{
       let alert = this.alertCtrl.create({
         subTitle: error,
       })
+      this.presentLoader(false)
       alert.present()
     })
   }

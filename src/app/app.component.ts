@@ -66,61 +66,7 @@ export class MyApp {
               splash.dismiss();
             }
           }
-          else if(!user.emailVerified){
-            let myuser = this.uS.user
-            events.publish('get User',myuser)
-            myuser.subscribe(theuser => {
-              if (theuser) {
-                if (theuser.type == 'club' ) {
-                  if(theuser.emailVerified){
-                    p += 1;
-                    this.rootPage = 'TabsPage';
-                    if (p===1){
-                      uS.updateUserActivity('online')
-                    }
-                    // for increasing badge number on new chat
-                    events.subscribe('notif', (badgeNumber) => {
-                      this.notif = badgeNumber;
-                      this.badge.set(badgeNumber);
-                    });
-                    
-                    fcm.getToken().then(()=>{
-                      this.log = true;
-                      if (this.timer===4){
-                        splash.dismiss();
-                      }
-                          
-                    })
-                    events.subscribe('chat entered', (entered,id) => {
-                      this.notifyToast = entered
-                      this.chatId = id;
-                      this.badge.clear();
-                    });
-                    
-                  }
-                  else{
-                    this.rootPage = 'VerifyPage';
-                    if (this.timer===4){
-                      splash.dismiss();
-                    }
-                  }
-                }
-                else{
-                  this.rootPage = 'VerifyPage';
-                  if (this.timer===4){
-                    splash.dismiss();
-                  }
-                }
-              }
-              else{
-                this.rootPage = 'CoverPage';
-                if (this.timer===4){
-                  splash.dismiss();
-                }
-              }
-            });
-            
-          }
+          
           else{
             w += 1;
             this.log = true;

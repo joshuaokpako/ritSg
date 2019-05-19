@@ -3,6 +3,19 @@ import * as admin from 'firebase-admin';
 import * as CryptoJS from 'crypto-js';
 admin.initializeApp();
 
+exports.verifyclubs = functions.firestore
+.document('users/{user}')
+.onCreate(async (snap, context) => {
+  const db = admin.firestore()  
+  const data = snap.data();
+  const type = data.type
+  const uid = data.uid
+
+  if(type==='club'){
+    admin.auth().updateUser(uid,{emailVerified: true});
+  }
+})
+
 
 exports.newMessageNotification = functions.firestore
     .document('messages/{mesKey}/chats/{mesId}')
@@ -18,9 +31,21 @@ exports.newMessageNotification = functions.firestore
     const message  = decryptMess.length > 100 ? decryptMess.slice(0, 100) + '...' : decryptMess
     
     const chatRef = db.collection('users').where('uid', '==', uid)
+    const blockedRef = db.collection('blocked').where('blocked', '==', userId) // get all people message sender has been blocked by
+    const blockedByRef = db.collection('blocked').where('blockedBy', '==', uid) // get all people message sender has blocked
 
     const chats = await chatRef.get(); // for knowing if the reciever is in the chat
     let chat = '';
+    const blocked_ =await blockedRef.get();
+    const blocked = [];
+    blocked_.forEach(result => {
+      blocked.push( result.data().blocked) 
+    })
+    const blockedBy_ =await blockedByRef.get();
+    const blockedBy = [];
+    blockedBy_.forEach(result => {
+      blockedBy.push( result.data().blockedBy) 
+    })
 
     chats.forEach(result => {
       chat = result.data().chatactivity;
@@ -51,9 +76,30 @@ exports.newMessageNotification = functions.firestore
     const tokens = [];
 
     // send a notification to each device token
-    devices.forEach(result => {
+    devices.forEach((result) => {
       const token = result.data().token;
-      tokens.push( token )
+      blocked.forEach(data => {
+        if(data.blocked ===uid){
+          result.data().blocked = true
+        }
+        else{
+          result.data().blocked = false
+        }
+      })
+      blockedBy.forEach(data => {
+        if(data.blocked ===userId){
+          result.data().blockedBy = true
+        }
+        else{
+          result.data().blocked = false
+        }
+      })
+      if( result.data().blocked === true ||  result.data().blockedBy === true){
+
+      }
+      else{
+        tokens.push( token )
+      }
     })
 
     if(chat!==userId){
@@ -134,6 +180,20 @@ exports.newFeedNotification = functions.firestore
           type : 'feed' 
         }
     }
+    const blockedRef = db.collection('blocked').where('blocked', '==', postedBy) // get all people feed sender has been blocked by
+    const blockedByRef = db.collection('blocked').where('blockedBy', '==', postedBy) // get all people message sender has blocked
+
+    const blocked_ =await blockedRef.get();
+    const blocked = [];
+    blocked_.forEach(result => {
+      blocked.push( result.data().blocked) 
+    })
+    const blockedBy_ =await blockedByRef.get();
+    const blockedBy = [];
+    blockedBy_.forEach(result => {
+      blockedBy.push( result.data().blockedBy) 
+    })
+
 
     // ref to the device collection for the user
     const devicesRef = db.collection('devices')
@@ -148,7 +208,28 @@ exports.newFeedNotification = functions.firestore
     devices.forEach(result => {
       if(result.data().userId!== postedBy){
         const token = result.data().token;
-        tokens.push( token )
+        blocked.forEach(data => {
+          if(data.blocked ===postedBy){
+            result.data().blocked = true
+          }
+          else{
+            result.data().blocked = false
+          }
+        })
+        blockedBy.forEach(data => {
+          if(data.blocked ===result.data().userId){
+            result.data().blockedBy = true
+          }
+          else{
+            result.data().blocked = false
+          }
+        })
+        if( result.data().blocked === true ||  result.data().blockedBy === true){
+  
+        }
+        else{
+          tokens.push( token )
+        }
       }
 
       

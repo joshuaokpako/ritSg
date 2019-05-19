@@ -21,35 +21,8 @@ export class ChatsPage implements OnInit{
   constructor(public events: Events,public uS:UserserviceProvider, public chServ:ChatServiceProvider,public navCtrl: NavController,public modalCtrl: ModalController, public alertCtrl:AlertController) {
   }
 
-async ionViewWillEnter(){
-  this.test= 0
-  this.observer = new Subject();
-  this.events.publish('chat entered', false,'noId');
-  await this.getBlocked()
-  this.chats =this.chServ.getChats().pipe(map((ch:any)=>{
-   //Only get the users info on page entry and keep it until page leave
-    ch.forEach(myelement => {
-          this.uS.getRef(myelement.userRef).subscribe(x=>{
-          if (x!= undefined){
-            myelement.userRef =x;
-            this.blockedUsers.forEach(element => {
-              if(myelement.uid === element.blocked){
-                myelement.blocked = true;
-              }
-            });
-          }
-          if (x!= undefined){
-          this.blockedBy.forEach(element => {
-            if(myelement.uid === element.blockedBy){
-              myelement.blocked = true;
-            }
-          });
-        }
-        })
-      })
-    return ch
-    }),share()
-  )
+ ionViewWillEnter(){
+ 
   
 }
 
@@ -66,8 +39,35 @@ getBlocked(){
 })
 }
 
-  ngOnInit(){
-    
+async ngOnInit(){
+    this.test= 0
+    this.observer = new Subject();
+    this.events.publish('chat entered', false,'noId');
+    await this.getBlocked()
+    this.chats =this.chServ.getChats().pipe(map((ch:any)=>{
+     //Only get the users info on page entry and keep it until page leave
+      ch.forEach(myelement => {
+            this.uS.getRef(myelement.userRef).subscribe(x=>{
+            if (x!= undefined){
+              myelement.userRef =x;
+              this.blockedUsers.forEach(element => {
+                if(myelement.uid === element.blocked){
+                  myelement.blocked = true;
+                }
+              });
+            }
+            if (x!= undefined){
+            this.blockedBy.forEach(element => {
+              if(myelement.uid === element.blockedBy){
+                myelement.blocked = true;
+              }
+            });
+          }
+          })
+        })
+      return ch
+      }),share()
+    )
   }
 
   ionViewWillLeave(){
