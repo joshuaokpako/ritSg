@@ -53,7 +53,7 @@ export class MyApp {
           this.log = true;
         }
         else if(log === 'loggedOut'){
-          this.log = false;
+          
         }
       })
       // Check if user is authenticated
@@ -133,7 +133,6 @@ export class MyApp {
               this.notif = badgeNumber;
               this.badge.set(badgeNumber);
             });
-            console.log(this.log)
             fcm.getToken().then(()=>{
               if (this.timer===4){
                 splash.dismiss();  
@@ -148,7 +147,6 @@ export class MyApp {
           }
         }
         else {
-          console.log(this.log)
           n+= 1;
           if(this.Fcm){
             this.Fcm.unsubscribe()

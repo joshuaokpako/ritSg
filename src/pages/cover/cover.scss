@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css?family=Pacifico');
 page-cover {
     
 
@@ -24,7 +23,6 @@ page-cover {
     }
     .bottom {
         position: absolute;
-        display: block;
         color: #f28a21;
         top: 80%;
         left: 50%;
@@ -33,8 +31,16 @@ page-cover {
     }
     .head h1 {
         font-size: 7vh!important;
-        font-weight: lighter!important;
         font-family: 'Pacifico', cursive;
+        @font-face {
+            font-family: 'Pacifico', cursive;
+            font-weight: 400;
+            src: local('Pacifico cursive'), local('Pacifico-cursive'), url(https://fonts.gstatic.com/s/pacifico/v13/FwZY7-Qmy14u9lezJ-6D6MmTpA.woff2) format('woff2'),
+            url('https://fonts.gstatic.com/s/pacifico/v13/FwZY7-Qmy14u9lezJ-6D6MmTpA.woff') format('woff'), /* Pretty Modern Browsers */
+            url('https://fonts.gstatic.com/s/pacifico/v13/FwZY7-Qmy14u9lezJ-6D6MmTpA.ttf')  format('truetype'), /* Safari, Android, iOS */
+            url('https://fonts.gstatic.com/s/pacifico/v13/FwZY7-Qmy14u9lezJ-6D6MmTpA.svg#svgPacifico') format('svg');
+            unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+          }
     }
     /* The animation code */
     @keyframes mybackground {

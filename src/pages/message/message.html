@@ -5,9 +5,7 @@
   Ionic pages and navigation.
 -->
 <ion-header>
-
   <ion-navbar color="rit">
-      <ion-toolbar>
       <img [hidden]='youblocked' class="roundImg resize" *ngIf="receiver" src="{{receiver.photoUrl}}" width="40px" style="display:inline-block" height="40px"/>
       <ion-title class="titleicon" *ngIf="receiver" style="display:inline-block" >{{receiver.fullName | titlecase}}<span><ion-card [hidden]='youblocked' class="myHeight" *ngIf="receiver?.activity=='online'" color="secondary"></ion-card></span></ion-title>
       <ion-buttons end *ngIf='!youblocked'>
@@ -15,9 +13,6 @@
             <ion-icon name="more"></ion-icon>
           </button>
       </ion-buttons>
-        
-      </ion-toolbar>
-      
   </ion-navbar>
   
  

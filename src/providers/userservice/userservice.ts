@@ -294,13 +294,13 @@ reauthenticateUser(oldPass,newPass){
     oldPass
 );
   return this.currentUser.reauthenticateAndRetrieveDataWithCredential(credential).then(()=>{
-    this.currentUser.updatePassword(newPass)
+    return this.currentUser.updatePassword(newPass)
   })
 }
 
   signOut(){
     return this.updateUserActivity('offline').then(()=>{
-      this.fireAuth.auth.signOut();
+      return this.fireAuth.auth.signOut();
     })
   }
 
@@ -309,7 +309,7 @@ reauthenticateUser(oldPass,newPass){
     return user.delete().then(()=>{
       this.fireAuth.auth.signOut();
     }). catch(()=>{
-      this.fireAuth.auth.signOut();
+      return this.fireAuth.auth.signOut();
     })
   }
  
@@ -333,7 +333,7 @@ reauthenticateUser(oldPass,newPass){
           carsInParking: x.carParking -1
         }
       }
-      this.db.upsert('parking/'+type, parking)
+      return this.db.upsert('parking/'+type, parking)
     })
   }
 
